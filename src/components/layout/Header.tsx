@@ -4,7 +4,7 @@ import logoAppDaOracao from '@/assets/logo-app-da-oracao.png';
 
 export const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40 lg:hidden">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40 xl:hidden">
       <div className="container mx-auto px-4">
         <div className="flex h-14 sm:h-16 items-center justify-center">
           {/* Logo */}

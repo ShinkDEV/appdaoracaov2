@@ -37,14 +37,14 @@ export const BottomNav: React.FC = () => {
       {/* Floating Action Button */}
       <button
         onClick={handleNewPrayer}
-        className="fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 lg:hidden"
+        className="fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 xl:hidden"
         aria-label="Criar pedido de oração"
       >
         <Plus className="h-7 w-7" strokeWidth={2.5} />
       </button>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border/30 pb-safe lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border/30 pb-safe xl:hidden">
         <div className="flex items-center justify-around px-4 py-2">
           {navItems.map((item) => {
             const active = isActive(item.path);
