@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube } from 'lucide-react';
+import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube, Gift } from 'lucide-react';
 import { DonationModal } from '@/components/donation';
+import { UpdatesModal } from '@/components/updates';
 
 const Settings = () => {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [donationOpen, setDonationOpen] = useState(false);
+  const [updatesOpen, setUpdatesOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -39,6 +41,14 @@ const Settings = () => {
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-1">App</h2>
             <Card className="overflow-hidden border-border/50 shadow-card">
               <CardContent className="p-0">
+                <button onClick={() => setUpdatesOpen(true)} className="w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50 border-b border-border/50">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-600"><Gift className="h-5 w-5" /></div>
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-foreground">Novidades</p>
+                    <p className="text-sm text-muted-foreground">Veja as últimas atualizações</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
+                </button>
                 <button onClick={() => navigate('/instalar')} className="w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50">
                   <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><Download className="h-5 w-5" /></div>
                   <div className="flex-1 text-left">
@@ -157,6 +167,7 @@ const Settings = () => {
       </div>
 
       <DonationModal open={donationOpen} onOpenChange={setDonationOpen} />
+      <UpdatesModal open={updatesOpen} onOpenChange={setUpdatesOpen} />
     </div>
   );
 };
