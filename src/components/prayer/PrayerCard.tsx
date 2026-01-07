@@ -28,25 +28,30 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
     locale: ptBR
   });
 
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
     <Card className={cn(
-      "transition-all duration-200 hover:shadow-md",
-      prayer.is_pinned && "border-primary/50 bg-primary/5"
+      "shadow-card hover:shadow-elevated transition-all duration-300 animate-fade-in overflow-hidden",
+      prayer.is_pinned && "ring-2 ring-primary/20 bg-gradient-to-br from-primary/5 to-transparent"
     )}>
-      <CardContent className="p-4">
+      <CardContent className="p-5">
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <Avatar className="h-10 w-10 shrink-0">
+            <Avatar className="h-11 w-11 shrink-0 ring-2 ring-border/50">
               {prayer.author?.photo_url ? (
                 <AvatarImage src={prayer.author.photo_url} alt={prayer.author.display_name || 'Usuário'} />
               ) : null}
-              <AvatarFallback className="bg-muted">
-                <User className="h-5 w-5 text-muted-foreground" />
+              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-medium">
+                {prayer.is_anonymous ? '🙏' : getInitials(prayer.author?.display_name)}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-sm truncate">
+              <p className="font-semibold text-sm truncate text-foreground">
                 {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'Usuário')}
               </p>
               <p className="text-xs text-muted-foreground">{timeAgo}</p>
@@ -55,19 +60,28 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
           
           <div className="flex items-center gap-2 shrink-0">
             {prayer.is_pinned && (
-              <Pin className="h-4 w-4 text-primary" />
-            )}
-            {theme && (
-              <Badge variant="secondary" className="text-xs">
-                {theme.icon} {theme.name}
+              <Badge variant="secondary" className="bg-primary/10 text-primary border-0 gap-1">
+                <Pin className="h-3 w-3" />
+                Fixado
               </Badge>
             )}
           </div>
         </div>
 
+        {/* Theme badge */}
+        {theme && (
+          <div className="mb-3">
+            <Badge variant="outline" className="text-xs font-medium bg-secondary/50 border-border/50">
+              {theme.icon} {theme.name}
+            </Badge>
+          </div>
+        )}
+
         {/* Content */}
         <div className="space-y-2 mb-4">
-          <h3 className="font-semibold text-base leading-tight">{prayer.title}</h3>
+          <h3 className="font-display font-semibold text-lg leading-tight text-foreground">
+            {prayer.title}
+          </h3>
           <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
             {displayDescription}
           </p>
@@ -77,7 +91,7 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
               variant="ghost"
               size="sm"
               onClick={() => setExpanded(!expanded)}
-              className="h-auto p-0 text-xs text-primary hover:bg-transparent"
+              className="h-auto p-0 text-xs text-primary hover:bg-transparent hover:text-primary/80 font-medium"
             >
               {expanded ? (
                 <>
@@ -93,25 +107,30 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t">
-          <span className="text-sm text-muted-foreground">
-            {prayer.prayer_count} {prayer.prayer_count === 1 ? 'pessoa orou' : 'pessoas oraram'}
-          </span>
+        <div className="flex items-center justify-between pt-4 border-t border-border/50">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <HandHeart className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              {prayer.prayer_count} {prayer.prayer_count === 1 ? 'pessoa orou' : 'pessoas oraram'}
+            </span>
+          </div>
           
           <Button
             variant={prayer.has_prayed ? "default" : "outline"}
             size="sm"
             onClick={() => onPray(prayer.id)}
             className={cn(
-              "gap-2 transition-all",
-              prayer.has_prayed && "bg-primary hover:bg-primary/90"
+              "gap-2 rounded-full px-5 transition-all duration-300 font-medium",
+              prayer.has_prayed 
+                ? "bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg" 
+                : "hover:bg-primary/10 hover:text-primary hover:border-primary/50"
             )}
           >
             <HandHeart className={cn(
-              "h-4 w-4",
-              prayer.has_prayed && "fill-current"
+              "h-4 w-4 transition-transform",
+              prayer.has_prayed && "fill-current scale-110"
             )} />
-            {prayer.has_prayed ? 'Orei' : 'Orar'}
+            {prayer.has_prayed ? 'Orei! 🙏' : 'Orar'}
           </Button>
         </div>
       </CardContent>
