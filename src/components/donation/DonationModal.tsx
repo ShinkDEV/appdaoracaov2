@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, ExternalLink } from 'lucide-react';
+import { Heart, Copy, Check, ExternalLink, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -56,48 +56,88 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Value selection */}
-          <div className="space-y-3">
-            <Label>Escolha um valor</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {DONATION_VALUES.map((value) => (
-                <Button
-                  key={value}
-                  variant={selectedValue === value ? 'default' : 'outline'}
-                  onClick={() => handleSelectValue(value)}
-                  className={cn(
-                    "h-12",
-                    selectedValue === value && "bg-primary"
-                  )}
-                >
-                  R$ {value}
-                </Button>
-              ))}
-              <div className="col-span-3">
-                <Input
-                  type="number"
-                  placeholder="Outro valor"
-                  value={customValue}
-                  onChange={(e) => handleCustomValueChange(e.target.value)}
-                  className="text-center"
-                />
+          {/* Card Section */}
+          <div className="space-y-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
+            <div className="flex items-center gap-2 text-primary font-medium">
+              <CreditCard className="h-5 w-5" />
+              Doar com Cartão
+            </div>
+            
+            {/* Value selection */}
+            <div className="space-y-3">
+              <Label className="text-muted-foreground">Escolha um valor</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {DONATION_VALUES.map((value) => (
+                  <Button
+                    key={value}
+                    variant={selectedValue === value ? 'default' : 'outline'}
+                    onClick={() => handleSelectValue(value)}
+                    className={cn(
+                      "h-11",
+                      selectedValue === value && "bg-primary shadow-md"
+                    )}
+                  >
+                    R$ {value}
+                  </Button>
+                ))}
+                <div className="col-span-3">
+                  <Input
+                    type="number"
+                    placeholder="Outro valor (R$)"
+                    value={customValue}
+                    onChange={(e) => handleCustomValueChange(e.target.value)}
+                    className="text-center"
+                  />
+                </div>
               </div>
+            </div>
+
+            {/* Card donation button */}
+            <Button 
+              className="w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold gap-2 shadow-lg"
+              disabled={finalValue <= 0}
+              asChild
+            >
+              <a href="https://apoia.se/appdaoracao" target="_blank" rel="noopener noreferrer">
+                <CreditCard className="h-5 w-5" />
+                Doar R$ {finalValue > 0 ? finalValue.toFixed(2).replace('.', ',') : '0,00'}
+                <ExternalLink className="h-4 w-4 ml-1" />
+              </a>
+            </Button>
+          </div>
+
+          {/* Separator */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-3 text-muted-foreground font-medium">
+                Ou, doar com PIX
+              </span>
             </div>
           </div>
 
-          {/* PIX info */}
-          <div className="space-y-3">
-            <Label>Chave PIX</Label>
+          {/* PIX Section */}
+          <div className="space-y-4 p-4 rounded-xl bg-muted/50 border">
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <div className="p-1.5 rounded-md bg-green-500/10">
+                <Copy className="h-4 w-4 text-green-600" />
+              </div>
+              Chave PIX
+            </div>
+            
             <div className="flex items-center gap-2">
               <Input
                 value={PIX_KEY}
                 readOnly
-                className="bg-muted"
+                className="bg-background font-mono text-sm"
               />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handleCopyPix}
+                className="shrink-0"
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-600" />
@@ -106,29 +146,16 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
                 )}
               </Button>
             </div>
-          </div>
 
-          {/* Instructions */}
-          <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-            <p className="text-sm font-medium">Como doar:</p>
-            <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-              <li>Copie a chave PIX acima</li>
-              <li>Abra o app do seu banco</li>
-              <li>Faça um PIX para a chave copiada</li>
-              <li>Informe o valor desejado{finalValue > 0 && `: R$ ${finalValue.toFixed(2)}`}</li>
-            </ol>
-          </div>
-
-          {/* Alternative payment */}
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-2">
-              Prefere outro método de pagamento?
-            </p>
-            <Button variant="link" size="sm" className="gap-1" asChild>
-              <a href="https://apoia.se/appdaoracao" target="_blank" rel="noopener noreferrer">
-                Apoie pelo Apoia.se <ExternalLink className="h-3 w-3" />
-              </a>
-            </Button>
+            {/* Instructions */}
+            <div className="bg-background/50 rounded-lg p-3 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Como doar via PIX:</p>
+              <ol className="text-xs text-muted-foreground/80 space-y-0.5 list-decimal list-inside">
+                <li>Copie a chave PIX acima</li>
+                <li>Abra o app do seu banco</li>
+                <li>Faça um PIX com o valor desejado</li>
+              </ol>
+            </div>
           </div>
         </div>
       </DialogContent>
