@@ -40,7 +40,19 @@ export function BannerCarousel({ banners, className }: BannerCarouselProps) {
     }
   };
 
-  if (banners.length === 0) return null;
+  if (banners.length === 0) {
+    // Default hero banner when no banners from database
+    return (
+      <div className={cn("relative w-full rounded-2xl overflow-hidden", className)}>
+        <div className="relative bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)] py-12 md:py-20 px-6 text-center">
+          <h1 className="text-xl md:text-4xl font-bold text-white leading-tight">
+            <span className="text-[hsl(190,100%,80%)]">O primeiro app</span> que conecta<br />
+            oração e propósito
+          </h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("relative", className)}>
@@ -58,7 +70,7 @@ export function BannerCarousel({ banners, className }: BannerCarouselProps) {
             <CarouselItem key={banner.id}>
               <div 
                 className={cn(
-                  "relative aspect-[21/9] md:aspect-[3/1] rounded-lg overflow-hidden",
+                  "relative aspect-[16/7] md:aspect-[3/1] rounded-2xl overflow-hidden",
                   banner.link && "cursor-pointer"
                 )}
                 onClick={() => handleBannerClick(banner.link)}
@@ -82,7 +94,7 @@ export function BannerCarousel({ banners, className }: BannerCarouselProps) {
 
       {/* Dots indicator */}
       {banners.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
           {banners.map((_, index) => (
             <button
               key={index}
