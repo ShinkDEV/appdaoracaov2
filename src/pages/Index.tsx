@@ -73,17 +73,17 @@ export default function Index() {
   });
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-4 sm:space-y-6">
       {/* Updates Modal */}
       <UpdatesModal open={showUpdates} onOpenChange={setShowUpdates} />
 
       {/* Hero Banner */}
       {banners.length > 0 ? (
-        <BannerCarousel banners={banners} className="rounded-xl md:rounded-2xl overflow-hidden" />
+        <BannerCarousel banners={banners} className="rounded-xl overflow-hidden" />
       ) : (
-        <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
-          <div className="relative py-12 sm:py-16 md:py-20 lg:py-24 px-6 sm:px-8 text-center">
-            <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+        <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
+          <div className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 text-center">
+            <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
               <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta<br />
               oração e propósito
             </h1>
@@ -91,26 +91,28 @@ export default function Index() {
         </div>
       )}
 
-      {/* Section Header with Search */}
-      <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Pedidos de Oração</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
-            {prayers.length} pedidos ativos
-          </p>
-        </div>
-        
-        {/* Search - Desktop */}
-        <div className="hidden md:block">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Buscar..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-64 lg:w-72 xl:w-80 pl-11 pr-4 h-10 lg:h-11 rounded-xl bg-card border border-border/50 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-sm"
-            />
+      {/* Section Header */}
+      <div className="flex flex-col gap-2 sm:gap-3">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Pedidos de Oração</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              {prayers.length} pedidos ativos
+            </p>
+          </div>
+          
+          {/* Search - Tablet/Desktop */}
+          <div className="hidden md:block">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Buscar..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-56 lg:w-64 pl-10 pr-4 h-10 rounded-xl bg-card border border-border/50 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-sm"
+              />
+            </div>
           </div>
         </div>
       </div>

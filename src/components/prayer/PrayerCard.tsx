@@ -32,7 +32,7 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
 
   return (
     <div className={cn(
-      "bg-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 border border-border/40 h-full flex flex-col",
+      "bg-card rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300 border border-border/40 h-full flex flex-col",
       prayer.is_pinned && "ring-1 ring-rose-200 bg-gradient-to-br from-rose-50/50 to-transparent dark:from-rose-950/20"
     )}>
       {/* Badges row */}
