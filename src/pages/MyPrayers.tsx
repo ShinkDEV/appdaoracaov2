@@ -79,37 +79,37 @@ const MyPrayers = () => {
     showAuthor?: boolean;
   }) => (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
-      <CardContent className="p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <Badge variant="secondary" className="text-xs font-medium shrink-0">
+      <CardContent className="p-3 sm:p-4 md:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-2 mb-2 sm:mb-3">
+          <Badge variant="secondary" className="text-[10px] sm:text-xs font-medium shrink-0">
             {getThemeName(prayer.theme_id)}
           </Badge>
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
+          <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {formatDate(prayer.created_at)}
           </span>
         </div>
         
-        <h3 className="font-semibold text-foreground mb-2 line-clamp-2">{prayer.title}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{prayer.description}</p>
+        <h3 className="font-semibold text-sm sm:text-base text-foreground mb-1.5 sm:mb-2 line-clamp-2">{prayer.title}</h3>
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 sm:mb-4">{prayer.description}</p>
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             {showAuthor && (
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
                   <AvatarImage src={prayer.author?.photo_url || undefined} />
-                  <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                  <AvatarFallback className="text-[10px] sm:text-xs bg-primary/10 text-primary">
                     {getInitials(prayer.author?.display_name)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[10px] sm:text-xs text-muted-foreground">
                   {prayer.is_anonymous ? 'Anônimo' : prayer.author?.display_name || 'Usuário'}
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Users className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
+              <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               <span>{prayer.prayer_count} orando</span>
             </div>
           </div>
@@ -119,25 +119,25 @@ const MyPrayers = () => {
               <Button 
                 variant={actionVariant} 
                 size="sm" 
-                className="gap-1.5"
+                className="gap-1.5 text-xs h-8 w-full sm:w-auto"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">{actionLabel}</span>
+                <span>{actionLabel}</span>
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="mx-4 max-w-[calc(100vw-2rem)] sm:max-w-lg rounded-xl">
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirmar ação</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogTitle className="text-base sm:text-lg">Confirmar ação</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs sm:text-sm">
                   {actionLabel === 'Excluir' 
                     ? 'Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.'
                     : 'Tem certeza que deseja parar de orar por este pedido?'
                   }
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={onAction} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                <AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onAction} className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90">
                   Confirmar
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -163,21 +163,21 @@ const MyPrayers = () => {
 
         <Tabs defaultValue="prayers" className="space-y-4 sm:space-y-6">
           <div className="px-4 sm:px-0">
-            <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50 rounded-full p-1">
-              <TabsTrigger value="prayers" className="rounded-full gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                <HandHeart className="h-4 w-4" />
+            <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50 rounded-full p-0.5 sm:p-1 h-auto">
+              <TabsTrigger value="prayers" className="rounded-full gap-1 sm:gap-2 text-[11px] sm:text-sm py-2 sm:py-2.5 px-2 sm:px-4">
+                <HandHeart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Orando</span>
                 {prayingFor.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  <Badge variant="secondary" className="ml-0.5 sm:ml-1 h-4 sm:h-5 px-1 sm:px-1.5 text-[10px] sm:text-xs">
                     {prayingFor.length}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="requests" className="rounded-full gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                <FileText className="h-4 w-4" />
+              <TabsTrigger value="requests" className="rounded-full gap-1 sm:gap-2 text-[11px] sm:text-sm py-2 sm:py-2.5 px-2 sm:px-4">
+                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Meus Pedidos</span>
                 {myRequests.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  <Badge variant="secondary" className="ml-0.5 sm:ml-1 h-4 sm:h-5 px-1 sm:px-1.5 text-[10px] sm:text-xs">
                     {myRequests.length}
                   </Badge>
                 )}
