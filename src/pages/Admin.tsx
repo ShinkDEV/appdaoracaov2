@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Layout } from '@/components/layout/Layout';
-import { Loading } from '@/components/ui/loading';
+import { LoadingPage } from '@/components/ui/loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { PrayerManagement } from '@/components/admin/PrayerManagement';
 import { BannedIPs } from '@/components/admin/BannedIPs';
 import { BannerManagement } from '@/components/admin/BannerManagement';
-import { Shield, Users, BookOpen, Globe, Image } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Shield, Users, BookOpen, Globe, Image, ArrowLeft } from 'lucide-react';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -21,13 +21,7 @@ export default function Admin() {
   }, [user, isAdmin, loading, navigate]);
 
   if (loading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loading size="lg" text="Carregando..." />
-        </div>
-      </Layout>
-    );
+    return <LoadingPage />;
   }
 
   if (!isAdmin) {
@@ -35,55 +29,59 @@ export default function Admin() {
   }
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 rounded-xl bg-primary/10">
-            <Shield className="h-8 w-8 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Painel Administrativo</h1>
-            <p className="text-muted-foreground">Gerencie usuários, pedidos e configurações</p>
-          </div>
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 lg:py-10">
+      {/* Header */}
+      <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-10">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/configuracoes')} className="rounded-full shrink-0 h-10 w-10">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="p-2.5 md:p-3 rounded-xl bg-primary/10">
+          <Shield className="h-6 w-6 md:h-8 md:w-8 text-primary" />
         </div>
+        <div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Painel Administrativo</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Gerencie usuários, pedidos e configurações</p>
+        </div>
+      </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
-            <TabsTrigger value="users" className="flex items-center gap-2">
+      <Tabs defaultValue="users" className="space-y-6 md:space-y-8">
+        <div className="flex justify-center">
+          <TabsList className="inline-flex w-auto bg-muted/50 rounded-full p-1 h-auto flex-wrap justify-center gap-1">
+            <TabsTrigger value="users" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Usuários</span>
             </TabsTrigger>
-            <TabsTrigger value="prayers" className="flex items-center gap-2">
+            <TabsTrigger value="prayers" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Pedidos</span>
             </TabsTrigger>
-            <TabsTrigger value="banners" className="flex items-center gap-2">
+            <TabsTrigger value="banners" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">Banners</span>
             </TabsTrigger>
-            <TabsTrigger value="ips" className="flex items-center gap-2">
+            <TabsTrigger value="ips" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Globe className="h-4 w-4" />
-              <span className="hidden sm:inline">IPs Banidos</span>
+              <span className="hidden sm:inline">IPs</span>
             </TabsTrigger>
           </TabsList>
+        </div>
 
-          <TabsContent value="users">
-            <UserManagement />
-          </TabsContent>
+        <TabsContent value="users" className="mt-6">
+          <UserManagement />
+        </TabsContent>
 
-          <TabsContent value="prayers">
-            <PrayerManagement />
-          </TabsContent>
+        <TabsContent value="prayers" className="mt-6">
+          <PrayerManagement />
+        </TabsContent>
 
-          <TabsContent value="banners">
-            <BannerManagement />
-          </TabsContent>
+        <TabsContent value="banners" className="mt-6">
+          <BannerManagement />
+        </TabsContent>
 
-          <TabsContent value="ips">
-            <BannedIPs />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </Layout>
+        <TabsContent value="ips" className="mt-6">
+          <BannedIPs />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
