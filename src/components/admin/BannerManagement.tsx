@@ -1,0 +1,1 @@
+export { BannerManagement } from './index';

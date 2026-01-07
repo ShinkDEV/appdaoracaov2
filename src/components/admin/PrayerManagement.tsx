@@ -1,0 +1,1 @@
+export { PrayerManagement } from './index';
