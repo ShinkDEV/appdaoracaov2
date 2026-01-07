@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/layout/Layout';
+
 import { Button } from '@/components/ui/button';
 import { LoadingPage, LoadingSpinner } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -45,11 +45,7 @@ const MyPrayers = () => {
   }, [user, authLoading, navigate]);
 
   if (authLoading) {
-    return (
-      <Layout>
-        <LoadingPage />
-      </Layout>
-    );
+    return <LoadingPage />;
   }
 
   const getThemeName = (themeId: string) => {
@@ -149,10 +145,9 @@ const MyPrayers = () => {
   );
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 max-w-6xl">
-        <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full shrink-0">
+    <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 max-w-6xl">
+      <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full shrink-0">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
@@ -251,7 +246,6 @@ const MyPrayers = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
 };
 
