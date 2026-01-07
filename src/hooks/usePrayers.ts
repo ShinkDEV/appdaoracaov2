@@ -67,15 +67,10 @@ export function usePrayers(options: UsePrayersOptions = {}) {
     }
 
     try {
+      // First fetch prayer requests without join
       let query = supabase
         .from('prayer_requests')
-        .select(`
-          *,
-          profiles (
-            display_name,
-            photo_url
-          )
-        `)
+        .select('*')
         .eq('is_deleted', false)
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false })
@@ -95,6 +90,30 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         console.error('Error fetching prayers:', prayerError);
         toast.error('Erro ao carregar pedidos de oração');
         return;
+      }
+
+      // Get unique user IDs for fetching profiles
+      const userIds = [...new Set((prayerData || []).map(p => p.user_id))];
+      
+      // Fetch profiles for authors
+      let profilesMap: Record<string, { display_name: string | null; photo_url: string | null }> = {};
+      
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('public_profiles')
+          .select('id, display_name, photo_url')
+          .in('id', userIds);
+        
+        if (profilesData) {
+          profilesData.forEach(profile => {
+            if (profile.id) {
+              profilesMap[profile.id] = {
+                display_name: profile.display_name,
+                photo_url: profile.photo_url
+              };
+            }
+          });
+        }
       }
 
       // Get prayer counts
@@ -140,10 +159,7 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: userPrayers.has(prayer.id),
-        author: prayer.is_anonymous ? undefined : {
-          display_name: (prayer.profiles as any)?.display_name,
-          photo_url: (prayer.profiles as any)?.photo_url
-        }
+        author: prayer.is_anonymous ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null }
       }));
 
       if (append) {
