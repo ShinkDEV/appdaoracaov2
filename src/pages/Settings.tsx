@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,8 +15,7 @@ const Settings = () => {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8 pb-32">
+    <div className="container mx-auto px-4 py-8 pb-32">
         <div className="flex items-center gap-4 mb-8">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full">
             <ArrowLeft className="h-5 w-5" />
@@ -88,11 +86,10 @@ const Settings = () => {
           )}
         </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-xs text-muted-foreground">App da Oração v1.1.0</p>
-        </div>
+      <div className="mt-12 text-center">
+        <p className="text-xs text-muted-foreground">App da Oração v1.1.0</p>
       </div>
-    </Layout>
+    </div>
   );
 };
 
