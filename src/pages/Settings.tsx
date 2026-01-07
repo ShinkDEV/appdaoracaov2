@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles } from 'lucide-react';
+import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube } from 'lucide-react';
 import { DonationModal } from '@/components/donation';
 
 const Settings = () => {
@@ -103,6 +103,38 @@ const Settings = () => {
                   <p className="text-xs text-muted-foreground">
                     ❤️ Obrigado por fazer parte desta comunidade
                   </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Social Media Section */}
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-1">Siga-nos</h2>
+            <Card className="overflow-hidden border-border/50 shadow-card">
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 h-12"
+                    asChild
+                  >
+                    <a href="https://instagram.com/appdaoracao" target="_blank" rel="noopener noreferrer">
+                      <Instagram className="h-5 w-5 text-pink-600" />
+                      <span className="text-sm font-medium">@appdaoracao</span>
+                    </a>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 h-12"
+                    asChild
+                  >
+                    <a href="https://www.youtube.com/@appdaoracao" target="_blank" rel="noopener noreferrer">
+                      <Youtube className="h-5 w-5 text-red-600" />
+                      <span className="text-sm font-medium">YouTube</span>
+                    </a>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
