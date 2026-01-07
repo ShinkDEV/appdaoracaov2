@@ -9,30 +9,38 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Desktop Sidebar */}
-      <Sidebar />
+    <div className="min-h-screen bg-background">
+      {/* Desktop Sidebar - Only visible on screens >= 1280px */}
+      <div className="hidden xl:block fixed left-0 top-0 h-full z-40">
+        <Sidebar />
+      </div>
       
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Mobile/Tablet Header */}
-        <Header />
+      {/* Main Content Wrapper */}
+      <div className="xl:pl-64">
+        {/* Mobile/Tablet Header - Hidden on desktop */}
+        <div className="xl:hidden">
+          <Header />
+        </div>
         
-        <main className="flex-1 w-full mx-auto px-4 sm:px-6 md:px-8 xl:px-10 py-4 sm:py-6 pb-24 xl:pb-10 max-w-[1400px]">
+        {/* Main Content */}
+        <main className="w-full px-4 sm:px-6 md:px-8 py-4 sm:py-6 pb-28 xl:pb-8 max-w-[1200px] mx-auto">
           {children}
         </main>
         
-        <footer className="hidden xl:block border-t border-border/30 py-4 lg:py-6 mt-auto bg-muted/30">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-xs sm:text-sm text-muted-foreground">
+        {/* Desktop Footer */}
+        <footer className="hidden xl:block border-t border-border/30 py-6 bg-muted/30">
+          <div className="max-w-[1200px] mx-auto px-8 text-center">
+            <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} App da Oração • Unindo pessoas em oração
             </p>
           </div>
         </footer>
       </div>
       
-      {/* Mobile/Tablet Bottom Nav */}
-      <BottomNav />
+      {/* Mobile/Tablet Bottom Nav - Hidden on desktop */}
+      <div className="xl:hidden">
+        <BottomNav />
+      </div>
     </div>
   );
 };

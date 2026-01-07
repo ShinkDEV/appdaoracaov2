@@ -37,15 +37,15 @@ export const BottomNav: React.FC = () => {
       {/* Floating Action Button */}
       <button
         onClick={handleNewPrayer}
-        className="fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 xl:hidden"
+        className="fixed bottom-24 right-4 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
         aria-label="Criar pedido de oração"
       >
         <Plus className="h-7 w-7" strokeWidth={2.5} />
       </button>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border/30 pb-safe xl:hidden">
-        <div className="flex items-center justify-around px-4 py-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border/30 pb-safe">
+        <div className="flex items-center justify-around px-2 sm:px-4 md:px-8 py-2 max-w-lg mx-auto">
           {navItems.map((item) => {
             const active = isActive(item.path);
             return (
@@ -53,7 +53,7 @@ export const BottomNav: React.FC = () => {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "relative flex flex-col items-center justify-center gap-1 px-5 py-2.5 rounded-2xl transition-all duration-200 min-w-[72px]",
+                  "relative flex flex-col items-center justify-center gap-1 px-4 sm:px-6 py-2.5 rounded-2xl transition-all duration-200 min-w-[64px] sm:min-w-[80px]",
                   active
                     ? "bg-primary/10"
                     : "hover:bg-muted/50"
@@ -61,13 +61,13 @@ export const BottomNav: React.FC = () => {
               >
                 <item.icon
                   className={cn(
-                    "h-6 w-6 transition-colors",
+                    "h-5 w-5 sm:h-6 sm:w-6 transition-colors",
                     active ? "text-primary" : "text-muted-foreground"
                   )}
                   strokeWidth={active ? 2.5 : 1.5}
                 />
                 <span className={cn(
-                  "text-xs font-medium transition-colors",
+                  "text-[10px] sm:text-xs font-medium transition-colors",
                   active ? "text-primary" : "text-muted-foreground"
                 )}>
                   {item.label}
@@ -75,7 +75,7 @@ export const BottomNav: React.FC = () => {
 
                 {/* Active dot indicator */}
                 {active && (
-                  <span className="absolute -bottom-0.5 w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="absolute -bottom-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-primary" />
                 )}
               </button>
             );
