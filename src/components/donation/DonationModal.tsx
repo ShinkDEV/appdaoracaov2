@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, ExternalLink, CreditCard, Mail, Instagram, Youtube } from 'lucide-react';
+import { Heart, Copy, Check, ExternalLink, CreditCard, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -202,40 +202,6 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
             <p className="text-xs text-muted-foreground">
               Dúvidas ou sugestões? Entre em contato conosco!
             </p>
-          </div>
-
-          {/* Social Media Section */}
-          <div className="space-y-3 p-4 rounded-xl bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-blue-500/5 border">
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <div className="p-1.5 rounded-md bg-gradient-to-br from-pink-500/20 to-purple-500/20">
-                <Heart className="h-4 w-4 text-pink-600" />
-              </div>
-              Siga-nos nas redes sociais
-            </div>
-            
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="flex-1 gap-2 h-11"
-                asChild
-              >
-                <a href="https://instagram.com/appdaoracao" target="_blank" rel="noopener noreferrer">
-                  <Instagram className="h-5 w-5 text-pink-600" />
-                  <span className="text-sm">@appdaoracao</span>
-                </a>
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="flex-1 gap-2 h-11"
-                asChild
-              >
-                <a href="https://www.youtube.com/@appdaoracao" target="_blank" rel="noopener noreferrer">
-                  <Youtube className="h-5 w-5 text-red-600" />
-                  <span className="text-sm">App da Oração</span>
-                </a>
-              </Button>
-            </div>
           </div>
         </div>
       </DialogContent>
