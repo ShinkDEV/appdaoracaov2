@@ -84,7 +84,7 @@ export function PrayerList({
   }
 
   return (
-    <div>
+    <div className="px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
         {prayers.map((prayer, index) => (
           <div 
