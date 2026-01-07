@@ -68,17 +68,17 @@ export default function Index() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8 lg:space-y-10">
       {/* Updates Modal */}
       <UpdatesModal open={showUpdates} onOpenChange={setShowUpdates} />
 
       {/* Hero Banner */}
       {banners.length > 0 ? (
-        <BannerCarousel banners={banners} className="-mx-4 md:mx-0 md:rounded-2xl" />
+        <BannerCarousel banners={banners} className="rounded-xl md:rounded-2xl overflow-hidden" />
       ) : (
-        <div className="relative -mx-4 md:mx-0 md:rounded-2xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
-          <div className="relative py-16 md:py-24 px-6 text-center">
-            <h1 className="text-2xl md:text-5xl font-bold text-white leading-tight">
+        <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
+          <div className="relative py-10 sm:py-14 md:py-20 lg:py-24 px-4 sm:px-6 text-center">
+            <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
               <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta<br />
               oração e propósito
             </h1>
@@ -87,10 +87,10 @@ export default function Index() {
       )}
 
       {/* Section Header with Search */}
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 pt-2">
+      <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Pedidos de Oração</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Pedidos de Oração</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
             {prayers.length} pedidos ativos
           </p>
         </div>
@@ -104,7 +104,7 @@ export default function Index() {
               placeholder="Buscar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-72 lg:w-80 pl-11 pr-4 h-11 rounded-xl bg-card border border-border/50 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-sm"
+              className="w-64 lg:w-72 xl:w-80 pl-11 pr-4 h-10 lg:h-11 rounded-xl bg-card border border-border/50 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-sm"
             />
           </div>
         </div>

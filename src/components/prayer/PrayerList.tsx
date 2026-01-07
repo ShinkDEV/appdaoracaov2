@@ -85,7 +85,7 @@ export function PrayerList({
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
         {prayers.map((prayer, index) => (
           <div 
             key={prayer.id} 
@@ -102,16 +102,16 @@ export function PrayerList({
       </div>
 
       {/* Load more trigger */}
-      <div ref={loadMoreRef} className="h-4 mt-4" />
+      <div ref={loadMoreRef} className="h-4 mt-6" />
 
       {loadingMore && (
-        <div className="flex justify-center py-6">
+        <div className="flex justify-center py-8">
           <Loading text="Carregando mais..." />
         </div>
       )}
 
       {!hasMore && prayers.length > 0 && (
-        <p className="text-center text-sm text-muted-foreground py-8">
+        <p className="text-center text-sm text-muted-foreground py-10">
           Você chegou ao fim! 🙏
         </p>
       )}
