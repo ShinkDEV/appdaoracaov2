@@ -71,7 +71,7 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         .from('prayer_requests')
         .select(`
           *,
-          profiles!prayer_requests_user_id_fkey (
+          profiles (
             display_name,
             photo_url
           )
