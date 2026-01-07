@@ -84,12 +84,12 @@ export function PrayerList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {prayers.map((prayer, index) => (
         <div 
           key={prayer.id} 
           className="animate-slide-up"
-          style={{ animationDelay: `${index * 0.05}s` }}
+          style={{ animationDelay: `${index * 0.03}s` }}
         >
           <PrayerCard
             prayer={prayer}
@@ -99,17 +99,17 @@ export function PrayerList({
         </div>
       ))}
 
-      {/* Load more trigger */}
-      <div ref={loadMoreRef} className="h-4" />
+      {/* Load more trigger - spans full width */}
+      <div ref={loadMoreRef} className="col-span-full h-4" />
 
       {loadingMore && (
-        <div className="flex justify-center py-6">
+        <div className="col-span-full flex justify-center py-6">
           <Loading text="Carregando mais..." />
         </div>
       )}
 
       {!hasMore && prayers.length > 0 && (
-        <p className="text-center text-sm text-muted-foreground py-8">
+        <p className="col-span-full text-center text-sm text-muted-foreground py-8">
           Você chegou ao fim! 🙏
         </p>
       )}

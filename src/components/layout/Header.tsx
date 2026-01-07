@@ -28,11 +28,11 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border/30 shadow-sm">
+    <header className="sticky top-0 z-50 bg-background border-b border-border/30">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center group">
+          <Link to="/" className="flex items-center">
             <img
               src={logoAppDaOracao}
               alt="App da Oração"
@@ -45,10 +45,8 @@ export const Header: React.FC = () => {
             {user ? (
               <>
                 <Button
-                  variant="default"
-                  size="sm"
                   onClick={() => navigate('/novo-pedido')}
-                  className="gap-2 rounded-full px-5"
+                  className="gap-2 rounded-full px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   <Plus className="h-4 w-4" />
                   Novo Pedido
@@ -56,33 +54,33 @@ export const Header: React.FC = () => {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden">
-                      <Avatar className="h-10 w-10 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
+                    <button className="relative h-10 w-10 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary/20">
+                      <Avatar className="h-10 w-10">
                         <AvatarImage src={profile?.photo_url || undefined} alt={profile?.display_name || 'Perfil'} />
                         <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-semibold">
                           {getInitials(profile?.display_name)}
                         </AvatarFallback>
                       </Avatar>
-                    </Button>
+                    </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-elevated">
-                    <div className="px-3 py-2.5 bg-gradient-to-r from-primary/5 to-accent/5 rounded-t-lg">
+                  <DropdownMenuContent align="end" className="w-56 rounded-xl bg-popover border border-border shadow-elevated">
+                    <div className="px-3 py-2.5">
                       <p className="text-sm font-semibold">{profile?.display_name || 'Usuário'}</p>
                       <p className="text-xs text-muted-foreground">{profile?.email}</p>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/perfil')} className="rounded-lg mx-1 cursor-pointer">
+                    <DropdownMenuItem onClick={() => navigate('/perfil')} className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       Meu Perfil
                     </DropdownMenuItem>
                     {isAdmin && (
-                      <DropdownMenuItem onClick={() => navigate('/admin')} className="rounded-lg mx-1 cursor-pointer">
+                      <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer">
                         <Shield className="mr-2 h-4 w-4" />
                         Administração
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive rounded-lg mx-1 cursor-pointer">
+                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       Sair
                     </DropdownMenuItem>
@@ -94,7 +92,7 @@ export const Header: React.FC = () => {
                 <Button variant="ghost" onClick={() => navigate('/auth')} className="rounded-full">
                   Entrar
                 </Button>
-                <Button variant="default" onClick={() => navigate('/auth?modo=cadastro')} className="rounded-full px-5">
+                <Button onClick={() => navigate('/auth?modo=cadastro')} className="rounded-full px-5">
                   Cadastrar
                 </Button>
               </div>
@@ -104,7 +102,6 @@ export const Header: React.FC = () => {
           {/* Mobile - Logo only, nav is in BottomNav */}
           <div className="md:hidden" />
         </div>
-
       </div>
     </header>
   );

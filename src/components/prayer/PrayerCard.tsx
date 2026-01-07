@@ -1,9 +1,6 @@
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { HandHeart, Pin, User, ChevronDown, ChevronUp } from 'lucide-react';
+import { HandHeart, Pin, ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -18,13 +15,13 @@ interface PrayerCardProps {
 export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
   const [expanded, setExpanded] = useState(false);
   
-  const shouldTruncate = prayer.description.length > 150;
+  const shouldTruncate = prayer.description.length > 100;
   const displayDescription = expanded || !shouldTruncate 
     ? prayer.description 
-    : prayer.description.slice(0, 150) + '...';
+    : prayer.description.slice(0, 100) + '...';
 
   const timeAgo = formatDistanceToNow(new Date(prayer.created_at), {
-    addSuffix: true,
+    addSuffix: false,
     locale: ptBR
   });
 
@@ -34,106 +31,89 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
   };
 
   return (
-    <Card className={cn(
-      "shadow-card hover:shadow-elevated transition-all duration-300 animate-fade-in overflow-hidden",
-      prayer.is_pinned && "ring-2 ring-primary/20 bg-gradient-to-br from-primary/5 to-transparent"
+    <div className={cn(
+      "bg-card rounded-2xl p-5 shadow-card transition-all duration-300 animate-fade-in border border-border/30",
+      prayer.is_pinned && "ring-1 ring-primary/20"
     )}>
-      <CardContent className="p-5">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <Avatar className="h-11 w-11 shrink-0 ring-2 ring-border/50">
-              {prayer.author?.photo_url ? (
-                <AvatarImage src={prayer.author.photo_url} alt={prayer.author.display_name || 'Usuário'} />
-              ) : null}
-              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-medium">
-                {prayer.is_anonymous ? '🙏' : getInitials(prayer.author?.display_name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-sm truncate text-foreground">
-                {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'Usuário')}
-              </p>
-              <p className="text-xs text-muted-foreground">{timeAgo}</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2 shrink-0">
-            {prayer.is_pinned && (
-              <Badge variant="secondary" className="bg-primary/10 text-primary border-0 gap-1">
-                <Pin className="h-3 w-3" />
-                Fixado
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        {/* Theme badge */}
-        {theme && (
-          <div className="mb-3">
-            <Badge variant="outline" className="text-xs font-medium bg-secondary/50 border-border/50">
-              {theme.icon} {theme.name}
-            </Badge>
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="space-y-2 mb-4">
-          <h3 className="font-display font-semibold text-lg leading-tight text-foreground">
-            {prayer.title}
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-            {displayDescription}
-          </p>
-          
-          {shouldTruncate && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setExpanded(!expanded)}
-              className="h-auto p-0 text-xs text-primary hover:bg-transparent hover:text-primary/80 font-medium"
-            >
-              {expanded ? (
-                <>
-                  Ver menos <ChevronUp className="h-3 w-3 ml-1" />
-                </>
-              ) : (
-                <>
-                  Ver mais <ChevronDown className="h-3 w-3 ml-1" />
-                </>
-              )}
-            </Button>
+      {/* Badges row */}
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          {prayer.is_pinned && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-600 border border-rose-200">
+              <Pin className="h-3 w-3" />
+              Fixado
+            </span>
+          )}
+          {theme && (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+              {theme.name}
+            </span>
           )}
         </div>
+        <span className="text-xs text-muted-foreground shrink-0">
+          há {timeAgo}
+        </span>
+      </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-border/50">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <HandHeart className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              {prayer.prayer_count} {prayer.prayer_count === 1 ? 'pessoa orou' : 'pessoas oraram'}
-            </span>
-          </div>
-          
-          <Button
-            variant={prayer.has_prayed ? "default" : "outline"}
-            size="sm"
+      {/* Title */}
+      <h3 className="font-semibold text-base text-foreground mb-2 leading-tight">
+        {prayer.title}
+      </h3>
+
+      {/* Description */}
+      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+        {displayDescription}
+        {shouldTruncate && !expanded && (
+          <button
+            onClick={() => setExpanded(true)}
+            className="text-primary hover:text-primary/80 ml-1 font-medium"
+          >
+            Ver mais
+          </button>
+        )}
+      </p>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-3 border-t border-border/30">
+        <div className="flex items-center gap-2.5">
+          <Avatar className="h-8 w-8 ring-2 ring-background">
+            {prayer.author?.photo_url ? (
+              <AvatarImage src={prayer.author.photo_url} alt={prayer.author.display_name || 'Usuário'} />
+            ) : null}
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary text-xs font-medium">
+              {prayer.is_anonymous ? '🙏' : getInitials(prayer.author?.display_name)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium text-foreground">
+            {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'App da Oração')}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
             onClick={() => onPray(prayer.id)}
             className={cn(
-              "gap-2 rounded-full px-5 transition-all duration-300 font-medium",
+              "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
               prayer.has_prayed 
-                ? "bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg" 
-                : "hover:bg-primary/10 hover:text-primary hover:border-primary/50"
+                ? "bg-rose-100 text-rose-600 border border-rose-200" 
+                : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30 hover:text-primary"
             )}
           >
             <HandHeart className={cn(
-              "h-4 w-4 transition-transform",
-              prayer.has_prayed && "fill-current scale-110"
+              "h-4 w-4",
+              prayer.has_prayed && "fill-current"
             )} />
-            {prayer.has_prayed ? 'Orei! 🙏' : 'Orar'}
-          </Button>
+            {prayer.has_prayed ? 'Orando' : 'Orar'}
+            {prayer.prayer_count > 0 && (
+              <span className="ml-0.5">({prayer.prayer_count})</span>
+            )}
+          </button>
+          
+          <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <ChevronDown className="h-4 w-4" />
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

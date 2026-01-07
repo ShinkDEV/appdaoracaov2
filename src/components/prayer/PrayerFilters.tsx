@@ -1,7 +1,6 @@
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Search, X } from 'lucide-react';
+import { Search, X, Clock, ArrowUpDown, HandHeart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PrayerTheme } from '@/hooks/usePrayers';
 
@@ -11,6 +10,8 @@ interface PrayerFiltersProps {
   onThemeChange: (themeId: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  sortBy?: 'newest' | 'oldest' | 'most_prayed';
+  onSortChange?: (sort: 'newest' | 'oldest' | 'most_prayed') => void;
 }
 
 export function PrayerFilters({
@@ -18,68 +19,108 @@ export function PrayerFilters({
   selectedTheme,
   onThemeChange,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  sortBy = 'newest',
+  onSortChange
 }: PrayerFiltersProps) {
   return (
     <div className="space-y-4">
-      {/* Search */}
-      <div className="relative">
+      {/* Search - Mobile only */}
+      <div className="relative md:hidden">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar pedidos de oração..."
+        <input
+          type="text"
+          placeholder="Buscar..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-11 pr-11 h-12 rounded-2xl bg-card shadow-card border-border/50 focus:shadow-elevated transition-shadow"
+          className="w-full pl-11 pr-11 h-12 rounded-xl bg-card border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
         />
         {searchQuery && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full hover:bg-muted"
+          <button
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
             onClick={() => onSearchChange('')}
           >
-            <X className="h-4 w-4" />
-          </Button>
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
         )}
       </div>
 
       {/* Theme filters */}
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex gap-2 pb-2">
-          <Button
-            variant={selectedTheme === 'all' ? 'default' : 'outline'}
-            size="sm"
+          <button
             onClick={() => onThemeChange('all')}
             className={cn(
-              "shrink-0 rounded-full px-5 font-medium transition-all duration-300",
+              "shrink-0 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 border",
               selectedTheme === 'all' 
-                ? "bg-primary shadow-md hover:shadow-lg" 
-                : "bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/50"
+                ? "bg-primary/10 text-primary border-primary/30" 
+                : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
             )}
           >
-            ✨ Todos
-          </Button>
+            Todos
+          </button>
           
           {themes.map((theme) => (
-            <Button
+            <button
               key={theme.id}
-              variant={selectedTheme === theme.id ? 'default' : 'outline'}
-              size="sm"
               onClick={() => onThemeChange(theme.id)}
               className={cn(
-                "shrink-0 rounded-full px-4 gap-1.5 font-medium transition-all duration-300",
+                "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border",
                 selectedTheme === theme.id 
-                  ? "bg-primary shadow-md hover:shadow-lg" 
-                  : "bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/50"
+                  ? "bg-primary/10 text-primary border-primary/30" 
+                  : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
               )}
             >
-              {theme.icon && <span>{theme.icon}</span>}
               {theme.name}
-            </Button>
+            </button>
           ))}
         </div>
         <ScrollBar orientation="horizontal" className="invisible" />
       </ScrollArea>
+
+      {/* Sort buttons */}
+      {onSortChange && (
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => onSortChange('newest')}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+              sortBy === 'newest' 
+                ? "bg-primary text-primary-foreground shadow-md" 
+                : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30"
+            )}
+          >
+            <Clock className="h-3.5 w-3.5" />
+            + Novos
+          </button>
+          
+          <button
+            onClick={() => onSortChange('oldest')}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+              sortBy === 'oldest' 
+                ? "bg-primary text-primary-foreground shadow-md" 
+                : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30"
+            )}
+          >
+            <ArrowUpDown className="h-3.5 w-3.5" />
+            + Antigos
+          </button>
+          
+          <button
+            onClick={() => onSortChange('most_prayed')}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+              sortBy === 'most_prayed' 
+                ? "bg-primary text-primary-foreground shadow-md" 
+                : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30"
+            )}
+          >
+            <HandHeart className="h-3.5 w-3.5" />
+            + Orados
+          </button>
+        </div>
+      )}
     </div>
   );
 }
