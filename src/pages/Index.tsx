@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePrayers } from '@/hooks/usePrayers';
 import { PrayerFilters, PrayerList } from '@/components/prayer';
+import { BannerCarousel } from '@/components/banner';
+import { UpdatesModal, useUpdatesModal } from '@/components/updates';
 import { supabase } from '@/integrations/supabase/client';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
-import { useRef } from 'react';
 
 interface Banner {
   id: string;
@@ -21,9 +20,7 @@ export default function Index() {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [banners, setBanners] = useState<Banner[]>([]);
   
-  const autoplayPlugin = useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: false })
-  );
+  const { showUpdates, setShowUpdates } = useUpdatesModal();
 
   const {
     prayers,
@@ -55,47 +52,13 @@ export default function Index() {
     fetchBanners();
   }, []);
 
-  const handleBannerClick = (link: string | null) => {
-    if (link) {
-      window.open(link, '_blank', 'noopener,noreferrer');
-    }
-  };
-
   return (
     <div className="space-y-6">
+      {/* Updates Modal */}
+      <UpdatesModal open={showUpdates} onOpenChange={setShowUpdates} />
+
       {/* Banners Carousel */}
-      {banners.length > 0 && (
-        <Carousel
-          plugins={[autoplayPlugin.current]}
-          className="w-full"
-          opts={{
-            loop: true,
-            align: 'start'
-          }}
-        >
-          <CarouselContent>
-            {banners.map((banner) => (
-              <CarouselItem key={banner.id}>
-                <div 
-                  className={`relative aspect-[21/9] md:aspect-[3/1] rounded-lg overflow-hidden ${banner.link ? 'cursor-pointer' : ''}`}
-                  onClick={() => handleBannerClick(banner.link)}
-                >
-                  <picture>
-                    {banner.mobile_image_url && (
-                      <source media="(max-width: 768px)" srcSet={banner.mobile_image_url} />
-                    )}
-                    <img
-                      src={banner.image_url}
-                      alt={banner.title || 'Banner'}
-                      className="w-full h-full object-cover"
-                    />
-                  </picture>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      )}
+      <BannerCarousel banners={banners} />
 
       {/* Filters */}
       <PrayerFilters
