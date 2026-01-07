@@ -1,0 +1,1 @@
+export { BannedIPs } from './index';
