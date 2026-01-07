@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NewRequest from "./pages/NewRequest";
@@ -25,15 +26,15 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Layout><Index /></Layout>} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/novo-pedido" element={<NewRequest />} />
-            <Route path="/perfil" element={<Profile />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/minhas-oracoes" element={<MyPrayers />} />
-            <Route path="/configuracoes" element={<Settings />} />
-            <Route path="/doacao-sucesso" element={<DonationSuccess />} />
-            <Route path="/instalar" element={<Install />} />
+            <Route path="/novo-pedido" element={<Layout><NewRequest /></Layout>} />
+            <Route path="/perfil" element={<Layout><Profile /></Layout>} />
+            <Route path="/admin" element={<Layout><Admin /></Layout>} />
+            <Route path="/minhas-oracoes" element={<Layout><MyPrayers /></Layout>} />
+            <Route path="/configuracoes" element={<Layout><Settings /></Layout>} />
+            <Route path="/doacao-sucesso" element={<Layout><DonationSuccess /></Layout>} />
+            <Route path="/instalar" element={<Layout><Install /></Layout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
