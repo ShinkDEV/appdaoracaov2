@@ -54,8 +54,13 @@ export default function Index() {
     fetchBanners();
   }, []);
 
-  // Sort prayers based on selected option
+  // Sort prayers based on selected option (keep pinned items on top)
   const sortedPrayers = [...prayers].sort((a, b) => {
+    // Pinned items always come first
+    if (a.is_pinned && !b.is_pinned) return -1;
+    if (!a.is_pinned && b.is_pinned) return 1;
+    
+    // Then sort by selected criteria
     switch (sortBy) {
       case 'oldest':
         return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
