@@ -24,18 +24,18 @@ export function PrayerFilters({
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Buscar pedidos de oração..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 pr-10"
+          className="pl-11 pr-11 h-12 rounded-2xl bg-card shadow-card border-border/50 focus:shadow-elevated transition-shadow"
         />
         {searchQuery && (
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full hover:bg-muted"
             onClick={() => onSearchChange('')}
           >
             <X className="h-4 w-4" />
@@ -50,9 +50,14 @@ export function PrayerFilters({
             variant={selectedTheme === 'all' ? 'default' : 'outline'}
             size="sm"
             onClick={() => onThemeChange('all')}
-            className="shrink-0"
+            className={cn(
+              "shrink-0 rounded-full px-5 font-medium transition-all duration-300",
+              selectedTheme === 'all' 
+                ? "bg-primary shadow-md hover:shadow-lg" 
+                : "bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/50"
+            )}
           >
-            Todos
+            ✨ Todos
           </Button>
           
           {themes.map((theme) => (
@@ -62,8 +67,10 @@ export function PrayerFilters({
               size="sm"
               onClick={() => onThemeChange(theme.id)}
               className={cn(
-                "shrink-0 gap-1.5",
-                selectedTheme === theme.id && "bg-primary"
+                "shrink-0 rounded-full px-4 gap-1.5 font-medium transition-all duration-300",
+                selectedTheme === theme.id 
+                  ? "bg-primary shadow-md hover:shadow-lg" 
+                  : "bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/50"
               )}
             >
               {theme.icon && <span>{theme.icon}</span>}
@@ -71,7 +78,7 @@ export function PrayerFilters({
             </Button>
           ))}
         </div>
-        <ScrollBar orientation="horizontal" />
+        <ScrollBar orientation="horizontal" className="invisible" />
       </ScrollArea>
     </div>
   );

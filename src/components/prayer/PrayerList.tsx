@@ -59,48 +59,58 @@ export function PrayerList({
   }, [loading, hasMore, loadingMore, onLoadMore]);
 
   if (loading) {
-    return <Loading text="Carregando pedidos de oração..." />;
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Loading text="Carregando pedidos de oração..." />
+      </div>
+    );
   }
 
   if (prayers.length === 0) {
     return (
       <EmptyState
-        icon={<BookHeart className="h-12 w-12" />}
+        icon={<BookHeart className="h-16 w-16" />}
         title="Nenhum pedido encontrado"
         description="Não há pedidos de oração no momento. Seja o primeiro a compartilhar!"
         action={
-          <Button onClick={onRefresh} variant="outline" className="gap-2">
+          <Button onClick={onRefresh} variant="outline" className="gap-2 rounded-full">
             <RefreshCw className="h-4 w-4" />
             Atualizar
           </Button>
         }
+        className="py-16"
       />
     );
   }
 
   return (
     <div className="space-y-4">
-      {prayers.map((prayer) => (
-        <PrayerCard
-          key={prayer.id}
-          prayer={prayer}
-          theme={getThemeById(prayer.theme_id)}
-          onPray={onPray}
-        />
+      {prayers.map((prayer, index) => (
+        <div 
+          key={prayer.id} 
+          className="animate-slide-up"
+          style={{ animationDelay: `${index * 0.05}s` }}
+        >
+          <PrayerCard
+            prayer={prayer}
+            theme={getThemeById(prayer.theme_id)}
+            onPray={onPray}
+          />
+        </div>
       ))}
 
       {/* Load more trigger */}
       <div ref={loadMoreRef} className="h-4" />
 
       {loadingMore && (
-        <div className="flex justify-center py-4">
+        <div className="flex justify-center py-6">
           <Loading text="Carregando mais..." />
         </div>
       )}
 
       {!hasMore && prayers.length > 0 && (
-        <p className="text-center text-sm text-muted-foreground py-4">
-          Você chegou ao fim 🙏
+        <p className="text-center text-sm text-muted-foreground py-8">
+          Você chegou ao fim! 🙏
         </p>
       )}
     </div>
