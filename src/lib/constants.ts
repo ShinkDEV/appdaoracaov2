@@ -1,3 +1,6 @@
+// Versão do app
+export const APP_VERSION = '1.0.0';
+
 // Temas de oração - lista parametrizada
 export const PRAYER_THEMES = [
   { id: 'familia-relacionamentos', name: 'Família e Relacionamentos', icon: '👨‍👩‍👧‍👦' },
