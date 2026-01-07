@@ -145,20 +145,25 @@ const MyPrayers = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 max-w-6xl">
-      <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full shrink-0">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 lg:py-10">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 md:mb-10">
+        <div className="flex items-center gap-3 md:gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full shrink-0 h-10 w-10">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Minhas Orações</h1>
-            <p className="text-muted-foreground text-xs md:text-sm">Acompanhe seus pedidos e orações</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Minhas Orações</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Acompanhe seus pedidos e orações</p>
           </div>
         </div>
+      </div>
 
-        <Tabs defaultValue="prayers" className="space-y-4 md:space-y-6">
-          <TabsList className="grid w-full max-w-xs md:max-w-md grid-cols-2 bg-muted/50 rounded-full p-1 h-auto">
-            <TabsTrigger value="prayers" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2.5 md:py-3 px-3 md:px-4">
+      {/* Tabs */}
+      <Tabs defaultValue="prayers" className="space-y-6 md:space-y-8">
+        <div className="flex justify-center">
+          <TabsList className="inline-flex w-auto bg-muted/50 rounded-full p-1 h-auto">
+            <TabsTrigger value="prayers" className="rounded-full gap-2 text-xs sm:text-sm py-2.5 sm:py-3 px-4 sm:px-6">
               <HandHeart className="h-4 w-4" />
               <span>Orando</span>
               {prayingFor.length > 0 && (
@@ -167,7 +172,7 @@ const MyPrayers = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="requests" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2.5 md:py-3 px-3 md:px-4">
+            <TabsTrigger value="requests" className="rounded-full gap-2 text-xs sm:text-sm py-2.5 sm:py-3 px-4 sm:px-6">
               <FileText className="h-4 w-4" />
               <span>Meus Pedidos</span>
               {myRequests.length > 0 && (
@@ -177,42 +182,46 @@ const MyPrayers = () => {
               )}
             </TabsTrigger>
           </TabsList>
+        </div>
 
-          <TabsContent value="prayers">
-            {loadingPraying ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner />
-              </div>
-            ) : prayingFor.length === 0 ? (
+        <TabsContent value="prayers" className="mt-6">
+          {loadingPraying ? (
+            <div className="flex justify-center py-16">
+              <LoadingSpinner />
+            </div>
+          ) : prayingFor.length === 0 ? (
+            <div className="flex justify-center py-12">
               <EmptyState
-                icon={<HandHeart className="h-12 w-12 md:h-16 md:w-16" />}
+                icon={<HandHeart className="h-14 w-14 md:h-16 md:w-16" />}
                 title="Nenhuma oração ainda"
                 description="Você ainda não está orando por nenhum pedido. Explore os pedidos e comece a orar!"
                 action={<Button onClick={() => navigate('/')} className="rounded-full px-6">Ver Pedidos</Button>}
               />
-            ) : (
-              <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                {prayingFor.map(prayer => (
-                  <PrayerItem
-                    key={prayer.id}
-                    prayer={prayer}
-                    onAction={() => stopPraying(prayer.id)}
-                    actionLabel="Remover"
-                    actionVariant="outline"
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {prayingFor.map(prayer => (
+                <PrayerItem
+                  key={prayer.id}
+                  prayer={prayer}
+                  onAction={() => stopPraying(prayer.id)}
+                  actionLabel="Remover"
+                  actionVariant="outline"
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
-          <TabsContent value="requests">
-            {loadingRequests ? (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner />
-              </div>
-            ) : myRequests.length === 0 ? (
+        <TabsContent value="requests" className="mt-6">
+          {loadingRequests ? (
+            <div className="flex justify-center py-16">
+              <LoadingSpinner />
+            </div>
+          ) : myRequests.length === 0 ? (
+            <div className="flex justify-center py-12">
               <EmptyState
-                icon={<FileText className="h-12 w-12 md:h-16 md:w-16" />}
+                icon={<FileText className="h-14 w-14 md:h-16 md:w-16" />}
                 title="Nenhum pedido ainda"
                 description="Você ainda não criou nenhum pedido de oração."
                 action={
@@ -222,30 +231,31 @@ const MyPrayers = () => {
                   </Button>
                 }
               />
-            ) : (
-              <div className="space-y-4">
-                <div className="flex justify-end">
-                  <Button onClick={() => navigate('/novo-pedido')} className="rounded-full gap-2">
-                    <Plus className="h-4 w-4" />
-                    Novo Pedido
-                  </Button>
-                </div>
-                <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                  {myRequests.map(prayer => (
-                    <PrayerItem
-                      key={prayer.id}
-                      prayer={prayer}
-                      onAction={() => deleteRequest(prayer.id)}
-                      actionLabel="Excluir"
-                      showAuthor={false}
-                    />
-                  ))}
-                </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex justify-center sm:justify-end">
+                <Button onClick={() => navigate('/novo-pedido')} className="rounded-full gap-2 px-6">
+                  <Plus className="h-4 w-4" />
+                  Novo Pedido
+                </Button>
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+              <div className="grid gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {myRequests.map(prayer => (
+                  <PrayerItem
+                    key={prayer.id}
+                    prayer={prayer}
+                    onAction={() => deleteRequest(prayer.id)}
+                    actionLabel="Excluir"
+                    showAuthor={false}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
