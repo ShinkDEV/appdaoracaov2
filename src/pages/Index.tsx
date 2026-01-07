@@ -68,26 +68,28 @@ export default function Index() {
   });
 
   return (
-    <div className="space-y-6 md:space-y-8 lg:space-y-10">
+    <div className="space-y-5 sm:space-y-6 md:space-y-8">
       {/* Updates Modal */}
       <UpdatesModal open={showUpdates} onOpenChange={setShowUpdates} />
 
       {/* Hero Banner */}
-      {banners.length > 0 ? (
-        <BannerCarousel banners={banners} className="rounded-xl md:rounded-2xl overflow-hidden" />
-      ) : (
-        <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
-          <div className="relative py-10 sm:py-14 md:py-20 lg:py-24 px-4 sm:px-6 text-center">
-            <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta<br />
-              oração e propósito
-            </h1>
+      <div className="px-1 sm:px-0">
+        {banners.length > 0 ? (
+          <BannerCarousel banners={banners} className="rounded-xl md:rounded-2xl overflow-hidden" />
+        ) : (
+          <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
+            <div className="relative py-10 sm:py-14 md:py-20 lg:py-24 px-4 sm:px-6 text-center">
+              <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta<br />
+                oração e propósito
+              </h1>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Section Header with Search */}
-      <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between px-1 sm:px-0">
         <div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Pedidos de Oração</h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
@@ -111,15 +113,17 @@ export default function Index() {
       </div>
 
       {/* Filters */}
-      <PrayerFilters
-        themes={themes}
-        selectedTheme={selectedTheme}
-        onThemeChange={setSelectedTheme}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-      />
+      <div className="px-1 sm:px-0">
+        <PrayerFilters
+          themes={themes}
+          selectedTheme={selectedTheme}
+          onThemeChange={setSelectedTheme}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+      </div>
 
       {/* Prayer List */}
       <PrayerList
