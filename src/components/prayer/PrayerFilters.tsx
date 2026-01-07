@@ -24,20 +24,20 @@ export function PrayerFilters({
   onSortChange
 }: PrayerFiltersProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Search - Mobile only */}
       <div className="relative md:hidden">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
           placeholder="Buscar..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-11 pr-11 h-12 rounded-xl bg-card border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+          className="w-full pl-10 pr-10 h-11 rounded-xl bg-card border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
         />
         {searchQuery && (
           <button
-            className="absolute right-3 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
             onClick={() => onSearchChange('')}
           >
             <X className="h-4 w-4 text-muted-foreground" />
@@ -46,12 +46,12 @@ export function PrayerFilters({
       </div>
 
       {/* Theme filters */}
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex gap-2 pb-2">
+      <ScrollArea className="w-full whitespace-nowrap -mx-1 px-1">
+        <div className="flex gap-1.5 sm:gap-2 pb-2">
           <button
             onClick={() => onThemeChange('all')}
             className={cn(
-              "shrink-0 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 border",
+              "shrink-0 rounded-full px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border",
               selectedTheme === 'all' 
                 ? "bg-primary/10 text-primary border-primary/30" 
                 : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
@@ -65,7 +65,7 @@ export function PrayerFilters({
               key={theme.id}
               onClick={() => onThemeChange(theme.id)}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 border",
+                "shrink-0 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border",
                 selectedTheme === theme.id 
                   ? "bg-primary/10 text-primary border-primary/30" 
                   : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
@@ -80,43 +80,43 @@ export function PrayerFilters({
 
       {/* Sort buttons */}
       {onSortChange && (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap">
           <button
             onClick={() => onSortChange('newest')}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+              "flex items-center gap-1 sm:gap-1.5 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200",
               sortBy === 'newest' 
                 ? "bg-primary text-primary-foreground shadow-md" 
                 : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30"
             )}
           >
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
             + Novos
           </button>
           
           <button
             onClick={() => onSortChange('oldest')}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+              "flex items-center gap-1 sm:gap-1.5 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200",
               sortBy === 'oldest' 
                 ? "bg-primary text-primary-foreground shadow-md" 
                 : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30"
             )}
           >
-            <ArrowUpDown className="h-3.5 w-3.5" />
+            <ArrowUpDown className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
             + Antigos
           </button>
           
           <button
             onClick={() => onSortChange('most_prayed')}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+              "flex items-center gap-1 sm:gap-1.5 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200",
               sortBy === 'most_prayed' 
                 ? "bg-primary text-primary-foreground shadow-md" 
                 : "bg-card text-muted-foreground border border-border/50 hover:border-primary/30"
             )}
           >
-            <HandHeart className="h-3.5 w-3.5" />
+            <HandHeart className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
             + Orados
           </button>
         </div>
