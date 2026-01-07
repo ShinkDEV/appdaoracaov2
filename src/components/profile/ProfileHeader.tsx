@@ -2,12 +2,11 @@ import { useState, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Camera, User, Pencil, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { ImageCropper } from './ImageCropper';
 
 interface ProfileHeaderProps {
   userId: string;
@@ -22,6 +21,8 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
   const [newName, setNewName] = useState(displayName || '');
   const [uploading, setUploading] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleNameSave = async () => {
@@ -47,7 +48,7 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
     }
   };
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -62,17 +63,33 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
       return;
     }
 
+    // Create object URL for cropper
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
+    setPhotoDialogOpen(false);
+    setCropperOpen(true);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setCropperOpen(false);
     setUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const fileName = `${userId}-${Date.now()}.jpg`;
       const filePath = `${userId}/${fileName}`;
 
       // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, { upsert: true });
+        .upload(filePath, croppedBlob, { 
+          upsert: true,
+          contentType: 'image/jpeg'
+        });
 
       if (uploadError) throw uploadError;
 
@@ -90,13 +107,16 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
       if (updateError) throw updateError;
 
       toast.success('Foto atualizada!');
-      setPhotoDialogOpen(false);
       onUpdate();
     } catch (error) {
       console.error('Error uploading photo:', error);
       toast.error('Erro ao fazer upload da foto');
     } finally {
       setUploading(false);
+      if (selectedImage) {
+        URL.revokeObjectURL(selectedImage);
+        setSelectedImage(null);
+      }
     }
   };
 
@@ -158,7 +178,7 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={handlePhotoUpload}
+              onChange={handleFileSelect}
             />
             
             <div className="flex flex-col gap-2">
@@ -214,6 +234,22 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
         )}
         <p className="text-sm text-muted-foreground">{email}</p>
       </div>
+
+      {/* Image Cropper Modal */}
+      {selectedImage && (
+        <ImageCropper
+          open={cropperOpen}
+          onOpenChange={(open) => {
+            setCropperOpen(open);
+            if (!open && selectedImage) {
+              URL.revokeObjectURL(selectedImage);
+              setSelectedImage(null);
+            }
+          }}
+          imageSrc={selectedImage}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 }
