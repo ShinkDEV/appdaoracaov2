@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, ExternalLink, CreditCard } from 'lucide-react';
+import { Heart, Copy, Check, ExternalLink, CreditCard, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -14,22 +14,35 @@ interface DonationModalProps {
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 
-// PIX key for donations - replace with actual key
+// PIX key for donations
 const PIX_KEY = 'pix@appdaoracao.com.br';
+const CONTACT_EMAIL = 'contato@appdaoracao.com';
 
 export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copiedPix, setCopiedPix] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
 
   const finalValue = selectedValue || (customValue ? parseFloat(customValue) : 0);
 
   const handleCopyPix = async () => {
     try {
       await navigator.clipboard.writeText(PIX_KEY);
-      setCopied(true);
+      setCopiedPix(true);
       toast.success('Chave PIX copiada!');
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopiedPix(false), 2000);
+    } catch {
+      toast.error('Erro ao copiar');
+    }
+  };
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      setCopiedEmail(true);
+      toast.success('E-mail copiado!');
+      setTimeout(() => setCopiedEmail(false), 2000);
     } catch {
       toast.error('Erro ao copiar');
     }
@@ -139,7 +152,7 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
                 onClick={handleCopyPix}
                 className="shrink-0"
               >
-                {copied ? (
+                {copiedPix ? (
                   <Check className="h-4 w-4 text-green-600" />
                 ) : (
                   <Copy className="h-4 w-4" />
@@ -156,6 +169,39 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
                 <li>Faça um PIX com o valor desejado</li>
               </ol>
             </div>
+          </div>
+
+          {/* Contact Section */}
+          <div className="space-y-3 p-4 rounded-xl bg-muted/30 border border-dashed">
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <div className="p-1.5 rounded-md bg-blue-500/10">
+                <Mail className="h-4 w-4 text-blue-600" />
+              </div>
+              Contato
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Input
+                value={CONTACT_EMAIL}
+                readOnly
+                className="bg-background font-mono text-sm"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCopyEmail}
+                className="shrink-0"
+              >
+                {copiedEmail ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Dúvidas ou sugestões? Entre em contato conosco!
+            </p>
           </div>
         </div>
       </DialogContent>
