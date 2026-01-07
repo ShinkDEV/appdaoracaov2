@@ -14,10 +14,237 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      banned_ips: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      banners: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          link: string | null
+          mobile_image_url: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          link?: string | null
+          mobile_image_url?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          link?: string | null
+          mobile_image_url?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      prayer_requests: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          description: string
+          id: string
+          is_anonymous: boolean | null
+          is_deleted: boolean | null
+          is_pinned: boolean | null
+          theme_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          description: string
+          id?: string
+          is_anonymous?: boolean | null
+          is_deleted?: boolean | null
+          is_pinned?: boolean | null
+          theme_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          description?: string
+          id?: string
+          is_anonymous?: boolean | null
+          is_deleted?: boolean | null
+          is_pinned?: boolean | null
+          theme_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_requests_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "prayer_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prayer_themes: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          ban_reason: string | null
+          banned: boolean | null
+          banned_at: string | null
+          created_at: string
+          display_name: string | null
+          email: string
+          id: string
+          last_ip: string | null
+          photo_url: string | null
+        }
+        Insert: {
+          ban_reason?: string | null
+          banned?: boolean | null
+          banned_at?: string | null
+          created_at?: string
+          display_name?: string | null
+          email: string
+          id: string
+          last_ip?: string | null
+          photo_url?: string | null
+        }
+        Update: {
+          ban_reason?: string | null
+          banned?: boolean | null
+          banned_at?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          id?: string
+          last_ip?: string | null
+          photo_url?: string | null
+        }
+        Relationships: []
+      }
+      user_prayers: {
+        Row: {
+          created_at: string
+          id: string
+          prayer_request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prayer_request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prayer_request_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_prayers_prayer_request_id_fkey"
+            columns: ["prayer_request_id"]
+            isOneToOne: false
+            referencedRelation: "prayer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          display_name: string | null
+          id: string | null
+          photo_url: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          id?: string | null
+          photo_url?: string | null
+        }
+        Update: {
+          display_name?: string | null
+          id?: string | null
+          photo_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
