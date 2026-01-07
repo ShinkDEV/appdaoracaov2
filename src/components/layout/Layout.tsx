@@ -18,11 +18,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Mobile/Tablet Header */}
         <Header />
         
-        <main className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-6 pb-24 lg:pb-10 max-w-[1400px]">
+        <main className="flex-1 w-full mx-auto px-4 sm:px-6 md:px-8 xl:px-10 py-4 sm:py-6 pb-24 xl:pb-10 max-w-[1400px]">
           {children}
         </main>
         
-        <footer className="hidden lg:block border-t border-border/30 py-4 lg:py-6 mt-auto bg-muted/30">
+        <footer className="hidden xl:block border-t border-border/30 py-4 lg:py-6 mt-auto bg-muted/30">
           <div className="container mx-auto px-4 text-center">
             <p className="text-xs sm:text-sm text-muted-foreground">
               © {new Date().getFullYear()} App da Oração • Unindo pessoas em oração

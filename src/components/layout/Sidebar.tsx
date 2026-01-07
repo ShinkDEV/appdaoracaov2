@@ -75,7 +75,7 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-card border-r border-border/40 p-4">
+    <aside className="hidden xl:flex flex-col w-64 h-screen sticky top-0 bg-card border-r border-border/40 p-4">
       {/* Logo */}
       <div className="mb-6 px-2">
         <button onClick={() => navigate('/')} className="flex items-center">
