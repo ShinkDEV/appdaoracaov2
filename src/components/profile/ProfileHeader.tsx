@@ -1,0 +1,219 @@
+import { useState, useRef } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Camera, User, Pencil, Check, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+interface ProfileHeaderProps {
+  userId: string;
+  displayName: string | null;
+  photoUrl: string | null;
+  email: string;
+  onUpdate: () => void;
+}
+
+export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }: ProfileHeaderProps) {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState(displayName || '');
+  const [uploading, setUploading] = useState(false);
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleNameSave = async () => {
+    if (!newName.trim()) {
+      toast.error('Nome não pode estar vazio');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: newName.trim() })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast.success('Nome atualizado!');
+      setIsEditingName(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error updating name:', error);
+      toast.error('Erro ao atualizar nome');
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor, selecione uma imagem');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Imagem deve ter no máximo 5MB');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ photo_url: publicUrl })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      toast.success('Foto atualizada!');
+      setPhotoDialogOpen(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      toast.error('Erro ao fazer upload da foto');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ photo_url: null })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast.success('Foto removida!');
+      setPhotoDialogOpen(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error removing photo:', error);
+      toast.error('Erro ao remover foto');
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center text-center space-y-4">
+      {/* Avatar with edit */}
+      <Dialog open={photoDialogOpen} onOpenChange={setPhotoDialogOpen}>
+        <DialogTrigger asChild>
+          <button className="relative group">
+            <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+              {photoUrl ? (
+                <AvatarImage src={photoUrl} alt={displayName || 'Usuário'} />
+              ) : null}
+              <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                <User className="h-10 w-10" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Camera className="h-6 w-6 text-white" />
+            </div>
+          </button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar foto de perfil</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <Avatar className="h-32 w-32">
+                {photoUrl ? (
+                  <AvatarImage src={photoUrl} alt={displayName || 'Usuário'} />
+                ) : null}
+                <AvatarFallback className="bg-primary/10 text-primary text-3xl">
+                  <User className="h-12 w-12" />
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+            
+            <div className="flex flex-col gap-2">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full"
+              >
+                {uploading ? 'Enviando...' : 'Escolher nova foto'}
+              </Button>
+              
+              {photoUrl && (
+                <Button
+                  variant="outline"
+                  onClick={handleRemovePhoto}
+                  className="w-full text-destructive hover:text-destructive"
+                >
+                  Remover foto
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Name with edit */}
+      <div className="space-y-1">
+        {isEditingName ? (
+          <div className="flex items-center gap-2">
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="text-center"
+              autoFocus
+            />
+            <Button size="icon" variant="ghost" onClick={handleNameSave}>
+              <Check className="h-4 w-4 text-green-600" />
+            </Button>
+            <Button size="icon" variant="ghost" onClick={() => {
+              setIsEditingName(false);
+              setNewName(displayName || '');
+            }}>
+              <X className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-semibold">{displayName || 'Usuário'}</h2>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setIsEditingName(true)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        <p className="text-sm text-muted-foreground">{email}</p>
+      </div>
+    </div>
+  );
+}

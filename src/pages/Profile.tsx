@@ -1,155 +1,85 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState, useEffect, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { LoadingSpinner } from '@/components/ui/loading';
-import { Camera, ArrowLeft } from 'lucide-react';
+import { Loading } from '@/components/ui/loading';
+import { ProfileHeader, ProfileStats, ProfileActions } from '@/components/profile';
 
-const Profile = () => {
-  const { user, profile, refreshProfile } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+interface Profile {
+  id: string;
+  email: string;
+  display_name: string | null;
+  photo_url: string | null;
+  created_at: string;
+}
 
-  const [displayName, setDisplayName] = useState(profile?.display_name || '');
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
+export default function Profile() {
+  const { user, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) navigate('/auth');
-    if (profile) setDisplayName(profile.display_name || '');
-  }, [user, profile, navigate]);
-
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
 
-    setLoading(true);
     try {
-      const { error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .update({ display_name: displayName.trim() })
-        .eq('id', user.id);
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
-      await refreshProfile();
-      toast({ title: 'Perfil atualizado!' });
-    } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Erro', description: error.message });
+      if (profileError) throw profileError;
+      setProfile(profileData);
+
+      // Check if admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      setIsAdmin(!!roleData);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
-    if (!file.type.startsWith('image/')) {
-      toast({ variant: 'destructive', title: 'Arquivo inválido', description: 'Selecione uma imagem.' });
-      return;
-    }
+  if (authLoading || loading) {
+    return <Loading text="Carregando perfil..." />;
+  }
 
-    setUploading(true);
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
-    try {
-      const filePath = `${user.id}/avatar.jpg`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          upsert: true,
-          contentType: file.type
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-
-      const urlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ photo_url: urlWithCacheBuster })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-      await refreshProfile();
-      toast({ title: 'Foto atualizada!' });
-    } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Erro no upload', description: error.message });
-    } finally {
-      setUploading(false);
-    }
-
-    e.target.value = '';
-  };
-
-  const getInitials = (name: string | null) => {
-    if (!name) return 'U';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
+  if (!profile) {
+    return <Loading text="Carregando perfil..." />;
+  }
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8 max-w-lg">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-        </Button>
+    <div className="space-y-6">
+      <ProfileHeader
+        userId={profile.id}
+        displayName={profile.display_name}
+        photoUrl={profile.photo_url}
+        email={profile.email}
+        onUpdate={fetchProfile}
+      />
 
-        <Card className="shadow-elevated">
-          <CardHeader className="text-center">
-            <div className="relative inline-block mx-auto mb-4">
-              <Avatar className="h-24 w-24 border-4 border-primary/20">
-                <AvatarImage src={profile?.photo_url || undefined} alt={profile?.display_name || 'Perfil'} />
-                <AvatarFallback className="bg-primary/10 text-primary text-2xl font-medium">
-                  {getInitials(profile?.display_name)}
-                </AvatarFallback>
-              </Avatar>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
-              >
-                {uploading ? <LoadingSpinner className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
-              </button>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-            </div>
-            <CardTitle className="font-display text-2xl">Meu Perfil</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleUpdateProfile} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input id="email" value={profile?.email || ''} disabled className="bg-muted" />
-              </div>
+      <ProfileStats
+        userId={profile.id}
+        createdAt={profile.created_at}
+      />
 
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Nome de exibição</Label>
-                <Input
-                  id="displayName"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Seu nome"
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? <LoadingSpinner /> : 'Salvar Alterações'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </Layout>
+      <ProfileActions isAdmin={isAdmin} />
+    </div>
   );
-};
-
-export default Profile;
+}
