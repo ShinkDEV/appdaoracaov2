@@ -150,55 +150,53 @@ const MyPrayers = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-0 sm:px-4 py-4 sm:py-8">
-        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 px-4 sm:px-0">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 max-w-6xl">
+        <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full shrink-0">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Minhas Orações</h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">Acompanhe seus pedidos e orações</p>
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Minhas Orações</h1>
+            <p className="text-muted-foreground text-xs md:text-sm">Acompanhe seus pedidos e orações</p>
           </div>
         </div>
 
-        <Tabs defaultValue="prayers" className="space-y-4 sm:space-y-6">
-          <div className="px-4 sm:px-0">
-            <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50 rounded-full p-0.5 sm:p-1 h-auto">
-              <TabsTrigger value="prayers" className="rounded-full gap-1 sm:gap-2 text-[11px] sm:text-sm py-2 sm:py-2.5 px-2 sm:px-4">
-                <HandHeart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Orando</span>
-                {prayingFor.length > 0 && (
-                  <Badge variant="secondary" className="ml-0.5 sm:ml-1 h-4 sm:h-5 px-1 sm:px-1.5 text-[10px] sm:text-xs">
-                    {prayingFor.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="requests" className="rounded-full gap-1 sm:gap-2 text-[11px] sm:text-sm py-2 sm:py-2.5 px-2 sm:px-4">
-                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Meus Pedidos</span>
-                {myRequests.length > 0 && (
-                  <Badge variant="secondary" className="ml-0.5 sm:ml-1 h-4 sm:h-5 px-1 sm:px-1.5 text-[10px] sm:text-xs">
-                    {myRequests.length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
-          </div>
+        <Tabs defaultValue="prayers" className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full max-w-xs md:max-w-md grid-cols-2 bg-muted/50 rounded-full p-1 h-auto">
+            <TabsTrigger value="prayers" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2.5 md:py-3 px-3 md:px-4">
+              <HandHeart className="h-4 w-4" />
+              <span>Orando</span>
+              {prayingFor.length > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  {prayingFor.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2.5 md:py-3 px-3 md:px-4">
+              <FileText className="h-4 w-4" />
+              <span>Meus Pedidos</span>
+              {myRequests.length > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  {myRequests.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
 
-          <TabsContent value="prayers" className="px-4 sm:px-0">
+          <TabsContent value="prayers">
             {loadingPraying ? (
               <div className="flex justify-center py-12">
                 <LoadingSpinner />
               </div>
             ) : prayingFor.length === 0 ? (
               <EmptyState
-                icon={<HandHeart className="h-12 w-12 sm:h-16 sm:w-16" />}
+                icon={<HandHeart className="h-12 w-12 md:h-16 md:w-16" />}
                 title="Nenhuma oração ainda"
                 description="Você ainda não está orando por nenhum pedido. Explore os pedidos e comece a orar!"
                 action={<Button onClick={() => navigate('/')} className="rounded-full px-6">Ver Pedidos</Button>}
               />
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                 {prayingFor.map(prayer => (
                   <PrayerItem
                     key={prayer.id}
@@ -212,14 +210,14 @@ const MyPrayers = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="requests" className="px-4 sm:px-0">
+          <TabsContent value="requests">
             {loadingRequests ? (
               <div className="flex justify-center py-12">
                 <LoadingSpinner />
               </div>
             ) : myRequests.length === 0 ? (
               <EmptyState
-                icon={<FileText className="h-12 w-12 sm:h-16 sm:w-16" />}
+                icon={<FileText className="h-12 w-12 md:h-16 md:w-16" />}
                 title="Nenhum pedido ainda"
                 description="Você ainda não criou nenhum pedido de oração."
                 action={
@@ -237,7 +235,7 @@ const MyPrayers = () => {
                     Novo Pedido
                   </Button>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
                   {myRequests.map(prayer => (
                     <PrayerItem
                       key={prayer.id}
