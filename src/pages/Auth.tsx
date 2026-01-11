@@ -74,6 +74,23 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Check if email exists in profiles
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email.toLowerCase().trim())
+        .maybeSingle();
+
+      if (!profile) {
+        toast({
+          variant: 'destructive',
+          title: 'E-mail não encontrado',
+          description: 'Não existe uma conta com este e-mail.',
+        });
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/redefinir-senha`,
       });
