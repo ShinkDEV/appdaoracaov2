@@ -53,6 +53,16 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Get current profile to check for existing photo
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('photo_url')
+      .eq('id', user.id)
+      .single();
+
+    const oldPhotoUrl = profile?.photo_url;
+    const r2PublicBase = 'https://pub-45973938291a4fa2a2bcfb9a2c6a9aec.r2.dev/';
+
     // Parse multipart form data
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -146,6 +156,71 @@ Deno.serve(async (req) => {
     
     // Construct public URL
     const publicUrl = `https://pub-45973938291a4fa2a2bcfb9a2c6a9aec.r2.dev/${fileName}`;
+    
+    // Delete old photo from R2 if it exists and is from R2
+    if (oldPhotoUrl && oldPhotoUrl.startsWith(r2PublicBase)) {
+      const oldFileName = oldPhotoUrl.replace(r2PublicBase, '');
+      console.log('Deleting old photo:', oldFileName);
+      
+      try {
+        const deleteDate = new Date();
+        const deleteDateStr = deleteDate.toISOString().replace(/[:-]|\.\d{3}/g, '').slice(0, 8);
+        const deleteDateTimeStr = deleteDate.toISOString().replace(/[:-]|\.\d{3}/g, '');
+        
+        const deleteUri = `/${bucketName}/${oldFileName}`;
+        const deleteUrl = `https://${host}/${bucketName}/${oldFileName}`;
+        const deletePayloadHash = await sha256Hex(new TextEncoder().encode(''));
+        
+        const deleteCanonicalHeaders = [
+          `host:${host}`,
+          `x-amz-content-sha256:${deletePayloadHash}`,
+          `x-amz-date:${deleteDateTimeStr}`,
+        ].join('\n') + '\n';
+        
+        const deleteSignedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+        
+        const deleteCanonicalRequest = [
+          'DELETE',
+          deleteUri,
+          '',
+          deleteCanonicalHeaders,
+          deleteSignedHeaders,
+          deletePayloadHash,
+        ].join('\n');
+        
+        const deleteCanonicalRequestHash = await sha256Hex(new TextEncoder().encode(deleteCanonicalRequest));
+        const deleteCredentialScope = `${deleteDateStr}/${region}/${service}/aws4_request`;
+        const deleteStringToSign = [
+          'AWS4-HMAC-SHA256',
+          deleteDateTimeStr,
+          deleteCredentialScope,
+          deleteCanonicalRequestHash,
+        ].join('\n');
+        
+        const deleteSigningKey = await getSignatureKey(secretAccessKey, deleteDateStr, region, service);
+        const deleteSignature = await hmacHex(deleteSigningKey, deleteStringToSign);
+        const deleteAuthHeader = `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${deleteCredentialScope}, SignedHeaders=${deleteSignedHeaders}, Signature=${deleteSignature}`;
+        
+        const deleteResponse = await fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            'Host': host,
+            'x-amz-content-sha256': deletePayloadHash,
+            'x-amz-date': deleteDateTimeStr,
+            'Authorization': deleteAuthHeader,
+          },
+        });
+        
+        if (deleteResponse.ok) {
+          console.log('Old photo deleted successfully');
+        } else {
+          console.error('Failed to delete old photo:', await deleteResponse.text());
+        }
+      } catch (deleteError) {
+        console.error('Error deleting old photo:', deleteError);
+        // Continue with upload even if delete fails
+      }
+    }
     
     // Update profile with new photo URL
     const { error: updateError } = await supabaseClient
