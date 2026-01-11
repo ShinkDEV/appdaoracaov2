@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NewRequest from "./pages/NewRequest";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
@@ -28,6 +29,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Layout><Index /></Layout>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/redefinir-senha" element={<ResetPassword />} />
             <Route path="/novo-pedido" element={<Layout><NewRequest /></Layout>} />
             <Route path="/perfil" element={<Layout><Profile /></Layout>} />
             <Route path="/admin" element={<Layout><Admin /></Layout>} />
