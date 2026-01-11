@@ -139,8 +139,8 @@ Deno.serve(async (req) => {
       );
     }
     
-    // Construct public URL (you need to enable public access on R2 or use a custom domain)
-    const publicUrl = `https://pub-${accountId}.r2.dev/${bucketName}/${fileName}`;
+    // Construct public URL
+    const publicUrl = `https://pub-45973938291a4fa2a2bcfb9a2c6a9aec.r2.dev/${fileName}`;
     
     // Update profile with new photo URL
     const { error: updateError } = await supabaseClient
