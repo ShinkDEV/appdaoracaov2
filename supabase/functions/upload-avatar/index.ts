@@ -41,7 +41,12 @@ Deno.serve(async (req) => {
     const secretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY');
     const bucketName = Deno.env.get('R2_BUCKET_NAME');
 
+    console.log('R2 Config - Account ID:', accountId?.substring(0, 8) + '...');
+    console.log('R2 Config - Bucket:', bucketName);
+    console.log('R2 Config - Access Key ID:', accessKeyId?.substring(0, 8) + '...');
+
     if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
+      console.error('Missing R2 config:', { accountId: !!accountId, accessKeyId: !!accessKeyId, secretAccessKey: !!secretAccessKey, bucketName: !!bucketName });
       return new Response(
         JSON.stringify({ error: 'R2 configuration missing' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
