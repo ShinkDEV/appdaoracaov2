@@ -92,16 +92,18 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
       formData.append('file', croppedBlob, 'avatar.jpg');
 
       // Upload via edge function to Cloudflare R2
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL || 'https://iwjhfwyvabcerqlsjogu.supabase.co'}/functions/v1/upload-avatar`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: formData,
-        }
-      );
+      const uploadUrl = `https://iwjhfwyvabcerqlsjogu.supabase.co/functions/v1/upload-avatar`;
+      console.log('Uploading to R2 via:', uploadUrl);
+      
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      });
+      
+      console.log('Upload response status:', response.status);
 
       const result = await response.json();
 
