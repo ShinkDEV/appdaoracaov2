@@ -150,6 +150,8 @@ export type Database = {
           id: string
           last_ip: string | null
           photo_url: string | null
+          verified: boolean | null
+          verified_at: string | null
         }
         Insert: {
           ban_reason?: string | null
@@ -161,6 +163,8 @@ export type Database = {
           id: string
           last_ip?: string | null
           photo_url?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
         }
         Update: {
           ban_reason?: string | null
@@ -172,6 +176,8 @@ export type Database = {
           id?: string
           last_ip?: string | null
           photo_url?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
         }
         Relationships: []
       }

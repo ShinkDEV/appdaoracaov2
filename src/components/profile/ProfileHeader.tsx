@@ -7,16 +7,18 @@ import { Camera, User, Pencil, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ImageCropper } from './ImageCropper';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 
 interface ProfileHeaderProps {
   userId: string;
   displayName: string | null;
   photoUrl: string | null;
   email: string;
+  verified?: boolean;
   onUpdate: () => void;
 }
 
-export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }: ProfileHeaderProps) {
+export function ProfileHeader({ userId, displayName, photoUrl, email, verified, onUpdate }: ProfileHeaderProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(displayName || '');
   const [uploading, setUploading] = useState(false);
@@ -232,6 +234,7 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
         ) : (
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-semibold">{displayName || 'Usuário'}</h2>
+            {verified && <VerifiedBadge size="lg" />}
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setIsEditingName(true)}>
               <Pencil className="h-4 w-4" />
             </Button>

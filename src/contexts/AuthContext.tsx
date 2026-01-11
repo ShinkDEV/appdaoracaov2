@@ -11,6 +11,8 @@ interface Profile {
   banned: boolean;
   banned_at: string | null;
   ban_reason: string | null;
+  verified: boolean;
+  verified_at: string | null;
   created_at: string;
 }
 

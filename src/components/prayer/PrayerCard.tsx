@@ -4,6 +4,7 @@ import { HandHeart, Pin, ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 import type { PrayerRequest, PrayerTheme } from '@/hooks/usePrayers';
 
 interface PrayerCardProps {
@@ -84,9 +85,14 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
               {prayer.is_anonymous ? '🙏' : getInitials(prayer.author?.display_name)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium text-foreground truncate">
-            {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'App da Oração')}
-          </span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-sm font-medium text-foreground truncate">
+              {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'App da Oração')}
+            </span>
+            {!prayer.is_anonymous && prayer.author?.verified && (
+              <VerifiedBadge size="sm" />
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
