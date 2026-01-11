@@ -238,16 +238,19 @@ export type Database = {
           display_name: string | null
           id: string | null
           photo_url: string | null
+          verified: boolean | null
         }
         Insert: {
           display_name?: string | null
           id?: string | null
           photo_url?: string | null
+          verified?: boolean | null
         }
         Update: {
           display_name?: string | null
           id?: string | null
           photo_url?: string | null
+          verified?: boolean | null
         }
         Relationships: []
       }
