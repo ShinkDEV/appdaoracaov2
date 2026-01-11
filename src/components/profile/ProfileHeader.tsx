@@ -80,31 +80,34 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, onUpdate }
     setUploading(true);
 
     try {
-      const fileName = `${userId}-${Date.now()}.jpg`;
-      const filePath = `${userId}/${fileName}`;
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Você precisa estar logado');
+        return;
+      }
 
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, croppedBlob, { 
-          upsert: true,
-          contentType: 'image/jpeg'
-        });
+      // Create form data
+      const formData = new FormData();
+      formData.append('file', croppedBlob, 'avatar.jpg');
 
-      if (uploadError) throw uploadError;
+      // Upload via edge function to Cloudflare R2
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL || 'https://iwjhfwyvabcerqlsjogu.supabase.co'}/functions/v1/upload-avatar`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+      const result = await response.json();
 
-      // Update profile
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ photo_url: publicUrl })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao fazer upload');
+      }
 
       toast.success('Foto atualizada!');
       onUpdate();
