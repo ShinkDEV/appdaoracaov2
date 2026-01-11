@@ -10,6 +10,7 @@ interface Profile {
   email: string;
   display_name: string | null;
   photo_url: string | null;
+  verified: boolean | null;
   created_at: string;
 }
 
@@ -71,6 +72,7 @@ export default function Profile() {
         displayName={profile.display_name}
         photoUrl={profile.photo_url}
         email={profile.email}
+        verified={profile.verified ?? false}
         onUpdate={fetchProfile}
       />
 

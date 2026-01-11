@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Search, Ban, CheckCircle, Users, UserX, UserCheck } from 'lucide-react';
+import { Search, Ban, CheckCircle, Users, UserX, UserCheck, BadgeCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -31,6 +31,8 @@ interface Profile {
   banned: boolean | null;
   ban_reason: string | null;
   banned_at: string | null;
+  verified: boolean | null;
+  verified_at: string | null;
   created_at: string;
 }
 
@@ -82,6 +84,26 @@ export function UserManagement() {
     setBanReason('');
   };
 
+  const toggleVerify = async (profile: Profile) => {
+    const newVerifyStatus = !profile.verified;
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        verified: newVerifyStatus,
+        verified_at: newVerifyStatus ? new Date().toISOString() : null,
+      })
+      .eq('id', profile.id);
+
+    if (error) {
+      toast.error('Erro ao atualizar verificação');
+      console.error(error);
+    } else {
+      toast.success(newVerifyStatus ? 'Usuário verificado!' : 'Verificação removida');
+      fetchProfiles();
+    }
+  };
+
   const getInitials = (name: string | null, email: string) => {
     if (name) {
       return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -96,6 +118,7 @@ export function UserManagement() {
 
   const bannedCount = profiles.filter(p => p.banned).length;
   const activeCount = profiles.length - bannedCount;
+  const verifiedCount = profiles.filter(p => p.verified).length;
 
   if (loading) {
     return (
@@ -110,7 +133,7 @@ export function UserManagement() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-4">
             <div className="p-3 rounded-xl bg-primary/10">
@@ -135,12 +158,23 @@ export function UserManagement() {
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-blue-500/10">
+              <BadgeCheck className="h-5 w-5 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{verifiedCount}</p>
+              <p className="text-sm text-muted-foreground">Verificados</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-4">
             <div className="p-3 rounded-xl bg-destructive/10">
               <UserX className="h-5 w-5 text-destructive" />
             </div>
             <div>
               <p className="text-2xl font-bold">{bannedCount}</p>
-              <p className="text-sm text-muted-foreground">Usuários banidos</p>
+              <p className="text-sm text-muted-foreground">Banidos</p>
             </div>
           </CardContent>
         </Card>
@@ -192,7 +226,12 @@ export function UserManagement() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-sm">{profile.display_name || 'Sem nome'}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-medium text-sm">{profile.display_name || 'Sem nome'}</p>
+                              {profile.verified && (
+                                <BadgeCheck className="h-4 w-4 text-primary fill-primary/20" />
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground">{profile.email}</p>
                           </div>
                         </div>
@@ -214,50 +253,64 @@ export function UserManagement() {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {profile.banned ? (
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Verify Button */}
                           <Button
-                            variant="outline"
+                            variant={profile.verified ? "secondary" : "outline"}
                             size="sm"
-                            onClick={() => toggleBan(profile)}
-                            className="gap-1.5"
+                            onClick={() => toggleVerify(profile)}
+                            className={profile.verified ? "gap-1.5 bg-primary/10 text-primary hover:bg-primary/20" : "gap-1.5"}
                           >
-                            <CheckCircle className="h-3.5 w-3.5" />
-                            <span className="hidden sm:inline">Desbanir</span>
+                            <BadgeCheck className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">{profile.verified ? 'Verificado' : 'Verificar'}</span>
                           </Button>
-                        ) : (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm" className="gap-1.5">
-                                <Ban className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Banir</span>
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Banir usuário</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja banir {profile.display_name || profile.email}?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <div className="py-4">
-                                <Input
-                                  placeholder="Motivo do ban (opcional)"
-                                  value={banReason}
-                                  onChange={(e) => setBanReason(e.target.value)}
-                                />
-                              </div>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel onClick={() => setBanReason('')}>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction 
-                                  onClick={() => toggleBan(profile, banReason)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Confirmar Ban
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        )}
+                          
+                          {/* Ban/Unban Button */}
+                          {profile.banned ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleBan(profile)}
+                              className="gap-1.5"
+                            >
+                              <CheckCircle className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline">Desbanir</span>
+                            </Button>
+                          ) : (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm" className="gap-1.5">
+                                  <Ban className="h-3.5 w-3.5" />
+                                  <span className="hidden sm:inline">Banir</span>
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Banir usuário</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Tem certeza que deseja banir {profile.display_name || profile.email}?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="py-4">
+                                  <Input
+                                    placeholder="Motivo do ban (opcional)"
+                                    value={banReason}
+                                    onChange={(e) => setBanReason(e.target.value)}
+                                  />
+                                </div>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setBanReason('')}>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={() => toggleBan(profile, banReason)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Confirmar Ban
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
