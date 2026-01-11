@@ -57,12 +57,12 @@ export function useMyPrayers() {
 
       // Get authors
       const userIds = [...new Set((prayersData || []).map(p => p.user_id))];
-      let profilesMap: Record<string, { display_name: string | null; photo_url: string | null }> = {};
+      let profilesMap: Record<string, { display_name: string | null; photo_url: string | null; verified: boolean | null }> = {};
 
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
           .from('public_profiles')
-          .select('id, display_name, photo_url')
+          .select('id, display_name, photo_url, verified')
           .in('id', userIds);
 
         if (profilesData) {
@@ -70,7 +70,8 @@ export function useMyPrayers() {
             if (profile.id) {
               profilesMap[profile.id] = {
                 display_name: profile.display_name,
-                photo_url: profile.photo_url
+                photo_url: profile.photo_url,
+                verified: profile.verified
               };
             }
           });
@@ -102,7 +103,7 @@ export function useMyPrayers() {
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: true,
-        author: prayer.is_anonymous ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null }
+        author: prayer.is_anonymous ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null, verified: false }
       }));
 
       setPrayingFor(formattedPrayers);
@@ -176,7 +177,7 @@ export function useMyPrayers() {
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: userPrayers.has(prayer.id),
-        author: { display_name: 'Você', photo_url: null }
+        author: { display_name: 'Você', photo_url: null, verified: false }
       }));
 
       setMyRequests(formattedPrayers);
