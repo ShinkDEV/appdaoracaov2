@@ -3,5 +3,8 @@ project_id = "iwjhfwyvabcerqlsjogu"
 [functions.upload-avatar]
 verify_jwt = false
 
+[functions.mercadopago-payment]
+verify_jwt = false
+
 [functions.efi-card-payment]
 verify_jwt = false
