@@ -3,10 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, ExternalLink, CreditCard, Mail, QrCode, Loader2 } from 'lucide-react';
+import { Heart, Copy, Check, ExternalLink, CreditCard, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
 
 interface DonationModalProps {
   open: boolean;
@@ -15,34 +14,23 @@ interface DonationModalProps {
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 
-// Contact email
+// PIX key for donations
+const PIX_KEY = 'pix@appdaoracao.com.br';
 const CONTACT_EMAIL = 'contato@appdaoracao.com';
-
-interface PixChargeResponse {
-  txid: string;
-  pixCopiaECola: string;
-  qrcode: string;
-  imagemQrcode: string;
-  valor: string;
-  expiracao: number;
-}
 
 export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState('');
   const [copiedPix, setCopiedPix] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
-  const [pixCharge, setPixCharge] = useState<PixChargeResponse | null>(null);
 
   const finalValue = selectedValue || (customValue ? parseFloat(customValue) : 0);
 
   const handleCopyPix = async () => {
-    if (!pixCharge?.pixCopiaECola) return;
     try {
-      await navigator.clipboard.writeText(pixCharge.pixCopiaECola);
+      await navigator.clipboard.writeText(PIX_KEY);
       setCopiedPix(true);
-      toast.success('Código PIX copiado!');
+      toast.success('Chave PIX copiada!');
       setTimeout(() => setCopiedPix(false), 2000);
     } catch {
       toast.error('Erro ao copiar');
@@ -63,54 +51,16 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const handleSelectValue = (value: number) => {
     setSelectedValue(value);
     setCustomValue('');
-    setPixCharge(null);
   };
 
   const handleCustomValueChange = (value: string) => {
     setCustomValue(value);
     setSelectedValue(null);
-    setPixCharge(null);
-  };
-
-  const handleGeneratePix = async () => {
-    if (finalValue <= 0) {
-      toast.error('Selecione um valor para doar');
-      return;
-    }
-
-    setIsGeneratingPix(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('efi-pix', {
-        body: {
-          amount: Math.round(finalValue * 100), // Convert to cents
-          description: 'Doação App da Oração',
-        },
-      });
-
-      if (error) throw error;
-
-      setPixCharge(data);
-      toast.success('QR Code PIX gerado com sucesso!');
-    } catch (error) {
-      console.error('Error generating PIX:', error);
-      toast.error('Erro ao gerar PIX. Tente novamente.');
-    } finally {
-      setIsGeneratingPix(false);
-    }
-  };
-
-  const handleClose = (isOpen: boolean) => {
-    if (!isOpen) {
-      setPixCharge(null);
-      setSelectedValue(null);
-      setCustomValue('');
-    }
-    onOpenChange(isOpen);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-center justify-center">
             <Heart className="h-5 w-5 text-primary" />
@@ -185,98 +135,40 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
           <div className="space-y-4 p-4 rounded-xl bg-muted/50 border">
             <div className="flex items-center gap-2 font-medium text-foreground">
               <div className="p-1.5 rounded-md bg-green-500/10">
-                <QrCode className="h-4 w-4 text-green-600" />
+                <Copy className="h-4 w-4 text-green-600" />
               </div>
-              PIX via EFI Bank
+              Chave PIX
             </div>
             
-            {!pixCharge ? (
+            <div className="flex items-center gap-2">
+              <Input
+                value={PIX_KEY}
+                readOnly
+                className="bg-background font-mono text-sm"
+              />
               <Button
-                onClick={handleGeneratePix}
-                disabled={finalValue <= 0 || isGeneratingPix}
-                className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold gap-2"
+                variant="outline"
+                size="icon"
+                onClick={handleCopyPix}
+                className="shrink-0"
               >
-                {isGeneratingPix ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Gerando QR Code...
-                  </>
+                {copiedPix ? (
+                  <Check className="h-4 w-4 text-green-600" />
                 ) : (
-                  <>
-                    <QrCode className="h-5 w-5" />
-                    Gerar QR Code PIX - R$ {finalValue > 0 ? finalValue.toFixed(2).replace('.', ',') : '0,00'}
-                  </>
+                  <Copy className="h-4 w-4" />
                 )}
               </Button>
-            ) : (
-              <div className="space-y-4">
-                {/* QR Code Image */}
-                <div className="flex justify-center">
-                  <div className="bg-white p-4 rounded-lg shadow-md">
-                    <img 
-                      src={pixCharge.imagemQrcode} 
-                      alt="QR Code PIX" 
-                      className="w-48 h-48"
-                    />
-                  </div>
-                </div>
-
-                {/* PIX Copy and Paste */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Ou copie o código PIX:</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={pixCharge.pixCopiaECola}
-                      readOnly
-                      className="bg-background font-mono text-xs"
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleCopyPix}
-                      className="shrink-0"
-                    >
-                      {copiedPix ? (
-                        <Check className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Value and Expiration */}
-                <div className="bg-background/50 rounded-lg p-3 space-y-1 text-center">
-                  <p className="text-lg font-bold text-green-600">
-                    R$ {pixCharge.valor.replace('.', ',')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Expira em {Math.round(pixCharge.expiracao / 60)} minutos
-                  </p>
-                </div>
-
-                {/* Generate New Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => setPixCharge(null)}
-                  className="w-full"
-                >
-                  Gerar novo QR Code
-                </Button>
-              </div>
-            )}
+            </div>
 
             {/* Instructions */}
-            {!pixCharge && (
-              <div className="bg-background/50 rounded-lg p-3 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Como doar via PIX:</p>
-                <ol className="text-xs text-muted-foreground/80 space-y-0.5 list-decimal list-inside">
-                  <li>Selecione o valor acima</li>
-                  <li>Clique em "Gerar QR Code PIX"</li>
-                  <li>Escaneie ou copie o código no seu banco</li>
-                </ol>
-              </div>
-            )}
+            <div className="bg-background/50 rounded-lg p-3 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Como doar via PIX:</p>
+              <ol className="text-xs text-muted-foreground/80 space-y-0.5 list-decimal list-inside">
+                <li>Copie a chave PIX acima</li>
+                <li>Abra o app do seu banco</li>
+                <li>Faça um PIX com o valor desejado</li>
+              </ol>
+            </div>
           </div>
 
           {/* Contact Section */}
