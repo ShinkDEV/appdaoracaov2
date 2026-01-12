@@ -77,6 +77,7 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const [isMpLoaded, setIsMpLoaded] = useState(false);
   const [cardFormInstance, setCardFormInstance] = useState<CardFormInstance | null>(null);
   const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [isFormMounted, setIsFormMounted] = useState(false);
 
   const finalValue = selectedValue || (customValue ? parseFloat(customValue) : 0);
 
@@ -135,6 +136,9 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
               if (error) {
                 console.error('CardForm mount error:', error);
                 toast.error('Erro ao carregar formulário');
+                setIsFormMounted(false);
+              } else {
+                setIsFormMounted(true);
               }
             },
             onSubmit: async (event) => {
@@ -158,8 +162,13 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
     initCardForm();
 
     return () => {
-      if (cardFormInstance) {
-        cardFormInstance.unmount();
+      if (cardFormInstance && isFormMounted) {
+        try {
+          cardFormInstance.unmount();
+        } catch (e) {
+          console.log('CardForm already unmounted');
+        }
+        setIsFormMounted(false);
       }
     };
   }, [step, isMpLoaded, finalValue]);
@@ -173,8 +182,13 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
 
   const handleClose = (isOpen: boolean) => {
     if (!isOpen) {
-      if (cardFormInstance) {
-        cardFormInstance.unmount();
+      if (cardFormInstance && isFormMounted) {
+        try {
+          cardFormInstance.unmount();
+        } catch (e) {
+          console.log('CardForm already unmounted');
+        }
+        setIsFormMounted(false);
       }
       resetForm();
     }
