@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,15 +18,54 @@ const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'pix@appdaoracao.com.br';
 const CONTACT_EMAIL = 'contato@appdaoracao.com';
 
-const CARD_BRANDS = [
-  { value: 'visa', label: 'Visa' },
-  { value: 'mastercard', label: 'Mastercard' },
-  { value: 'elo', label: 'Elo' },
-  { value: 'amex', label: 'American Express' },
-  { value: 'hipercard', label: 'Hipercard' },
-];
-
 type Step = 'select-value' | 'card-form' | 'success';
+
+declare global {
+  interface Window {
+    MercadoPago: new (publicKey: string) => MercadoPagoInstance;
+  }
+}
+
+interface MercadoPagoInstance {
+  cardForm: (options: CardFormOptions) => CardFormInstance;
+}
+
+interface CardFormOptions {
+  amount: string;
+  iframe: boolean;
+  form: {
+    id: string;
+    cardNumber: { id: string; placeholder: string };
+    expirationDate: { id: string; placeholder: string };
+    securityCode: { id: string; placeholder: string };
+    cardholderName: { id: string; placeholder: string };
+    issuer: { id: string; placeholder: string };
+    installments: { id: string; placeholder: string };
+    identificationType: { id: string; placeholder: string };
+    identificationNumber: { id: string; placeholder: string };
+    cardholderEmail: { id: string; placeholder: string };
+  };
+  callbacks: {
+    onFormMounted: (error: Error | null) => void;
+    onSubmit: (event: Event) => void;
+    onFetching: (resource: string) => () => void;
+  };
+}
+
+interface CardFormInstance {
+  getCardFormData: () => CardFormData;
+  unmount: () => void;
+}
+
+interface CardFormData {
+  token: string;
+  installments: number;
+  paymentMethodId: string;
+  issuerId: string;
+  identificationType: string;
+  identificationNumber: string;
+  cardholderEmail: string;
+}
 
 export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const [step, setStep] = useState<Step>('select-value');
@@ -35,55 +74,108 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const [copiedPix, setCopiedPix] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Card form state
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
-  const [cardBrand, setCardBrand] = useState('');
-  const [installments, setInstallments] = useState('1');
-
-  // Customer info
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [customerCpf, setCustomerCpf] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-
-  // Address
-  const [street, setStreet] = useState('');
-  const [number, setNumber] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [zipcode, setZipcode] = useState('');
+  const [isMpLoaded, setIsMpLoaded] = useState(false);
+  const [cardFormInstance, setCardFormInstance] = useState<CardFormInstance | null>(null);
+  const [publicKey, setPublicKey] = useState<string | null>(null);
 
   const finalValue = selectedValue || (customValue ? parseFloat(customValue) : 0);
+
+  // Load Mercado Pago SDK
+  useEffect(() => {
+    if (step === 'card-form' && !isMpLoaded) {
+      const script = document.createElement('script');
+      script.src = 'https://sdk.mercadopago.com/js/v2';
+      script.async = true;
+      script.onload = () => setIsMpLoaded(true);
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [step, isMpLoaded]);
+
+  // Fetch public key and initialize form
+  useEffect(() => {
+    const initCardForm = async () => {
+      if (step !== 'card-form' || !isMpLoaded || !window.MercadoPago) return;
+
+      try {
+        // Get public key from edge function
+        const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
+          body: { action: 'get-public-key' },
+        });
+
+        if (error || !data?.publicKey) {
+          toast.error('Erro ao carregar formulário de pagamento');
+          return;
+        }
+
+        setPublicKey(data.publicKey);
+
+        const mp = new window.MercadoPago(data.publicKey);
+
+        const cardForm = mp.cardForm({
+          amount: finalValue.toString(),
+          iframe: true,
+          form: {
+            id: 'mp-card-form',
+            cardNumber: { id: 'mp-card-number', placeholder: 'Número do cartão' },
+            expirationDate: { id: 'mp-expiration-date', placeholder: 'MM/AA' },
+            securityCode: { id: 'mp-security-code', placeholder: 'CVV' },
+            cardholderName: { id: 'mp-cardholder-name', placeholder: 'Nome no cartão' },
+            issuer: { id: 'mp-issuer', placeholder: 'Banco emissor' },
+            installments: { id: 'mp-installments', placeholder: 'Parcelas' },
+            identificationType: { id: 'mp-identification-type', placeholder: 'Tipo de documento' },
+            identificationNumber: { id: 'mp-identification-number', placeholder: 'CPF' },
+            cardholderEmail: { id: 'mp-cardholder-email', placeholder: 'E-mail' },
+          },
+          callbacks: {
+            onFormMounted: (error) => {
+              if (error) {
+                console.error('CardForm mount error:', error);
+                toast.error('Erro ao carregar formulário');
+              }
+            },
+            onSubmit: async (event) => {
+              event.preventDefault();
+              await handlePayment();
+            },
+            onFetching: (resource) => {
+              console.log('Fetching:', resource);
+              return () => {};
+            },
+          },
+        });
+
+        setCardFormInstance(cardForm);
+      } catch (error) {
+        console.error('Error initializing card form:', error);
+        toast.error('Erro ao inicializar pagamento');
+      }
+    };
+
+    initCardForm();
+
+    return () => {
+      if (cardFormInstance) {
+        cardFormInstance.unmount();
+      }
+    };
+  }, [step, isMpLoaded, finalValue]);
 
   const resetForm = () => {
     setStep('select-value');
     setSelectedValue(null);
     setCustomValue('');
-    setCardNumber('');
-    setCardName('');
-    setCardExpiry('');
-    setCardCvv('');
-    setCardBrand('');
-    setInstallments('1');
-    setCustomerName('');
-    setCustomerEmail('');
-    setCustomerCpf('');
-    setCustomerPhone('');
-    setStreet('');
-    setNumber('');
-    setNeighborhood('');
-    setCity('');
-    setState('');
-    setZipcode('');
+    setCardFormInstance(null);
   };
 
   const handleClose = (isOpen: boolean) => {
     if (!isOpen) {
+      if (cardFormInstance) {
+        cardFormInstance.unmount();
+      }
       resetForm();
     }
     onOpenChange(isOpen);
@@ -121,106 +213,53 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
     setSelectedValue(null);
   };
 
-  const formatCardNumber = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    return numbers.replace(/(\d{4})(?=\d)/g, '$1 ').trim().slice(0, 19);
-  };
-
-  const formatExpiry = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length >= 2) {
-      return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}`;
-    }
-    return numbers;
-  };
-
-  const formatCpf = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    return numbers
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-      .slice(0, 14);
-  };
-
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    return numbers
-      .replace(/(\d{2})(\d)/, '($1) $2')
-      .replace(/(\d{5})(\d)/, '$1-$2')
-      .slice(0, 15);
-  };
-
-  const formatZipcode = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    return numbers.replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9);
-  };
-
-  const handleProcessPayment = async () => {
-    if (!cardNumber || !cardName || !cardExpiry || !cardCvv || !cardBrand) {
-      toast.error('Preencha todos os dados do cartão');
-      return;
-    }
-
-    if (!customerName || !customerEmail || !customerCpf) {
-      toast.error('Preencha os dados pessoais');
-      return;
-    }
-
-    if (!street || !number || !neighborhood || !city || !state || !zipcode) {
-      toast.error('Preencha o endereço completo');
+  const handlePayment = async () => {
+    if (!cardFormInstance) {
+      toast.error('Formulário não carregado');
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      const [expirationMonth, expirationYear] = cardExpiry.split('/');
-      
-      // Step 1: Tokenize card
-      const { data: tokenData, error: tokenError } = await supabase.functions.invoke('efi-card-payment/tokenize', {
-        body: {
-          brand: cardBrand,
-          number: cardNumber.replace(/\s/g, ''),
-          cvv: cardCvv,
-          expirationMonth,
-          expirationYear: `20${expirationYear}`,
-        },
-      });
+      const formData = cardFormInstance.getCardFormData();
 
-      if (tokenError || !tokenData?.paymentToken) {
-        throw new Error(tokenError?.message || 'Erro ao processar cartão');
+      if (!formData.token) {
+        toast.error('Erro ao processar cartão. Verifique os dados.');
+        setIsProcessing(false);
+        return;
       }
 
-      // Step 2: Process payment
-      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('efi-card-payment/pay', {
+      const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
         body: {
-          amount: Math.round(finalValue * 100),
-          cardToken: tokenData.paymentToken,
-          installments: parseInt(installments),
-          customer: {
-            name: customerName,
-            email: customerEmail,
-            cpf: customerCpf,
-            phone: customerPhone,
-          },
-          billingAddress: {
-            street,
-            number,
-            neighborhood,
-            city,
-            state,
-            zipcode,
+          token: formData.token,
+          transactionAmount: finalValue,
+          installments: formData.installments,
+          paymentMethodId: formData.paymentMethodId,
+          issuerId: formData.issuerId,
+          payer: {
+            email: formData.cardholderEmail,
+            identification: {
+              type: formData.identificationType,
+              number: formData.identificationNumber,
+            },
           },
         },
       });
 
-      if (paymentError) {
-        throw new Error(paymentError.message || 'Erro ao processar pagamento');
+      if (error) {
+        throw new Error(error.message || 'Erro ao processar pagamento');
       }
 
-      setStep('success');
-      toast.success('Doação realizada com sucesso!');
+      if (data.status === 'approved') {
+        setStep('success');
+        toast.success('Doação realizada com sucesso!');
+      } else if (data.status === 'in_process' || data.status === 'pending') {
+        setStep('success');
+        toast.info('Pagamento em análise');
+      } else {
+        throw new Error(data.statusDetail || 'Pagamento não aprovado');
+      }
     } catch (error) {
       console.error('Payment error:', error);
       toast.error(error instanceof Error ? error.message : 'Erro ao processar pagamento');
@@ -268,7 +307,7 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
 
         <Button 
           className="w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold gap-2 shadow-lg"
-          disabled={finalValue <= 0}
+          disabled={finalValue < 1}
           onClick={() => setStep('card-form')}
         >
           <CreditCard className="h-5 w-5" />
@@ -348,115 +387,58 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
         <p className="text-2xl font-bold text-primary">R$ {finalValue.toFixed(2).replace('.', ',')}</p>
       </div>
 
-      {/* Card Details */}
-      <div className="space-y-3">
-        <Label className="font-medium">Dados do Cartão</Label>
-        
-        <Select value={cardBrand} onValueChange={setCardBrand}>
-          <SelectTrigger>
-            <SelectValue placeholder="Bandeira do cartão" />
-          </SelectTrigger>
-          <SelectContent>
-            {CARD_BRANDS.map((brand) => (
-              <SelectItem key={brand.value} value={brand.value}>
-                {brand.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Input
-          placeholder="Número do cartão"
-          value={cardNumber}
-          onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-          maxLength={19}
-        />
-
-        <Input
-          placeholder="Nome impresso no cartão"
-          value={cardName}
-          onChange={(e) => setCardName(e.target.value.toUpperCase())}
-        />
-
-        <div className="grid grid-cols-2 gap-2">
-          <Input
-            placeholder="MM/AA"
-            value={cardExpiry}
-            onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-            maxLength={5}
-          />
-          <Input
-            placeholder="CVV"
-            value={cardCvv}
-            onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-            maxLength={4}
-            type="password"
-          />
+      {!isMpLoaded ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Carregando...</span>
         </div>
+      ) : (
+        <form id="mp-card-form" className="space-y-4">
+          <div className="space-y-3">
+            <Label className="font-medium">Dados do Cartão</Label>
+            <div id="mp-card-number" className="h-10 border rounded-md"></div>
+            <div className="grid grid-cols-2 gap-2">
+              <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
+              <div id="mp-security-code" className="h-10 border rounded-md"></div>
+            </div>
+            <div id="mp-cardholder-name" className="h-10 border rounded-md"></div>
+            <div id="mp-issuer" className="h-10 border rounded-md"></div>
+            <div id="mp-installments" className="h-10 border rounded-md"></div>
+          </div>
 
-        <Select value={installments} onValueChange={setInstallments}>
-          <SelectTrigger>
-            <SelectValue placeholder="Parcelas" />
-          </SelectTrigger>
-          <SelectContent>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => {
-              const installmentValue = finalValue / n;
-              if (installmentValue >= 5) {
-                return (
-                  <SelectItem key={n} value={n.toString()}>
-                    {n}x de R$ {installmentValue.toFixed(2).replace('.', ',')}
-                  </SelectItem>
-                );
-              }
-              return null;
-            })}
-          </SelectContent>
-        </Select>
-      </div>
+          <div className="space-y-3">
+            <Label className="font-medium">Dados Pessoais</Label>
+            <div id="mp-cardholder-email" className="h-10 border rounded-md"></div>
+            <div className="grid grid-cols-2 gap-2">
+              <div id="mp-identification-type" className="h-10 border rounded-md"></div>
+              <div id="mp-identification-number" className="h-10 border rounded-md"></div>
+            </div>
+          </div>
 
-      {/* Customer Info */}
-      <div className="space-y-3">
-        <Label className="font-medium">Dados Pessoais</Label>
-        <Input placeholder="Nome completo" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
-        <Input placeholder="E-mail" type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
-        <div className="grid grid-cols-2 gap-2">
-          <Input placeholder="CPF" value={customerCpf} onChange={(e) => setCustomerCpf(formatCpf(e.target.value))} maxLength={14} />
-          <Input placeholder="Telefone" value={customerPhone} onChange={(e) => setCustomerPhone(formatPhone(e.target.value))} maxLength={15} />
-        </div>
-      </div>
+          <Button
+            type="button"
+            className="w-full h-12 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold gap-2"
+            onClick={handlePayment}
+            disabled={isProcessing}
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-5 w-5" />
+                Confirmar Doação
+              </>
+            )}
+          </Button>
+        </form>
+      )}
 
-      {/* Address */}
-      <div className="space-y-3">
-        <Label className="font-medium">Endereço de Cobrança</Label>
-        <Input placeholder="CEP" value={zipcode} onChange={(e) => setZipcode(formatZipcode(e.target.value))} maxLength={9} />
-        <div className="grid grid-cols-3 gap-2">
-          <Input className="col-span-2" placeholder="Rua" value={street} onChange={(e) => setStreet(e.target.value)} />
-          <Input placeholder="Nº" value={number} onChange={(e) => setNumber(e.target.value)} />
-        </div>
-        <Input placeholder="Bairro" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} />
-        <div className="grid grid-cols-3 gap-2">
-          <Input className="col-span-2" placeholder="Cidade" value={city} onChange={(e) => setCity(e.target.value)} />
-          <Input placeholder="UF" value={state} onChange={(e) => setState(e.target.value.toUpperCase().slice(0, 2))} maxLength={2} />
-        </div>
-      </div>
-
-      <Button
-        className="w-full h-12 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold gap-2"
-        onClick={handleProcessPayment}
-        disabled={isProcessing}
-      >
-        {isProcessing ? (
-          <>
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Processando...
-          </>
-        ) : (
-          <>
-            <CreditCard className="h-5 w-5" />
-            Confirmar Doação
-          </>
-        )}
-      </Button>
+      <p className="text-xs text-center text-muted-foreground">
+        Pagamento processado com segurança pelo Mercado Pago
+      </p>
     </div>
   );
 
