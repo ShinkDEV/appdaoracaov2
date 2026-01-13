@@ -252,7 +252,7 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
         body: {
           token: tokenResponse.token,
           transactionAmount: finalValue,
-          installments: formData.installments || 1,
+          installments: parseInt(String(formData.installments || 1), 10),
           paymentMethodId: formData.paymentMethodId,
           issuerId: formData.issuerId,
           payer: {
