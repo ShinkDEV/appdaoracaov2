@@ -17,7 +17,13 @@ const loginSchema = z.object({
 });
 
 const signupSchema = loginSchema.extend({
-  displayName: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(50, 'Nome muito longo'),
+  displayName: z.string()
+    .min(2, 'Nome deve ter pelo menos 2 caracteres')
+    .max(50, 'Nome muito longo')
+    .refine(
+      (name) => !name.includes('@') && !/\S+@\S+\.\S+/.test(name),
+      'Nome não pode conter endereço de e-mail'
+    ),
 });
 
 const emailSchema = z.object({
