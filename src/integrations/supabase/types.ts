@@ -148,7 +148,6 @@ export type Database = {
           display_name: string | null
           email: string
           id: string
-          last_ip: string | null
           photo_url: string | null
           verified: boolean | null
           verified_at: string | null
@@ -161,7 +160,6 @@ export type Database = {
           display_name?: string | null
           email: string
           id: string
-          last_ip?: string | null
           photo_url?: string | null
           verified?: boolean | null
           verified_at?: string | null
@@ -174,10 +172,30 @@ export type Database = {
           display_name?: string | null
           email?: string
           id?: string
-          last_ip?: string | null
           photo_url?: string | null
           verified?: boolean | null
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      user_ip_tracking: {
+        Row: {
+          id: string
+          ip_address: string
+          recorded_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          ip_address: string
+          recorded_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string
+          recorded_at?: string
+          user_id?: string
         }
         Relationships: []
       }
