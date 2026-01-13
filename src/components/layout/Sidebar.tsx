@@ -121,7 +121,7 @@ export const Sidebar: React.FC = () => {
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{profile?.display_name || 'Usuário'}</p>
-                <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
             </div>
             <button

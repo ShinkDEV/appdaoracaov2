@@ -7,7 +7,6 @@ import { ProfileHeader, ProfileStats, ProfileActions } from '@/components/profil
 
 interface Profile {
   id: string;
-  email: string;
   display_name: string | null;
   photo_url: string | null;
   verified: boolean | null;
@@ -71,7 +70,7 @@ export default function Profile() {
         userId={profile.id}
         displayName={profile.display_name}
         photoUrl={profile.photo_url}
-        email={profile.email}
+        email={user.email || ''}
         verified={profile.verified ?? false}
         onUpdate={fetchProfile}
       />
