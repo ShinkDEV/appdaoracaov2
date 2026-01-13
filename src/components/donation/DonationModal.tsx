@@ -415,17 +415,32 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
               <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
               <div id="mp-security-code" className="h-10 border rounded-md"></div>
             </div>
-            <div id="mp-cardholder-name" className="h-10 border rounded-md"></div>
-            <div id="mp-issuer" className="h-10 border rounded-md"></div>
-            <div id="mp-installments" className="h-10 border rounded-md"></div>
+            <input 
+              type="text" 
+              id="mp-cardholder-name" 
+              className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Nome no cartão"
+            />
+            <select id="mp-issuer" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"></select>
+            <select id="mp-installments" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"></select>
           </div>
 
           <div className="space-y-3">
             <Label className="font-medium">Dados Pessoais</Label>
-            <div id="mp-cardholder-email" className="h-10 border rounded-md"></div>
+            <input 
+              type="email" 
+              id="mp-cardholder-email" 
+              className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="E-mail"
+            />
             <div className="grid grid-cols-2 gap-2">
-              <div id="mp-identification-type" className="h-10 border rounded-md"></div>
-              <div id="mp-identification-number" className="h-10 border rounded-md"></div>
+              <select id="mp-identification-type" className="h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"></select>
+              <input 
+                type="text" 
+                id="mp-identification-number" 
+                className="h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="CPF"
+              />
             </div>
           </div>
 
