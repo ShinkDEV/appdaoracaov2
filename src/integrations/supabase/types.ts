@@ -304,6 +304,13 @@ export type Database = {
       }
     }
     Functions: {
+      get_prayer_counts: {
+        Args: { prayer_ids: string[] }
+        Returns: {
+          count: number
+          prayer_request_id: string
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {

@@ -117,24 +117,24 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         }
       }
 
-      // Get prayer counts
+      // Get prayer counts using secure RPC function (doesn't expose who prayed)
       const prayerIds = prayerData?.map(p => p.id) || [];
       
       let prayerCounts: Record<string, number> = {};
       let userPrayers: Set<string> = new Set();
 
       if (prayerIds.length > 0) {
+        // Use secure function to get counts without exposing individual prayer activity
         const { data: countsData } = await supabase
-          .from('user_prayers')
-          .select('prayer_request_id')
-          .in('prayer_request_id', prayerIds);
+          .rpc('get_prayer_counts', { prayer_ids: prayerIds });
 
         if (countsData) {
-          countsData.forEach(up => {
-            prayerCounts[up.prayer_request_id] = (prayerCounts[up.prayer_request_id] || 0) + 1;
+          countsData.forEach((item: { prayer_request_id: string; count: number }) => {
+            prayerCounts[item.prayer_request_id] = item.count;
           });
         }
 
+        // User can still see their own prayers (allowed by RLS)
         if (user) {
           const { data: userPrayersData } = await supabase
             .from('user_prayers')
