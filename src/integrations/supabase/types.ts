@@ -146,7 +146,6 @@ export type Database = {
           banned_at: string | null
           created_at: string
           display_name: string | null
-          email: string
           id: string
           photo_url: string | null
           verified: boolean | null
@@ -158,7 +157,6 @@ export type Database = {
           banned_at?: string | null
           created_at?: string
           display_name?: string | null
-          email: string
           id: string
           photo_url?: string | null
           verified?: boolean | null
@@ -170,7 +168,6 @@ export type Database = {
           banned_at?: string | null
           created_at?: string
           display_name?: string | null
-          email?: string
           id?: string
           photo_url?: string | null
           verified?: boolean | null
