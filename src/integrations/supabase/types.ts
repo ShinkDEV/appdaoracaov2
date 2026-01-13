@@ -334,6 +334,9 @@ export type Database = {
           p_theme_id?: string
         }
         Returns: {
+          author_display_name: string
+          author_photo_url: string
+          author_verified: boolean
           created_at: string
           description: string
           id: string

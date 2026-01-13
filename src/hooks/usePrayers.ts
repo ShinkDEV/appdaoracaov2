@@ -68,7 +68,7 @@ export function usePrayers(options: UsePrayersOptions = {}) {
     }
 
     try {
-      // Use secure RPC function which masks user_id for anonymous requests
+      // Use secure RPC function which includes author info directly
       const { data: prayerData, error: prayerError } = await supabase
         .rpc('get_public_prayer_requests', {
           p_theme_id: options.themeFilter || null,
@@ -81,31 +81,6 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         console.error('Error fetching prayers:', prayerError);
         toast.error('Erro ao carregar pedidos de oração');
         return;
-      }
-
-      // Get unique user IDs for fetching profiles (only non-null, non-anonymous)
-      const userIds = [...new Set((prayerData || []).filter(p => p.user_id).map(p => p.user_id as string))];
-      
-      // Fetch profiles for authors
-      let profilesMap: Record<string, { display_name: string | null; photo_url: string | null; verified: boolean | null }> = {};
-      
-      if (userIds.length > 0) {
-        const { data: profilesData } = await supabase
-          .from('public_profiles')
-          .select('id, display_name, photo_url, verified')
-          .in('id', userIds);
-        
-        if (profilesData) {
-          profilesData.forEach(profile => {
-            if (profile.id) {
-              profilesMap[profile.id] = {
-                display_name: profile.display_name,
-                photo_url: profile.photo_url,
-                verified: profile.verified
-              };
-            }
-          });
-        }
       }
 
       // Get prayer counts using secure RPC function (doesn't expose who prayed)
@@ -141,17 +116,21 @@ export function usePrayers(options: UsePrayersOptions = {}) {
 
       const formattedPrayers: PrayerRequest[] = (prayerData || []).map(prayer => ({
         id: prayer.id,
-        user_id: prayer.user_id || '', // user_id is null for anonymous requests
+        user_id: prayer.user_id || '',
         title: prayer.title,
         description: prayer.description,
         theme_id: prayer.theme_id,
         is_anonymous: prayer.is_anonymous || false,
         is_pinned: prayer.is_pinned || false,
-        is_deleted: false, // View only returns non-deleted
+        is_deleted: false,
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: userPrayers.has(prayer.id),
-        author: prayer.is_anonymous || !prayer.user_id ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null, verified: false }
+        author: prayer.is_anonymous ? undefined : {
+          display_name: prayer.author_display_name || 'App da Oração',
+          photo_url: prayer.author_photo_url,
+          verified: prayer.author_verified || false
+        }
       }));
 
       if (append) {
