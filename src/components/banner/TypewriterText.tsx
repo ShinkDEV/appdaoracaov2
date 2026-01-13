@@ -2,20 +2,19 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const words = [
-  'Cura',
-  'Libertação',
-  'Família',
-  'Trabalho',
-  'Igreja',
-  'Nações',
-  'Sabedoria',
-  'Emoções',
-  'Relacionamentos',
-  'Finanças',
-  'Liderança',
-  'Autoridades',
-  'Decisões',
-  'Sentimentos'
+  'curas',
+  'libertações',
+  'famílias',
+  'trabalhos',
+  'igrejas',
+  'nações',
+  'emoções',
+  'relacionamentos',
+  'finanças',
+  'lideranças',
+  'autoridades',
+  'decisões',
+  'sentimentos'
 ];
 
 export function TypewriterText() {

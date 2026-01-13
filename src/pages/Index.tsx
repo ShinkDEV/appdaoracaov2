@@ -94,7 +94,7 @@ export default function Index() {
               <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta
             </h1>
             <h1 className="text-base sm:text-lg md:text-2xl lg:text-3xl font-bold text-white leading-relaxed">
-              oração, propósito e <TypewriterText />
+              propósito e oração por <TypewriterText />
             </h1>
           </div>
         </div>
