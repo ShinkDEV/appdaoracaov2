@@ -50,7 +50,7 @@ export function TypewriterText() {
   }, [displayText, isDeleting, currentWordIndex]);
 
   return (
-    <span className="inline-block min-w-[140px] sm:min-w-[180px] text-left">
+    <span className="inline-block text-center">
       <AnimatePresence mode="wait">
         <motion.span
           key={displayText}
