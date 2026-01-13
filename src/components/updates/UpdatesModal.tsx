@@ -22,8 +22,17 @@ interface Update {
 
 const UPDATES: Update[] = [
   {
+    version: '1.2.0',
+    date: '2026-01-13',
+    changes: [
+      { type: 'improvement', text: 'Melhorias de performance na animação do hero' },
+      { type: 'fix', text: 'Correção de animações em produção' },
+      { type: 'improvement', text: 'Otimizações gerais de estabilidade' },
+    ]
+  },
+  {
     version: '1.1.0',
-    date: '2025-01-13',
+    date: '2026-01-07',
     changes: [
       { type: 'feature', text: 'Instalação como app (PWA) - adicione à tela inicial!' },
       { type: 'feature', text: 'Sistema de doações via PIX e cartão' },
@@ -35,7 +44,7 @@ const UPDATES: Update[] = [
   },
   {
     version: '1.0.0',
-    date: '2024-01-01',
+    date: '2026-01-01',
     changes: [
       { type: 'feature', text: 'Lançamento do App da Oração!' },
       { type: 'feature', text: 'Crie e compartilhe pedidos de oração' },
