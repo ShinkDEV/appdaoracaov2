@@ -68,11 +68,10 @@ export function usePrayers(options: UsePrayersOptions = {}) {
     }
 
     try {
-      // First fetch prayer requests without join
+      // Use the public_prayer_requests view which hides user_id for anonymous requests
       let query = supabase
-        .from('prayer_requests')
+        .from('public_prayer_requests')
         .select('*')
-        .eq('is_deleted', false)
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false })
         .range(pageNum * pageSize, (pageNum + 1) * pageSize - 1);
@@ -93,8 +92,8 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         return;
       }
 
-      // Get unique user IDs for fetching profiles
-      const userIds = [...new Set((prayerData || []).map(p => p.user_id))];
+      // Get unique user IDs for fetching profiles (only non-null, non-anonymous)
+      const userIds = [...new Set((prayerData || []).filter(p => p.user_id).map(p => p.user_id as string))];
       
       // Fetch profiles for authors
       let profilesMap: Record<string, { display_name: string | null; photo_url: string | null; verified: boolean | null }> = {};
@@ -151,17 +150,17 @@ export function usePrayers(options: UsePrayersOptions = {}) {
 
       const formattedPrayers: PrayerRequest[] = (prayerData || []).map(prayer => ({
         id: prayer.id,
-        user_id: prayer.user_id,
+        user_id: prayer.user_id || '', // user_id is null for anonymous requests
         title: prayer.title,
         description: prayer.description,
         theme_id: prayer.theme_id,
         is_anonymous: prayer.is_anonymous || false,
         is_pinned: prayer.is_pinned || false,
-        is_deleted: prayer.is_deleted || false,
+        is_deleted: false, // View only returns non-deleted
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: userPrayers.has(prayer.id),
-        author: prayer.is_anonymous ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null, verified: false }
+        author: prayer.is_anonymous || !prayer.user_id ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null, verified: false }
       }));
 
       if (append) {
