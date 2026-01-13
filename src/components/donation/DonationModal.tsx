@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, Mail, CreditCard, Loader2, ArrowLeft } from 'lucide-react';
+import { Heart, Copy, Check, CreditCard, Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,8 +15,7 @@ interface DonationModalProps {
 }
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
-const PIX_KEY = 'pix@appdaoracao.com.br';
-const CONTACT_EMAIL = 'contato@appdaoracao.com';
+const PIX_KEY = 'apoio@appdaoracao.com';
 
 type Step = 'select-value' | 'card-form' | 'success';
 
@@ -73,7 +72,6 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState('');
   const [copiedPix, setCopiedPix] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMpLoaded, setIsMpLoaded] = useState(false);
   const [cardFormInstance, setCardFormInstance] = useState<CardFormInstance | null>(null);
@@ -207,16 +205,6 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
     }
   };
 
-  const handleCopyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(CONTACT_EMAIL);
-      setCopiedEmail(true);
-      toast.success('E-mail copiado!');
-      setTimeout(() => setCopiedEmail(false), 2000);
-    } catch {
-      toast.error('Erro ao copiar');
-    }
-  };
 
   const handleSelectValue = (value: number) => {
     setSelectedValue(value);
@@ -376,25 +364,6 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
         </div>
       </div>
 
-      {/* Contact Section */}
-      <div className="space-y-3 p-4 rounded-xl bg-muted/30 border border-dashed">
-        <div className="flex items-center gap-2 font-medium text-foreground">
-          <div className="p-1.5 rounded-md bg-blue-500/10">
-            <Mail className="h-4 w-4 text-blue-600" />
-          </div>
-          Contato
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Input value={CONTACT_EMAIL} readOnly className="bg-background font-mono text-sm" />
-          <Button variant="outline" size="icon" onClick={handleCopyEmail} className="shrink-0">
-            {copiedEmail ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Dúvidas ou sugestões? Entre em contato conosco!
-        </p>
-      </div>
     </div>
   );
 
