@@ -6,6 +6,7 @@ import { usePrayers } from '@/hooks/usePrayers';
 import { useAuth } from '@/contexts/AuthContext';
 import { PrayerFilters, PrayerList } from '@/components/prayer';
 import { BannerCarousel } from '@/components/banner';
+import { TypewriterText } from '@/components/banner/TypewriterText';
 import { UpdatesModal, useUpdatesModal } from '@/components/updates';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -89,9 +90,9 @@ export default function Index() {
       ) : (
         <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
           <div className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 text-center">
-            <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
+            <h1 className="text-base sm:text-lg md:text-2xl lg:text-3xl font-bold text-white leading-relaxed">
               <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta<br />
-              oração e propósito
+              oração, propósito e <TypewriterText />
             </h1>
           </div>
         </div>
