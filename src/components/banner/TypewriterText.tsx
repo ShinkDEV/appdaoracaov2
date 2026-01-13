@@ -56,7 +56,7 @@ export function TypewriterText() {
           key={displayText}
           initial={{ opacity: 0.8 }}
           animate={{ opacity: 1 }}
-          className="text-[hsl(50,100%,70%)] font-bold"
+          className="text-[hsl(190,100%,85%)] font-bold"
         >
           {displayText}
         </motion.span>
@@ -64,7 +64,7 @@ export function TypewriterText() {
       <motion.span
         animate={{ opacity: [1, 0] }}
         transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
-        className="text-[hsl(50,100%,70%)] ml-0.5"
+        className="text-[hsl(190,100%,85%)] ml-0.5"
       >
         |
       </motion.span>
