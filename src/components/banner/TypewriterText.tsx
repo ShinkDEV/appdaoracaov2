@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const words = [
   'curas',
@@ -50,23 +49,12 @@ export function TypewriterText() {
 
   return (
     <span className="inline-block text-center">
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={displayText}
-          initial={{ opacity: 0.8 }}
-          animate={{ opacity: 1 }}
-          className="text-[hsl(190,100%,85%)] font-bold"
-        >
-          {displayText}
-        </motion.span>
-      </AnimatePresence>
-      <motion.span
-        animate={{ opacity: [1, 0] }}
-        transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
-        className="text-[hsl(190,100%,85%)] ml-0.5"
-      >
+      <span className="text-[hsl(190,100%,85%)] font-bold transition-opacity duration-150">
+        {displayText}
+      </span>
+      <span className="text-[hsl(190,100%,85%)] ml-0.5 animate-pulse">
         |
-      </motion.span>
+      </span>
     </span>
   );
 }
