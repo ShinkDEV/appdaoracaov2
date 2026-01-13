@@ -68,23 +68,14 @@ export function usePrayers(options: UsePrayersOptions = {}) {
     }
 
     try {
-      // Use the public_prayer_requests view which hides user_id for anonymous requests
-      let query = supabase
-        .from('public_prayer_requests')
-        .select('*')
-        .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false })
-        .range(pageNum * pageSize, (pageNum + 1) * pageSize - 1);
-
-      if (options.themeFilter && options.themeFilter !== 'all') {
-        query = query.eq('theme_id', options.themeFilter);
-      }
-
-      if (options.searchQuery) {
-        query = query.or(`title.ilike.%${options.searchQuery}%,description.ilike.%${options.searchQuery}%`);
-      }
-
-      const { data: prayerData, error: prayerError } = await query;
+      // Use secure RPC function which masks user_id for anonymous requests
+      const { data: prayerData, error: prayerError } = await supabase
+        .rpc('get_public_prayer_requests', {
+          p_theme_id: options.themeFilter || null,
+          p_search: options.searchQuery || null,
+          p_limit: pageSize,
+          p_offset: pageNum * pageSize
+        });
 
       if (prayerError) {
         console.error('Error fetching prayers:', prayerError);

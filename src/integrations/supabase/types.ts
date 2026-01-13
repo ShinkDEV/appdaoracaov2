@@ -311,6 +311,24 @@ export type Database = {
           prayer_request_id: string
         }[]
       }
+      get_public_prayer_requests: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_theme_id?: string
+        }
+        Returns: {
+          created_at: string
+          description: string
+          id: string
+          is_anonymous: boolean
+          is_pinned: boolean
+          theme_id: string
+          title: string
+          user_id: string
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
