@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,6 +31,34 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check - require valid auth for all operations
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Missing or invalid authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+    console.log('Authenticated user:', userId);
+
     const accessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
     const publicKey = Deno.env.get('MERCADOPAGO_PUBLIC_KEY');
 
@@ -39,7 +68,7 @@ serve(async (req) => {
 
     const body = await req.json();
 
-    // Return public key for frontend SDK
+    // Return public key for frontend SDK (now requires authentication)
     if (body.action === 'get-public-key') {
       return new Response(
         JSON.stringify({ publicKey }),
@@ -58,6 +87,7 @@ serve(async (req) => {
     }
 
     console.log('Processing Mercado Pago payment:', {
+      userId,
       amount: paymentData.transactionAmount,
       installments: paymentData.installments,
       email: paymentData.payer.email,
@@ -100,6 +130,7 @@ serve(async (req) => {
       id: result.id,
       status: result.status,
       status_detail: result.status_detail,
+      userId,
     });
 
     return new Response(
