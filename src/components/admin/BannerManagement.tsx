@@ -96,9 +96,37 @@ export function BannerManagement() {
     setDialogOpen(true);
   };
 
+  // Validate URL to only allow http/https protocols (prevents javascript:, data:, etc.)
+  const isValidUrl = (url: string): boolean => {
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  };
+
   const saveBanner = async () => {
     if (!formData.image_url) {
       toast.error('URL da imagem é obrigatória');
+      return;
+    }
+
+    // Validate image URL
+    if (!isValidUrl(formData.image_url)) {
+      toast.error('URL da imagem inválida (deve usar http:// ou https://)');
+      return;
+    }
+
+    // Validate mobile image URL if provided
+    if (formData.mobile_image_url && !isValidUrl(formData.mobile_image_url)) {
+      toast.error('URL da imagem mobile inválida (deve usar http:// ou https://)');
+      return;
+    }
+
+    // Validate link URL if provided
+    if (formData.link && !isValidUrl(formData.link)) {
+      toast.error('Link inválido (deve usar http:// ou https://)');
       return;
     }
 
