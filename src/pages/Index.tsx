@@ -120,7 +120,19 @@ export default function Index() {
               className="gap-2"
               size="lg"
             >
-              <LogIn className="h-5 w-5" />
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [1, 0.8, 1]
+                }}
+                transition={{ 
+                  duration: 1.5, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <LogIn className="h-5 w-5" />
+              </motion.div>
               Entrar agora
             </Button>
           </motion.div>
