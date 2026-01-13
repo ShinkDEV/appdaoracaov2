@@ -23,7 +23,7 @@ interface Update {
 const UPDATES: Update[] = [
   {
     version: '1.1.0',
-    date: '2025-01-07',
+    date: '2025-01-13',
     changes: [
       { type: 'feature', text: 'Instalação como app (PWA) - adicione à tela inicial!' },
       { type: 'feature', text: 'Sistema de doações via PIX e cartão' },
