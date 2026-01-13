@@ -54,6 +54,7 @@ interface CardFormOptions {
 
 interface CardFormInstance {
   getCardFormData: () => CardFormData;
+  createCardToken: () => Promise<{ token: string }>;
   unmount: () => void;
 }
 
@@ -236,19 +237,22 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
     setIsProcessing(true);
 
     try {
-      const formData = cardFormInstance.getCardFormData();
-
-      if (!formData.token) {
+      // First create the card token
+      const tokenResponse = await cardFormInstance.createCardToken();
+      
+      if (!tokenResponse?.token) {
         toast.error('Erro ao processar cartão. Verifique os dados.');
         setIsProcessing(false);
         return;
       }
 
+      const formData = cardFormInstance.getCardFormData();
+
       const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
         body: {
-          token: formData.token,
+          token: tokenResponse.token,
           transactionAmount: finalValue,
-          installments: formData.installments,
+          installments: formData.installments || 1,
           paymentMethodId: formData.paymentMethodId,
           issuerId: formData.issuerId,
           payer: {
@@ -276,7 +280,12 @@ export function DonationModal({ open, onOpenChange }: DonationModalProps) {
       }
     } catch (error) {
       console.error('Payment error:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao processar pagamento');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao processar pagamento';
+      if (errorMessage.includes('cardNumber') || errorMessage.includes('securityCode') || errorMessage.includes('expirationDate')) {
+        toast.error('Verifique os dados do cartão');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsProcessing(false);
     }
