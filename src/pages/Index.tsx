@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePrayers } from '@/hooks/usePrayers';
+import { useAuth } from '@/contexts/AuthContext';
 import { PrayerFilters, PrayerList } from '@/components/prayer';
 import { BannerCarousel } from '@/components/banner';
 import { UpdatesModal, useUpdatesModal } from '@/components/updates';
 import { supabase } from '@/integrations/supabase/client';
-import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, LogIn } from 'lucide-react';
 
 interface Banner {
   id: string;
@@ -16,6 +19,8 @@ interface Banner {
 }
 
 export default function Index() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedTheme, setSelectedTheme] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'most_prayed'>('newest');
@@ -88,6 +93,20 @@ export default function Index() {
               oração e propósito
             </h1>
           </div>
+        </div>
+      )}
+
+      {/* Login Button for non-authenticated users */}
+      {!user && (
+        <div className="flex justify-center">
+          <Button 
+            onClick={() => navigate('/auth')}
+            className="gap-2"
+            size="lg"
+          >
+            <LogIn className="h-5 w-5" />
+            Entrar agora
+          </Button>
         </div>
       )}
 
