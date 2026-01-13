@@ -77,6 +77,7 @@ serve(async (req) => {
         payment_method_id: paymentData.paymentMethodId,
         issuer_id: paymentData.issuerId,
         description: 'Doação App da Oração',
+        statement_descriptor: 'APP DA ORACAO',
         payer: {
           email: paymentData.payer.email,
           identification: paymentData.payer.identification,
