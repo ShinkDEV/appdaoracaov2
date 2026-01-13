@@ -208,6 +208,13 @@ export type Database = {
             referencedRelation: "prayer_requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_prayers_prayer_request_id_fkey"
+            columns: ["prayer_request_id"]
+            isOneToOne: false
+            referencedRelation: "public_prayer_requests"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -233,6 +240,47 @@ export type Database = {
       }
     }
     Views: {
+      public_prayer_requests: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          is_anonymous: boolean | null
+          is_pinned: boolean | null
+          theme_id: string | null
+          title: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_anonymous?: boolean | null
+          is_pinned?: boolean | null
+          theme_id?: string | null
+          title?: string | null
+          user_id?: never
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_anonymous?: boolean | null
+          is_pinned?: boolean | null
+          theme_id?: string | null
+          title?: string | null
+          user_id?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_requests_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "prayer_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_profiles: {
         Row: {
           display_name: string | null
