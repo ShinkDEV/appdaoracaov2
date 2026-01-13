@@ -3,15 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube, Gift } from 'lucide-react';
+import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube, Gift, Mail, Copy, Check } from 'lucide-react';
 import { DonationModal } from '@/components/donation';
 import { UpdatesModal } from '@/components/updates';
+import { toast } from 'sonner';
+
+const CONTACT_EMAIL = 'contato@appdaoracao.com';
 
 const Settings = () => {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [donationOpen, setDonationOpen] = useState(false);
   const [updatesOpen, setUpdatesOpen] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      setCopiedEmail(true);
+      toast.success('E-mail copiado!');
+      setTimeout(() => setCopiedEmail(false), 2000);
+    } catch {
+      toast.error('Erro ao copiar');
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -146,6 +161,30 @@ const Settings = () => {
                     </a>
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contact Section */}
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-1">Contato</h2>
+            <Card className="overflow-hidden border-border/50 shadow-card">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-blue-500/10">
+                    <Mail className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground text-sm">E-mail</p>
+                    <p className="text-sm text-muted-foreground truncate">{CONTACT_EMAIL}</p>
+                  </div>
+                  <Button variant="outline" size="icon" onClick={handleCopyEmail} className="shrink-0">
+                    {copiedEmail ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Dúvidas, sugestões ou problemas? Entre em contato!
+                </p>
               </CardContent>
             </Card>
           </div>
