@@ -25,7 +25,6 @@ import { ptBR } from 'date-fns/locale';
 
 interface Profile {
   id: string;
-  email: string;
   display_name: string | null;
   photo_url: string | null;
   banned: boolean | null;
@@ -104,16 +103,16 @@ export function UserManagement() {
     }
   };
 
-  const getInitials = (name: string | null, email: string) => {
+  const getInitials = (name: string | null) => {
     if (name) {
       return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     }
-    return email.slice(0, 2).toUpperCase();
+    return 'US';
   };
 
   const filteredProfiles = profiles.filter(profile => 
-    profile.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    profile.display_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    profile.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    profile.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const bannedCount = profiles.filter(p => p.banned).length;
@@ -222,7 +221,7 @@ export function UserManagement() {
                           <Avatar className="h-8 w-8">
                             <AvatarImage src={profile.photo_url || undefined} />
                             <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                              {getInitials(profile.display_name, profile.email)}
+                              {getInitials(profile.display_name)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
@@ -232,7 +231,7 @@ export function UserManagement() {
                                 <BadgeCheck className="h-4 w-4 text-primary fill-primary/20" />
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground">{profile.email}</p>
+                            <p className="text-xs text-muted-foreground">{profile.id.slice(0, 8)}...</p>
                           </div>
                         </div>
                       </TableCell>
@@ -288,7 +287,7 @@ export function UserManagement() {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Banir usuário</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Tem certeza que deseja banir {profile.display_name || profile.email}?
+                                    Tem certeza que deseja banir {profile.display_name || 'este usuário'}?
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <div className="py-4">

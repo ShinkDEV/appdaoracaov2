@@ -35,7 +35,6 @@ interface PrayerRequest {
   created_at: string;
   author?: {
     display_name: string | null;
-    email: string;
   };
 }
 
@@ -85,7 +84,7 @@ export function PrayerManagement() {
       const userIds = [...new Set(prayersData.map(p => p.user_id))];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, display_name, email')
+        .select('id, display_name')
         .in('id', userIds);
 
       const prayersWithAuthors = prayersData.map(prayer => ({
@@ -154,8 +153,7 @@ export function PrayerManagement() {
   const filteredPrayers = prayers.filter(prayer => 
     prayer.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     prayer.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    prayer.author?.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    prayer.author?.email.toLowerCase().includes(searchQuery.toLowerCase())
+    prayer.author?.display_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const pinnedCount = prayers.filter(p => p.is_pinned && !p.is_deleted).length;
@@ -276,7 +274,7 @@ export function PrayerManagement() {
                           {prayer.is_anonymous ? (
                             <span className="text-muted-foreground italic">Anônimo</span>
                           ) : (
-                            <span>{prayer.author?.display_name || prayer.author?.email}</span>
+                            <span>{prayer.author?.display_name || 'Usuário'}</span>
                           )}
                         </div>
                       </TableCell>

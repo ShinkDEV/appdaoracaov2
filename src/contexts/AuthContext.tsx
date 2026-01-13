@@ -5,7 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
   id: string;
-  email: string;
   display_name: string | null;
   photo_url: string | null;
   banned: boolean;
