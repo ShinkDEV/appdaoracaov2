@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePrayers } from '@/hooks/usePrayers';
 import { useAuth } from '@/contexts/AuthContext';
@@ -98,16 +99,32 @@ export default function Index() {
 
       {/* Login Button for non-authenticated users */}
       {!user && (
-        <div className="flex justify-center">
-          <Button 
-            onClick={() => navigate('/auth')}
-            className="gap-2"
-            size="lg"
+        <motion.div 
+          className="flex justify-center"
+          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ 
+            duration: 0.5, 
+            delay: 0.3,
+            type: "spring",
+            stiffness: 200,
+            damping: 20
+          }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <LogIn className="h-5 w-5" />
-            Entrar agora
-          </Button>
-        </div>
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="gap-2"
+              size="lg"
+            >
+              <LogIn className="h-5 w-5" />
+              Entrar agora
+            </Button>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Section Header */}
