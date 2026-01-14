@@ -201,11 +201,24 @@ const Subscription = () => {
                   </div>
                 </div>
 
-                {subscription.next_payment_date && subscription.status === "active" && (
+                {subscription.status === "active" && (
                   <div className="pt-2 border-t">
                     <p className="text-sm text-muted-foreground">Próxima cobrança</p>
                     <p className="font-medium">
-                      {format(new Date(subscription.next_payment_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {(() => {
+                        // Calcular próxima cobrança: 1 mês após a criação da assinatura
+                        const createdDate = new Date(subscription.created_at);
+                        const nextPayment = new Date(createdDate);
+                        nextPayment.setMonth(nextPayment.getMonth() + 1);
+                        
+                        // Se já passou, adicionar mais meses até ser no futuro
+                        const now = new Date();
+                        while (nextPayment <= now) {
+                          nextPayment.setMonth(nextPayment.getMonth() + 1);
+                        }
+                        
+                        return format(nextPayment, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+                      })()}
                     </p>
                   </div>
                 )}
