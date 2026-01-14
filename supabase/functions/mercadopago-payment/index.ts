@@ -99,33 +99,53 @@ serve(async (req) => {
 
     if (isMonthly) {
       // Create a subscription/preapproval for monthly donations
-      // First, we need to create a preapproval plan
+      const preapprovalPayload: Record<string, unknown> = {
+        reason: 'Apoio Mensal - App da Oração',
+        auto_recurring: {
+          frequency: 1,
+          frequency_type: 'months',
+          transaction_amount: paymentData.transactionAmount,
+          currency_id: 'BRL',
+        },
+        back_url: 'https://prayer-remix-hub.lovable.app/doacao-sucesso',
+        payer_email: paymentData.payer.email,
+        card_token_id: paymentData.token,
+        status: 'authorized',
+      };
+
+      // Add payment_method_id if provided
+      if (paymentData.paymentMethodId) {
+        preapprovalPayload.payment_method_id = paymentData.paymentMethodId;
+      }
+
+      console.log('Creating preapproval with payload:', JSON.stringify(preapprovalPayload, null, 2));
+
       const preapprovalResponse = await fetch('https://api.mercadopago.com/preapproval', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          reason: 'Apoio Mensal - App da Oração',
-          auto_recurring: {
-            frequency: 1,
-            frequency_type: 'months',
-            transaction_amount: paymentData.transactionAmount,
-            currency_id: 'BRL',
-          },
-          back_url: 'https://prayer-remix-hub.lovable.app/doacao-sucesso',
-          payer_email: paymentData.payer.email,
-          card_token_id: paymentData.token,
-          status: 'authorized',
-        }),
+        body: JSON.stringify(preapprovalPayload),
       });
 
       const preapprovalResult = await preapprovalResponse.json();
 
+      console.log('Preapproval response:', JSON.stringify(preapprovalResult, null, 2));
+
       if (!preapprovalResponse.ok) {
         console.error('Mercado Pago Preapproval Error:', preapprovalResult);
-        const errorMessage = preapprovalResult.message || preapprovalResult.cause?.[0]?.description || 'Subscription failed';
+        
+        // Better error message extraction
+        let errorMessage = 'Erro ao criar assinatura';
+        if (preapprovalResult.message) {
+          errorMessage = preapprovalResult.message;
+        } else if (preapprovalResult.cause && Array.isArray(preapprovalResult.cause)) {
+          errorMessage = preapprovalResult.cause.map((c: { description?: string }) => c.description).filter(Boolean).join(', ') || errorMessage;
+        } else if (preapprovalResult.error) {
+          errorMessage = preapprovalResult.error;
+        }
+        
         return new Response(
           JSON.stringify({ error: errorMessage, details: preapprovalResult }),
           { status: preapprovalResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
