@@ -269,13 +269,16 @@ export function BannerManagement() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="image_url">URL da Imagem *</Label>
+                  <Label htmlFor="image_url">URL da Imagem Desktop *</Label>
                   <Input
                     id="image_url"
                     value={formData.image_url}
                     onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                     placeholder="https://..."
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Tamanho recomendado: <span className="font-medium">1200 x 400 px</span>
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="mobile_image_url">URL da Imagem Mobile (opcional)</Label>
@@ -285,6 +288,9 @@ export function BannerManagement() {
                     onChange={(e) => setFormData({ ...formData, mobile_image_url: e.target.value })}
                     placeholder="https://..."
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Tamanho recomendado: <span className="font-medium">600 x 300 px</span>
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="link">Link (opcional)</Label>
