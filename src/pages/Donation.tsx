@@ -460,19 +460,10 @@ export default function Donation() {
         <form id="mp-card-form" className="space-y-4">
           <div className="space-y-3">
             <Label className="font-medium">Dados do Cartão</Label>
-            <div className="relative">
-              <div id="mp-card-number" className="h-10 border rounded-md"></div>
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none mp-placeholder" id="placeholder-card-number">Número do cartão</span>
-            </div>
+            <div id="mp-card-number" className="h-10 border rounded-md"></div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none mp-placeholder" id="placeholder-expiration">MM/AA</span>
-              </div>
-              <div className="relative">
-                <div id="mp-security-code" className="h-10 border rounded-md"></div>
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none mp-placeholder" id="placeholder-cvv">CVV</span>
-              </div>
+              <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
+              <div id="mp-security-code" className="h-10 border rounded-md"></div>
             </div>
             <input 
               type="text" 
