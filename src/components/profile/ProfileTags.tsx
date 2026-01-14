@@ -1,4 +1,5 @@
-import { Lock, Heart, BadgeCheck, Info } from 'lucide-react';
+import { useState } from 'react';
+import { Lock, Heart, BadgeCheck, Info, Send, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -15,19 +16,82 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { toast } from 'sonner';
 
 interface ProfileTagsProps {
   isSupporter: boolean;
   isVerified: boolean;
 }
 
+type RequirementType = '10k_followers' | '50k_views' | '100k_influencer';
+
 export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
   const navigate = useNavigate();
+  const [showVerificationForm, setShowVerificationForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    requirement: '' as RequirementType | '',
+    link: '',
+  });
 
   const handleSupporterClick = () => {
     if (!isSupporter) {
       navigate('/doacao');
     }
+  };
+
+  const getRequirementLabel = (req: RequirementType) => {
+    switch (req) {
+      case '10k_followers':
+        return 'Mais de 10 mil seguidores + postagem sobre o app';
+      case '50k_views':
+        return 'Postagem sobre o app com 50 mil+ visualizações';
+      case '100k_influencer':
+        return 'Influenciador com mais de 100 mil seguidores';
+    }
+  };
+
+  const getLinkPlaceholder = () => {
+    switch (formData.requirement) {
+      case '10k_followers':
+        return 'Link do seu perfil e da postagem';
+      case '50k_views':
+        return 'Link da postagem com as visualizações';
+      case '100k_influencer':
+        return 'Link do seu perfil';
+      default:
+        return 'Link do perfil ou postagem';
+    }
+  };
+
+  const handleSubmitVerification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.requirement || !formData.link) {
+      toast.error('Por favor, preencha todos os campos');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Por favor, insira um e-mail válido');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate API call - in production, this would send to an edge function
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast.success('Solicitação enviada com sucesso! Analisaremos seu pedido em breve.');
+    setShowVerificationForm(false);
+    setFormData({ name: '', email: '', requirement: '', link: '' });
+    setIsSubmitting(false);
   };
 
   return (
@@ -76,7 +140,117 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                     <strong>Atenção:</strong> não é uma troca, é apenas uma forma de filtrar os pedidos de verificação em paralelo a divulgação do app para que mais vidas sejam alcançadas através da oração.
                   </p>
                 </div>
+
+                {!isVerified && (
+                  <Button 
+                    onClick={() => setShowVerificationForm(true)} 
+                    className="w-full mt-2"
+                    variant="default"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Solicitar Verificação
+                  </Button>
+                )}
               </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Verification Request Form Dialog */}
+          <Dialog open={showVerificationForm} onOpenChange={setShowVerificationForm}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <BadgeCheck className="h-5 w-5 text-blue-500" />
+                  Solicitar Verificação
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmitVerification} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome completo</Label>
+                  <Input
+                    id="name"
+                    placeholder="Seu nome"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    maxLength={100}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail para contato</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    maxLength={255}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <Label>Qual requisito você atende?</Label>
+                  <RadioGroup
+                    value={formData.requirement}
+                    onValueChange={(value: RequirementType) => 
+                      setFormData({ ...formData, requirement: value })
+                    }
+                  >
+                    <div className="flex items-start space-x-2">
+                      <RadioGroupItem value="10k_followers" id="req1" className="mt-1" />
+                      <Label htmlFor="req1" className="font-normal text-sm cursor-pointer">
+                        {getRequirementLabel('10k_followers')}
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <RadioGroupItem value="50k_views" id="req2" className="mt-1" />
+                      <Label htmlFor="req2" className="font-normal text-sm cursor-pointer">
+                        {getRequirementLabel('50k_views')}
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <RadioGroupItem value="100k_influencer" id="req3" className="mt-1" />
+                      <Label htmlFor="req3" className="font-normal text-sm cursor-pointer">
+                        {getRequirementLabel('100k_influencer')}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="link">Link do perfil ou postagem</Label>
+                  <Input
+                    id="link"
+                    placeholder={getLinkPlaceholder()}
+                    value={formData.link}
+                    onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                    maxLength={500}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Cole o link conforme o requisito selecionado
+                  </p>
+                </div>
+
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Sua solicitação será analisada em até 7 dias úteis. Você receberá uma resposta no e-mail informado.
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Enviar Solicitação
+                    </>
+                  )}
+                </Button>
+              </form>
             </DialogContent>
           </Dialog>
         </div>
