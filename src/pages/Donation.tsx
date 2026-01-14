@@ -12,6 +12,15 @@ import { useNavigate } from 'react-router-dom';
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'apoio@appdaoracao.com';
 
+// CPF mask function
+const formatCPF = (value: string): string => {
+  const numbers = value.replace(/\D/g, '').slice(0, 11);
+  return numbers
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+};
+
 type Step = 'select-value' | 'card-form' | 'success';
 
 declare global {
@@ -398,7 +407,11 @@ export default function Donation() {
                 type="text" 
                 id="mp-identification-number" 
                 className="h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Número do CPF"
+                placeholder="000.000.000-00"
+                maxLength={14}
+                onChange={(e) => {
+                  e.target.value = formatCPF(e.target.value);
+                }}
               />
             </div>
           </div>
