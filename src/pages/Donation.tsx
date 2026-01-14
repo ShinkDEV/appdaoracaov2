@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { initMercadoPago, CardNumber, ExpirationDate, SecurityCode, createCardToken } from '@mercadopago/sdk-react';
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'apoio@appdaoracao.com';
@@ -54,56 +55,6 @@ const validateCPF = (cpf: string): boolean => {
 type Step = 'select-value' | 'card-form' | 'success';
 type DonationType = 'one-time' | 'monthly';
 
-declare global {
-  interface Window {
-    MercadoPago: new (publicKey: string) => MercadoPagoInstance;
-  }
-}
-
-interface MercadoPagoInstance {
-  cardForm: (options: CardFormOptions) => CardFormInstance;
-}
-
-interface CardFormOptions {
-  amount: string;
-  iframe: boolean;
-  form: {
-    id: string;
-    cardNumber: { id: string; placeholder: string };
-    expirationDate: { id: string; placeholder: string };
-    securityCode: { id: string; placeholder: string };
-    cardholderName: { id: string; placeholder: string };
-    issuer: { id: string; placeholder: string };
-    installments: { id: string; placeholder: string };
-    identificationType: { id: string; placeholder: string };
-    identificationNumber: { id: string; placeholder: string };
-    cardholderEmail: { id: string; placeholder: string };
-  };
-  callbacks: {
-    onFormMounted: (error: Error | null) => void;
-    onSubmit: (event: Event) => void;
-    onFetching: (resource: string) => () => void;
-    onValidityChange?: (error: { field?: string; message?: string } | null, field: string) => void;
-    onCardTokenReceived?: (errorData: { message?: string } | null, token: string | null) => void;
-  };
-}
-
-interface CardFormInstance {
-  getCardFormData: () => CardFormData;
-  createCardToken: () => Promise<{ token: string }>;
-  unmount: () => void;
-}
-
-interface CardFormData {
-  token: string;
-  installments: number;
-  paymentMethodId: string;
-  issuerId: string;
-  identificationType: string;
-  identificationNumber: string;
-  cardholderEmail: string;
-}
-
 export default function Donation() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('select-value');
@@ -112,113 +63,45 @@ export default function Donation() {
   const [customValue, setCustomValue] = useState('');
   const [copiedPix, setCopiedPix] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isMpLoaded, setIsMpLoaded] = useState(false);
-  const [cardFormInstance, setCardFormInstance] = useState<CardFormInstance | null>(null);
-  const [isFormMounted, setIsFormMounted] = useState(false);
+  const [isMpInitialized, setIsMpInitialized] = useState(false);
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  
+  // Form fields
+  const [cardholderName, setCardholderName] = useState('');
+  const [cardholderEmail, setCardholderEmail] = useState('');
+  const [identificationType, setIdentificationType] = useState('CPF');
+  const [identificationNumber, setIdentificationNumber] = useState('');
 
   const finalValue = selectedValue || (customValue ? parseFloat(customValue) : 0);
 
-  // Load Mercado Pago SDK
+  // Fetch public key and initialize Mercado Pago SDK
   useEffect(() => {
-    if (step === 'card-form' && !isMpLoaded) {
-      const script = document.createElement('script');
-      script.src = 'https://sdk.mercadopago.com/js/v2';
-      script.async = true;
-      script.onload = () => setIsMpLoaded(true);
-      document.body.appendChild(script);
-
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
-  }, [step, isMpLoaded]);
-
-  // Initialize card form
-  useEffect(() => {
-    const initCardForm = async () => {
-      if (step !== 'card-form' || !isMpLoaded || !window.MercadoPago) return;
-
-      try {
-        const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
-          body: { action: 'get-public-key' },
-        });
-
-        if (error || !data?.publicKey) {
-          toast.error('Erro ao carregar formulário de pagamento');
-          return;
-        }
-
-        const mp = new window.MercadoPago(data.publicKey);
-
-        const cardForm = mp.cardForm({
-          amount: finalValue.toString(),
-          iframe: true,
-          form: {
-            id: 'mp-card-form',
-            cardNumber: { id: 'mp-card-number', placeholder: 'Número do cartão' },
-            expirationDate: { id: 'mp-expiration-date', placeholder: 'MM/AA' },
-            securityCode: { id: 'mp-security-code', placeholder: 'CVV' },
-            cardholderName: { id: 'mp-cardholder-name', placeholder: 'Nome no cartão' },
-            issuer: { id: 'mp-issuer', placeholder: 'Banco emissor' },
-            installments: { id: 'mp-installments', placeholder: 'Parcelas' },
-            identificationType: { id: 'mp-identification-type', placeholder: 'Tipo de documento' },
-            identificationNumber: { id: 'mp-identification-number', placeholder: 'CPF' },
-            cardholderEmail: { id: 'mp-cardholder-email', placeholder: 'E-mail' },
-          },
-          callbacks: {
-            onFormMounted: (error) => {
-              if (error) {
-                console.error('CardForm mount error:', error);
-                toast.error('Erro ao carregar formulário. Recarregue a página.');
-                setIsFormMounted(false);
-              } else {
-                console.log('CardForm mounted successfully');
-                setIsFormMounted(true);
-              }
-            },
-            onSubmit: async (event) => {
-              event.preventDefault();
-              await handlePayment();
-            },
-            onFetching: (resource) => {
-              console.log('Fetching:', resource);
-              return () => {};
-            },
-            onValidityChange: (error: { field?: string; message?: string } | null, field: string) => {
-              if (error) {
-                console.log(`Field validation error [${field}]:`, error);
-              }
-            },
-            onCardTokenReceived: (errorData: { message?: string } | null, token: string | null) => {
-              if (errorData) {
-                console.error('Card token error:', errorData);
-              } else if (token) {
-                console.log('Token received successfully');
-              }
-            },
-          },
-        });
-
-        setCardFormInstance(cardForm);
-      } catch (error) {
-        console.error('Error initializing card form:', error);
-        toast.error('Erro ao inicializar pagamento');
-      }
-    };
-
-    initCardForm();
-
-    return () => {
-      if (cardFormInstance && isFormMounted) {
+    const initMP = async () => {
+      if (step === 'card-form' && !isMpInitialized) {
         try {
-          cardFormInstance.unmount();
-        } catch (e) {
-          console.log('CardForm already unmounted');
+          const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
+            body: { action: 'get-public-key' },
+          });
+
+          if (error || !data?.publicKey) {
+            console.error('Error fetching public key:', error);
+            toast.error('Erro ao carregar formulário de pagamento');
+            return;
+          }
+
+          setPublicKey(data.publicKey);
+          initMercadoPago(data.publicKey, { locale: 'pt-BR' });
+          setIsMpInitialized(true);
+          console.log('MercadoPago SDK initialized');
+        } catch (error) {
+          console.error('Error initializing MercadoPago:', error);
+          toast.error('Erro ao inicializar pagamento');
         }
-        setIsFormMounted(false);
       }
     };
-  }, [step, isMpLoaded, finalValue]);
+
+    initMP();
+  }, [step, isMpInitialized]);
 
   const handleCopyPix = async () => {
     try {
@@ -242,41 +125,21 @@ export default function Donation() {
   };
 
   const handlePayment = async () => {
-    if (!cardFormInstance) {
-      toast.error('Formulário não carregado. Aguarde ou recarregue a página.');
-      return;
-    }
-
-    if (!isFormMounted) {
-      toast.error('Formulário ainda está carregando. Aguarde um momento.');
-      return;
-    }
-
     // Validate cardholder name
-    const nameInput = document.getElementById('mp-cardholder-name') as HTMLInputElement;
-    if (!nameInput?.value || nameInput.value.trim().length < 3) {
+    if (!cardholderName || cardholderName.trim().length < 3) {
       toast.error('Nome do titular inválido. Digite o nome impresso no cartão.');
       return;
     }
 
-    // Validate CPF before processing
-    const cpfInput = document.getElementById('mp-identification-number') as HTMLInputElement;
-    if (!cpfInput?.value || !validateCPF(cpfInput.value)) {
+    // Validate CPF
+    if (!validateCPF(identificationNumber)) {
       toast.error('CPF inválido. Verifique o número informado.');
       return;
     }
 
     // Validate email
-    const emailInput = document.getElementById('mp-cardholder-email') as HTMLInputElement;
-    if (!emailInput?.value || !emailInput.value.includes('@')) {
+    if (!cardholderEmail || !cardholderEmail.includes('@')) {
       toast.error('E-mail inválido. Verifique o endereço informado.');
-      return;
-    }
-
-    // Validate identification type
-    const idTypeSelect = document.getElementById('mp-identification-type') as HTMLSelectElement;
-    if (!idTypeSelect?.value) {
-      toast.error('Selecione o tipo de documento.');
       return;
     }
 
@@ -284,84 +147,37 @@ export default function Donation() {
 
     try {
       console.log('Creating card token...');
-      console.log('Form mounted:', isFormMounted);
       
-      let tokenResponse;
-      try {
-        tokenResponse = await cardFormInstance.createCardToken();
-        console.log('Token response:', tokenResponse);
-      } catch (tokenError: unknown) {
-        console.error('Token creation error:', tokenError);
-        console.error('Token error details:', JSON.stringify(tokenError, null, 2));
-        
-        // Extract specific error message from MercadoPago SDK
-        let errorMsg = 'Verifique os dados do cartão: número, validade e CVV.';
-        if (tokenError && typeof tokenError === 'object') {
-          const err = tokenError as { 
-            message?: string; 
-            cause?: Array<{ code?: string; description?: string }>;
-            error?: string;
-            status?: number;
-          };
-          
-          console.log('Error object:', err);
-          
-          if (err.message) {
-            // Translate common error messages
-            if (err.message.includes('cardNumber')) {
-              errorMsg = 'Número do cartão inválido.';
-            } else if (err.message.includes('securityCode') || err.message.includes('CVV')) {
-              errorMsg = 'CVV inválido.';
-            } else if (err.message.includes('expirationDate') || err.message.includes('expiration')) {
-              errorMsg = 'Data de validade inválida.';
-            } else if (err.message.includes('cardholderName')) {
-              errorMsg = 'Nome do titular inválido.';
-            } else {
-              errorMsg = err.message;
-            }
-          } else if (err.cause && Array.isArray(err.cause) && err.cause.length > 0) {
-            const causes = err.cause.map(c => c.description || c.code).filter(Boolean);
-            if (causes.length > 0) {
-              errorMsg = causes.join('. ');
-            }
-          } else if (err.error) {
-            errorMsg = err.error;
-          }
-        }
-        
-        toast.error(errorMsg);
-        setIsProcessing(false);
-        return;
-      }
-      
-      if (!tokenResponse?.token) {
+      // Create card token using the React SDK
+      const tokenResponse = await createCardToken({
+        cardholderName: cardholderName,
+        identificationType: identificationType,
+        identificationNumber: identificationNumber.replace(/\D/g, ''),
+      });
+
+      console.log('Token response:', tokenResponse);
+
+      if (!tokenResponse?.id) {
         console.error('No token received:', tokenResponse);
         toast.error('Erro ao processar cartão. Verifique os dados.');
         setIsProcessing(false);
         return;
       }
 
-      console.log('Token created successfully');
-      const formData = cardFormInstance.getCardFormData();
-      console.log('Form data:', { 
-        paymentMethodId: formData.paymentMethodId,
-        email: formData.cardholderEmail,
-        donationType 
-      });
+      console.log('Token created successfully:', tokenResponse.id);
 
       const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
         body: {
-          token: tokenResponse.token,
+          token: tokenResponse.id,
           transactionAmount: finalValue,
-          installments: donationType === 'monthly' ? 1 : parseInt(String(formData.installments || 1), 10),
-          paymentMethodId: formData.paymentMethodId,
-          issuerId: formData.issuerId,
+          installments: 1,
+          paymentMethodId: tokenResponse.first_six_digits ? 'visa' : 'master', // Will be determined by the API
           donationType: donationType,
           payer: {
-            email: formData.cardholderEmail,
+            email: cardholderEmail,
             identification: {
-              type: formData.identificationType,
-              number: formData.identificationNumber,
+              type: identificationType,
+              number: identificationNumber.replace(/\D/g, ''),
             },
           },
         },
@@ -396,8 +212,16 @@ export default function Donation() {
     } catch (error) {
       console.error('Payment error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erro ao processar pagamento';
-      if (errorMessage.includes('cardNumber') || errorMessage.includes('securityCode') || errorMessage.includes('expirationDate')) {
-        toast.error('Verifique os dados do cartão');
+      
+      // Translate common error messages
+      if (errorMessage.includes('cardNumber') || errorMessage.includes('card number')) {
+        toast.error('Número do cartão inválido');
+      } else if (errorMessage.includes('securityCode') || errorMessage.includes('CVV') || errorMessage.includes('security code')) {
+        toast.error('CVV inválido');
+      } else if (errorMessage.includes('expirationDate') || errorMessage.includes('expiration')) {
+        toast.error('Data de validade inválida');
+      } else if (errorMessage.includes('cardholderName')) {
+        toast.error('Nome do titular inválido');
       } else {
         toast.error(errorMessage);
       }
@@ -408,6 +232,12 @@ export default function Donation() {
 
   const renderSelectValue = () => (
     <div className="space-y-6">
+      {/* Back button */}
+      <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-1 -ml-2">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar para início
+      </Button>
+
       {/* Donation Type Toggle */}
       <div className="flex rounded-lg bg-muted p-1">
         <button
@@ -460,27 +290,31 @@ export default function Donation() {
           </Label>
           <div className="grid grid-cols-3 gap-2">
             {DONATION_VALUES.map((value) => (
-              <Button
+              <button
                 key={value}
-                variant={selectedValue === value ? 'default' : 'outline'}
                 onClick={() => handleSelectValue(value)}
                 className={cn(
-                  "h-11",
-                  selectedValue === value && "bg-primary shadow-md"
+                  "py-3 px-4 rounded-lg text-sm font-semibold transition-all border",
+                  selectedValue === value
+                    ? "bg-primary text-primary-foreground border-primary shadow-md"
+                    : "bg-background border-border hover:border-primary/50 hover:bg-primary/5"
                 )}
               >
-                R$ {value}{donationType === 'monthly' ? '/mês' : ''}
-              </Button>
+                R$ {value}
+              </button>
             ))}
-            <div className="col-span-3">
-              <Input
-                type="number"
-                placeholder={donationType === 'monthly' ? 'Outro valor mensal (R$)' : 'Outro valor (R$)'}
-                value={customValue}
-                onChange={(e) => handleCustomValueChange(e.target.value)}
-                className="text-center"
-              />
-            </div>
+          </div>
+          
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">R$</span>
+            <Input
+              type="number"
+              placeholder="Outro valor"
+              value={customValue}
+              onChange={(e) => handleCustomValueChange(e.target.value)}
+              className="pl-10"
+              min={1}
+            />
           </div>
         </div>
 
@@ -557,72 +391,93 @@ export default function Donation() {
         )}
       </div>
 
-      {!isMpLoaded ? (
+      {!isMpInitialized ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-muted-foreground">Carregando SDK...</span>
+          <span className="ml-2 text-muted-foreground">Carregando formulário...</span>
         </div>
-      ) : !isFormMounted ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-muted-foreground">Preparando formulário...</span>
-        </div>
-      ) : null}
-      
-      <form id="mp-card-form" className={`space-y-4 ${!isFormMounted ? 'opacity-0 h-0 overflow-hidden' : ''}`}>
-        <div className="space-y-3">
-          <Label className="font-medium">Dados do Cartão</Label>
-          <div id="mp-card-number" className="h-10 border rounded-md"></div>
-            <div className="grid grid-cols-2 gap-2">
-              <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
-              <div id="mp-security-code" className="h-10 border rounded-md"></div>
+      ) : (
+        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handlePayment(); }}>
+          <div className="space-y-3">
+            <Label className="font-medium">Dados do Cartão</Label>
+            
+            <div className="space-y-2">
+              <div className="h-12 border rounded-md overflow-hidden bg-background">
+                <CardNumber 
+                  placeholder="Número do cartão"
+                  style={{
+                    height: '100%',
+                    padding: '0 12px',
+                  }}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <div className="h-12 border rounded-md overflow-hidden bg-background">
+                  <ExpirationDate 
+                    placeholder="MM/AA"
+                    style={{
+                      height: '100%',
+                      padding: '0 12px',
+                    }}
+                  />
+                </div>
+                <div className="h-12 border rounded-md overflow-hidden bg-background">
+                  <SecurityCode 
+                    placeholder="CVV"
+                    style={{
+                      height: '100%',
+                      padding: '0 12px',
+                    }}
+                  />
+                </div>
+              </div>
+              
+              <input 
+                type="text" 
+                value={cardholderName}
+                onChange={(e) => setCardholderName(e.target.value)}
+                className="w-full h-12 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Nome impresso no cartão"
+                required
+              />
             </div>
-            <input 
-              type="text" 
-              id="mp-cardholder-name" 
-              className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Nome impresso no cartão"
-            />
-            {/* Hidden - auto-populated by MP SDK based on card number */}
-            <select id="mp-issuer" className="hidden"></select>
-            {/* Hide installments for monthly donations */}
-            <select 
-              id="mp-installments" 
-              className={donationType === 'monthly' ? 'hidden' : 'w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary'}
-            >
-              <option value="">Parcelas</option>
-            </select>
           </div>
 
           <div className="space-y-3">
             <Label className="font-medium">Dados Pessoais</Label>
             <input 
               type="email" 
-              id="mp-cardholder-email" 
-              className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              value={cardholderEmail}
+              onChange={(e) => setCardholderEmail(e.target.value)}
+              className="w-full h-12 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Seu e-mail"
+              required
             />
             <div className="grid grid-cols-2 gap-2">
-              <select id="mp-identification-type" className="h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="">Documento</option>
+              <select 
+                value={identificationType}
+                onChange={(e) => setIdentificationType(e.target.value)}
+                className="h-12 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="CPF">CPF</option>
+                <option value="CNPJ">CNPJ</option>
               </select>
               <input 
                 type="text" 
-                id="mp-identification-number" 
-                className="h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                value={identificationNumber}
+                onChange={(e) => setIdentificationNumber(formatCPF(e.target.value))}
+                className="h-12 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="000.000.000-00"
                 maxLength={14}
-                onChange={(e) => {
-                  e.target.value = formatCPF(e.target.value);
-                }}
+                required
               />
             </div>
           </div>
 
           <Button
-            type="button"
+            type="submit"
             className="w-full h-12 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold gap-2"
-            onClick={handlePayment}
             disabled={isProcessing}
           >
             {isProcessing ? (
@@ -638,6 +493,7 @@ export default function Donation() {
             )}
           </Button>
         </form>
+      )}
 
       <p className="text-xs text-center text-muted-foreground">
         Pagamento processado com segurança pelo Mercado Pago
@@ -660,60 +516,54 @@ export default function Donation() {
             : `Muito obrigado pela sua contribuição de R$ ${finalValue.toFixed(2).replace('.', ',')}`
           }
         </p>
-        {donationType === 'monthly' && (
-          <p className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-2 mt-2">
-            A cobrança será feita automaticamente todo mês. Para cancelar, entre em contato conosco.
-          </p>
-        )}
-        <p className="text-sm text-muted-foreground">
-          Que Deus abençoe você e sua família! 🙏
-        </p>
       </div>
-      <Button onClick={() => navigate('/')} className="w-full">
-        Voltar ao Início
+      <div className="flex items-center justify-center gap-2 text-primary">
+        <Heart className="h-5 w-5 fill-primary" />
+        <span className="font-medium">Que Deus abençoe você!</span>
+      </div>
+      <Button 
+        variant="outline" 
+        className="gap-2"
+        onClick={() => {
+          setStep('select-value');
+          setSelectedValue(null);
+          setCustomValue('');
+          setCardholderName('');
+          setCardholderEmail('');
+          setIdentificationNumber('');
+        }}
+      >
+        Fazer outra doação
       </Button>
     </div>
   );
 
   return (
     <Layout>
-      <div className="max-w-md mx-auto">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate('/')} 
-          className="gap-1.5 mb-4 -ml-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar para início
-        </Button>
-
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Heart className="h-8 w-8 text-primary" />
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 py-6 px-4">
+        <div className="max-w-md mx-auto">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
+              <Heart className="h-8 w-8 text-primary-foreground" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Apoie o App da Oração</h1>
+            <p className="text-sm text-muted-foreground mt-2">
+              Sua contribuição nos ajuda a manter o app gratuito e disponível para todos
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Fazer uma Doação</h1>
-          <p className="text-muted-foreground mt-2">
-            Sua doação ajuda a manter o App da Oração funcionando
+
+          {/* Content Card */}
+          <div className="bg-background rounded-2xl shadow-xl border p-6">
+            {step === 'select-value' && renderSelectValue()}
+            {step === 'card-form' && renderCardForm()}
+            {step === 'success' && renderSuccess()}
+          </div>
+
+          {/* Footer */}
+          <p className="text-center text-xs text-muted-foreground mt-6">
+            Todas as doações são processadas de forma segura
           </p>
-          <div className="mt-4 p-3 rounded-lg bg-[hsl(var(--supporter-light))] border border-[hsl(var(--supporter)/0.3)]">
-            <p className="text-sm text-[hsl(var(--supporter))] font-medium flex items-center justify-center gap-2">
-              <Heart className="h-4 w-4 fill-current" />
-              Seja um Apoiador Mensal!
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Ganhe uma <span className="font-semibold text-[hsl(var(--supporter))]">tag exclusiva</span> no seu nome
-            </p>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="bg-card rounded-xl border p-6">
-          {step === 'select-value' && renderSelectValue()}
-          {step === 'card-form' && renderCardForm()}
-          {step === 'success' && renderSuccess()}
         </div>
       </div>
     </Layout>
