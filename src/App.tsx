@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import DonationSuccess from "./pages/DonationSuccess";
 import Donation from "./pages/Donation";
 import Install from "./pages/Install";
+import Advertise from "./pages/Advertise";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/doacao-sucesso" element={<Layout><DonationSuccess /></Layout>} />
             <Route path="/apoio" element={<Donation />} />
             <Route path="/instalar" element={<Layout><Install /></Layout>} />
+            <Route path="/anuncie" element={<Advertise />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
