@@ -21,6 +21,36 @@ const formatCPF = (value: string): string => {
     .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
 };
 
+// CPF validation function
+const validateCPF = (cpf: string): boolean => {
+  const numbers = cpf.replace(/\D/g, '');
+  
+  if (numbers.length !== 11) return false;
+  
+  // Check for known invalid CPFs (all same digits)
+  if (/^(\d)\1+$/.test(numbers)) return false;
+  
+  // Validate first check digit
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(numbers[i]) * (10 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(numbers[9])) return false;
+  
+  // Validate second check digit
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(numbers[i]) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(numbers[10])) return false;
+  
+  return true;
+};
+
 type Step = 'select-value' | 'card-form' | 'success';
 
 declare global {
@@ -197,6 +227,13 @@ export default function Donation() {
   const handlePayment = async () => {
     if (!cardFormInstance) {
       toast.error('Formulário não carregado');
+      return;
+    }
+
+    // Validate CPF before processing
+    const cpfInput = document.getElementById('mp-identification-number') as HTMLInputElement;
+    if (cpfInput && !validateCPF(cpfInput.value)) {
+      toast.error('CPF inválido. Verifique o número informado.');
       return;
     }
 
