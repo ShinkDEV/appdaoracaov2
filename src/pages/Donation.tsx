@@ -473,7 +473,11 @@ export default function Donation() {
             />
             {/* Hidden - auto-populated by MP SDK based on card number */}
             <select id="mp-issuer" className="hidden"></select>
-            <select id="mp-installments" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+            {/* Hide installments for monthly donations */}
+            <select 
+              id="mp-installments" 
+              className={donationType === 'monthly' ? 'hidden' : 'w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary'}
+            >
               <option value="">Parcelas</option>
             </select>
           </div>
