@@ -99,13 +99,18 @@ serve(async (req) => {
 
     if (isMonthly) {
       // Create a subscription/preapproval for monthly donations
+      // Use start_date as now to trigger immediate first payment
+      const now = new Date().toISOString();
+      
       const preapprovalPayload: Record<string, unknown> = {
         reason: 'Apoio Mensal - App da Oração',
+        external_reference: `donation_${userId}_${Date.now()}`,
         auto_recurring: {
           frequency: 1,
           frequency_type: 'months',
           transaction_amount: paymentData.transactionAmount,
           currency_id: 'BRL',
+          start_date: now, // Start immediately to charge first payment now
         },
         back_url: 'https://prayer-remix-hub.lovable.app/doacao-sucesso',
         payer_email: paymentData.payer.email,
