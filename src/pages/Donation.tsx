@@ -242,15 +242,31 @@ export default function Donation() {
     setIsProcessing(true);
 
     try {
-      const tokenResponse = await cardFormInstance.createCardToken();
+      console.log('Creating card token...');
+      let tokenResponse;
+      try {
+        tokenResponse = await cardFormInstance.createCardToken();
+      } catch (tokenError) {
+        console.error('Token creation error:', tokenError);
+        toast.error('Erro ao processar dados do cartão. Verifique as informações.');
+        setIsProcessing(false);
+        return;
+      }
       
       if (!tokenResponse?.token) {
+        console.error('No token received:', tokenResponse);
         toast.error('Erro ao processar cartão. Verifique os dados.');
         setIsProcessing(false);
         return;
       }
 
+      console.log('Token created successfully');
       const formData = cardFormInstance.getCardFormData();
+      console.log('Form data:', { 
+        paymentMethodId: formData.paymentMethodId,
+        email: formData.cardholderEmail,
+        donationType 
+      });
 
       const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
         body: {
@@ -270,8 +286,16 @@ export default function Donation() {
         },
       });
 
+      console.log('Edge function response:', { data, error });
+
       if (error) {
+        console.error('Edge function error:', error);
         throw new Error(error.message || 'Erro ao processar pagamento');
+      }
+
+      if (data?.error) {
+        console.error('Payment API error:', data.error);
+        throw new Error(data.error);
       }
 
       if (data.status === 'approved') {
@@ -285,7 +309,8 @@ export default function Donation() {
         setStep('success');
         toast.info('Pagamento em análise');
       } else {
-        throw new Error(data.statusDetail || 'Pagamento não aprovado');
+        console.error('Payment not approved:', data);
+        throw new Error(data.statusDetail || data.error || 'Pagamento não aprovado');
       }
     } catch (error) {
       console.error('Payment error:', error);
