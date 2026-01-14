@@ -41,17 +41,7 @@ export function BannerCarousel({ banners, className }: BannerCarouselProps) {
   };
 
   if (banners.length === 0) {
-    // Default hero banner when no banners from database
-    return (
-      <div className={cn("relative w-full rounded-2xl overflow-hidden", className)}>
-        <div className="relative bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)] py-12 md:py-20 px-6 text-center">
-          <h1 className="text-xl md:text-4xl font-bold text-white leading-tight">
-            <span className="text-[hsl(190,100%,80%)]">O primeiro app</span> que conecta<br />
-            oração e propósito
-          </h1>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
