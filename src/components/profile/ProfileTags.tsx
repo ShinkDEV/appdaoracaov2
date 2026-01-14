@@ -88,28 +88,28 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
             <TooltipTrigger asChild>
               <div
                 onClick={handleSupporterClick}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ease-out ${
                   isSupporter
-                    ? 'bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800'
-                    : 'bg-muted/30 border-border/50 opacity-60 cursor-pointer hover:opacity-80 hover:border-amber-300'
+                    ? 'bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800 hover:shadow-md hover:shadow-amber-200/50 dark:hover:shadow-amber-900/30 hover:scale-[1.02]'
+                    : 'bg-muted/30 border-border/50 opacity-60 cursor-pointer hover:opacity-100 hover:border-amber-300 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 hover:scale-[1.02] hover:shadow-sm'
                 }`}
               >
                 <div
-                  className={`p-2 rounded-full ${
+                  className={`p-2 rounded-full transition-all duration-300 ${
                     isSupporter
                       ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white'
-                      : 'bg-muted text-muted-foreground'
+                      : 'bg-muted text-muted-foreground group-hover:bg-amber-100'
                   }`}
                 >
                   {isSupporter ? (
                     <Heart className="h-4 w-4" />
                   ) : (
-                    <Lock className="h-4 w-4" />
+                    <Lock className="h-4 w-4 transition-transform duration-300 hover:rotate-12" />
                   )}
                 </div>
                 <div className="flex-1">
                   <p
-                    className={`font-medium ${
+                    className={`font-medium transition-colors duration-300 ${
                       isSupporter ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'
                     }`}
                   >
@@ -120,7 +120,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                   </p>
                 </div>
                 {isSupporter && (
-                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-1 rounded-full">
+                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-1 rounded-full transition-transform duration-300 hover:scale-105">
                     Ativo
                   </span>
                 )}
@@ -137,14 +137,14 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <div
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ease-out ${
                   isVerified
-                    ? 'bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/30 dark:to-sky-950/30 border-blue-200 dark:border-blue-800'
-                    : 'bg-muted/30 border-border/50 opacity-60'
+                    ? 'bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/30 dark:to-sky-950/30 border-blue-200 dark:border-blue-800 hover:shadow-md hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30 hover:scale-[1.02]'
+                    : 'bg-muted/30 border-border/50 opacity-60 hover:opacity-80 hover:scale-[1.01]'
                 }`}
               >
                 <div
-                  className={`p-2 rounded-full ${
+                  className={`p-2 rounded-full transition-all duration-300 ${
                     isVerified
                       ? 'bg-gradient-to-br from-blue-500 to-sky-500 text-white'
                       : 'bg-muted text-muted-foreground'
@@ -158,7 +158,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                 </div>
                 <div className="flex-1">
                   <p
-                    className={`font-medium ${
+                    className={`font-medium transition-colors duration-300 ${
                       isVerified ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'
                     }`}
                   >
@@ -169,7 +169,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                   </p>
                 </div>
                 {isVerified && (
-                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded-full">
+                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded-full transition-transform duration-300 hover:scale-105">
                     Ativo
                   </span>
                 )}
