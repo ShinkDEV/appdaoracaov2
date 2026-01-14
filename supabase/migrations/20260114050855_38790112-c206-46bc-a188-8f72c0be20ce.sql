@@ -1,0 +1,2 @@
+INSERT INTO public.subscriptions (user_id, mercadopago_subscription_id, amount, status, payer_email) 
+VALUES ('8e2c12db-0ce3-4983-abfb-1988ad0487a4', 'test_subscription_001', 10.00, 'active', 'eduardofelyx0@gmail.com')
