@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Loading } from '@/components/ui/loading';
-import { ProfileHeader, ProfileStats, ProfileActions } from '@/components/profile';
+import { ProfileHeader, ProfileStats, ProfileActions, ProfileTags } from '@/components/profile';
 
 interface Profile {
   id: string;
@@ -89,6 +89,11 @@ export default function Profile() {
         verified={profile.verified ?? false}
         isSupporter={isSupporter}
         onUpdate={fetchProfile}
+      />
+
+      <ProfileTags
+        isSupporter={isSupporter}
+        isVerified={profile.verified ?? false}
       />
 
       <ProfileStats
