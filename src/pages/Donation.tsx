@@ -3,7 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, CreditCard, Loader2, ArrowLeft } from 'lucide-react';
+import { Heart, Copy, Check, CreditCard, Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,6 +52,7 @@ const validateCPF = (cpf: string): boolean => {
 };
 
 type Step = 'select-value' | 'card-form' | 'success';
+type DonationType = 'one-time' | 'monthly';
 
 declare global {
   interface Window {
@@ -104,6 +105,7 @@ interface CardFormData {
 export default function Donation() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('select-value');
+  const [donationType, setDonationType] = useState<DonationType>('one-time');
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState('');
   const [copiedPix, setCopiedPix] = useState(false);
@@ -295,15 +297,56 @@ export default function Donation() {
 
   const renderSelectValue = () => (
     <div className="space-y-6">
+      {/* Donation Type Toggle */}
+      <div className="flex rounded-lg bg-muted p-1">
+        <button
+          onClick={() => setDonationType('one-time')}
+          className={cn(
+            "flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all",
+            donationType === 'one-time'
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Doação Única
+        </button>
+        <button
+          onClick={() => setDonationType('monthly')}
+          className={cn(
+            "flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all flex items-center justify-center gap-1.5",
+            donationType === 'monthly'
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          Mensal
+        </button>
+      </div>
+
+      {donationType === 'monthly' && (
+        <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+          <p className="text-sm text-primary font-medium flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Doação recorrente
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            O valor será cobrado automaticamente todo mês. Você pode cancelar a qualquer momento.
+          </p>
+        </div>
+      )}
+
       {/* Card Section */}
       <div className="space-y-4 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
         <div className="flex items-center gap-2 text-primary font-medium">
           <CreditCard className="h-5 w-5" />
-          Doar com Cartão
+          {donationType === 'monthly' ? 'Apoio Mensal com Cartão' : 'Doar com Cartão'}
         </div>
         
         <div className="space-y-3">
-          <Label className="text-muted-foreground">Escolha um valor</Label>
+          <Label className="text-muted-foreground">
+            {donationType === 'monthly' ? 'Valor mensal' : 'Escolha um valor'}
+          </Label>
           <div className="grid grid-cols-3 gap-2">
             {DONATION_VALUES.map((value) => (
               <Button
@@ -315,13 +358,13 @@ export default function Donation() {
                   selectedValue === value && "bg-primary shadow-md"
                 )}
               >
-                R$ {value}
+                R$ {value}{donationType === 'monthly' ? '/mês' : ''}
               </Button>
             ))}
             <div className="col-span-3">
               <Input
                 type="number"
-                placeholder="Outro valor (R$)"
+                placeholder={donationType === 'monthly' ? 'Outro valor mensal (R$)' : 'Outro valor (R$)'}
                 value={customValue}
                 onChange={(e) => handleCustomValueChange(e.target.value)}
                 className="text-center"
@@ -337,6 +380,7 @@ export default function Donation() {
         >
           <CreditCard className="h-5 w-5" />
           Continuar - R$ {finalValue > 0 ? finalValue.toFixed(2).replace('.', ',') : '0,00'}
+          {donationType === 'monthly' ? '/mês' : ''}
         </Button>
       </div>
 
@@ -388,8 +432,18 @@ export default function Donation() {
       </Button>
 
       <div className="text-center p-3 rounded-lg bg-primary/10 border border-primary/20">
-        <p className="text-sm text-muted-foreground">Valor da doação</p>
-        <p className="text-2xl font-bold text-primary">R$ {finalValue.toFixed(2).replace('.', ',')}</p>
+        <p className="text-sm text-muted-foreground">
+          {donationType === 'monthly' ? 'Valor mensal' : 'Valor da doação'}
+        </p>
+        <p className="text-2xl font-bold text-primary">
+          R$ {finalValue.toFixed(2).replace('.', ',')}
+          {donationType === 'monthly' && <span className="text-sm font-normal">/mês</span>}
+        </p>
+        {donationType === 'monthly' && (
+          <p className="text-xs text-muted-foreground mt-1">
+            Cobrança recorrente mensal
+          </p>
+        )}
       </div>
 
       {!isMpLoaded ? (
@@ -486,10 +540,20 @@ export default function Donation() {
         <Check className="h-10 w-10 text-green-600" />
       </div>
       <div className="space-y-2">
-        <h3 className="text-xl font-bold text-foreground">Doação Realizada!</h3>
+        <h3 className="text-xl font-bold text-foreground">
+          {donationType === 'monthly' ? 'Apoio Mensal Ativado!' : 'Doação Realizada!'}
+        </h3>
         <p className="text-muted-foreground">
-          Muito obrigado pela sua contribuição de R$ {finalValue.toFixed(2).replace('.', ',')}
+          {donationType === 'monthly' 
+            ? `Muito obrigado! Você agora apoia com R$ ${finalValue.toFixed(2).replace('.', ',')}/mês`
+            : `Muito obrigado pela sua contribuição de R$ ${finalValue.toFixed(2).replace('.', ',')}`
+          }
         </p>
+        {donationType === 'monthly' && (
+          <p className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-2 mt-2">
+            A cobrança será feita automaticamente todo mês. Para cancelar, entre em contato conosco.
+          </p>
+        )}
         <p className="text-sm text-muted-foreground">
           Que Deus abençoe você e sua família! 🙏
         </p>
