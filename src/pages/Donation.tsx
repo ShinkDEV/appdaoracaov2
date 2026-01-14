@@ -83,6 +83,8 @@ interface CardFormOptions {
     onFormMounted: (error: Error | null) => void;
     onSubmit: (event: Event) => void;
     onFetching: (resource: string) => () => void;
+    onValidityChange?: (error: { field?: string; message?: string } | null, field: string) => void;
+    onCardTokenReceived?: (errorData: { message?: string } | null, token: string | null) => void;
   };
 }
 
@@ -167,9 +169,10 @@ export default function Donation() {
             onFormMounted: (error) => {
               if (error) {
                 console.error('CardForm mount error:', error);
-                toast.error('Erro ao carregar formulário');
+                toast.error('Erro ao carregar formulário. Recarregue a página.');
                 setIsFormMounted(false);
               } else {
+                console.log('CardForm mounted successfully');
                 setIsFormMounted(true);
               }
             },
@@ -180,6 +183,18 @@ export default function Donation() {
             onFetching: (resource) => {
               console.log('Fetching:', resource);
               return () => {};
+            },
+            onValidityChange: (error: { field?: string; message?: string } | null, field: string) => {
+              if (error) {
+                console.log(`Field validation error [${field}]:`, error);
+              }
+            },
+            onCardTokenReceived: (errorData: { message?: string } | null, token: string | null) => {
+              if (errorData) {
+                console.error('Card token error:', errorData);
+              } else if (token) {
+                console.log('Token received successfully');
+              }
             },
           },
         });
@@ -228,7 +243,12 @@ export default function Donation() {
 
   const handlePayment = async () => {
     if (!cardFormInstance) {
-      toast.error('Formulário não carregado');
+      toast.error('Formulário não carregado. Aguarde ou recarregue a página.');
+      return;
+    }
+
+    if (!isFormMounted) {
+      toast.error('Formulário ainda está carregando. Aguarde um momento.');
       return;
     }
 
@@ -239,16 +259,41 @@ export default function Donation() {
       return;
     }
 
+    // Validate email
+    const emailInput = document.getElementById('mp-cardholder-email') as HTMLInputElement;
+    if (!emailInput?.value || !emailInput.value.includes('@')) {
+      toast.error('E-mail inválido. Verifique o endereço informado.');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       console.log('Creating card token...');
+      console.log('Form mounted:', isFormMounted);
+      
       let tokenResponse;
       try {
         tokenResponse = await cardFormInstance.createCardToken();
-      } catch (tokenError) {
+        console.log('Token response:', tokenResponse);
+      } catch (tokenError: unknown) {
         console.error('Token creation error:', tokenError);
-        toast.error('Erro ao processar dados do cartão. Verifique as informações.');
+        
+        // Extract specific error message from MercadoPago SDK
+        let errorMsg = 'Erro ao processar dados do cartão.';
+        if (tokenError && typeof tokenError === 'object') {
+          const err = tokenError as { message?: string; cause?: Array<{ code?: string; description?: string }> };
+          if (err.message) {
+            errorMsg = err.message;
+          } else if (err.cause && Array.isArray(err.cause) && err.cause.length > 0) {
+            const causes = err.cause.map(c => c.description || c.code).filter(Boolean);
+            if (causes.length > 0) {
+              errorMsg = causes.join('. ');
+            }
+          }
+        }
+        
+        toast.error(errorMsg + ' Verifique as informações do cartão.');
         setIsProcessing(false);
         return;
       }
