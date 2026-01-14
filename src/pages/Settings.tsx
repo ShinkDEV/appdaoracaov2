@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube, Gift, Mail, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube, Gift, Mail, Copy, Check, Megaphone } from 'lucide-react';
 
 import { UpdatesModal } from '@/components/updates';
 import { toast } from 'sonner';
@@ -184,6 +184,25 @@ const Settings = () => {
                 <p className="text-xs text-muted-foreground mt-3">
                   Dúvidas, sugestões ou problemas? Entre em contato!
                 </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Advertise Section */}
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-1">Para Empresas</h2>
+            <Card className="overflow-hidden border-border/50 shadow-card">
+              <CardContent className="p-0">
+                <button onClick={() => navigate('/anuncie')} className="w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 text-violet-600">
+                    <Megaphone className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-foreground">Anuncie no App</p>
+                    <p className="text-sm text-muted-foreground">Divulgue para milhares de cristãos</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
+                </button>
               </CardContent>
             </Card>
           </div>
