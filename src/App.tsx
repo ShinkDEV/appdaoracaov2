@@ -15,6 +15,7 @@ import MyPrayers from "./pages/MyPrayers";
 import Settings from "./pages/Settings";
 import DonationSuccess from "./pages/DonationSuccess";
 import Donation from "./pages/Donation";
+import Subscription from "./pages/Subscription";
 import Install from "./pages/Install";
 import Advertise from "./pages/Advertise";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/minhas-oracoes" element={<Layout><MyPrayers /></Layout>} />
             <Route path="/configuracoes" element={<Layout><Settings /></Layout>} />
             <Route path="/doacao-sucesso" element={<Layout><DonationSuccess /></Layout>} />
+            <Route path="/assinatura" element={<Layout><Subscription /></Layout>} />
             <Route path="/apoio" element={<Donation />} />
             <Route path="/instalar" element={<Layout><Install /></Layout>} />
             <Route path="/anuncie" element={<Advertise />} />
