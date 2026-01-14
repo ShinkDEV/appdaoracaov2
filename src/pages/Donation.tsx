@@ -252,9 +252,16 @@ export default function Donation() {
       return;
     }
 
+    // Validate cardholder name
+    const nameInput = document.getElementById('mp-cardholder-name') as HTMLInputElement;
+    if (!nameInput?.value || nameInput.value.trim().length < 3) {
+      toast.error('Nome do titular inválido. Digite o nome impresso no cartão.');
+      return;
+    }
+
     // Validate CPF before processing
     const cpfInput = document.getElementById('mp-identification-number') as HTMLInputElement;
-    if (cpfInput && !validateCPF(cpfInput.value)) {
+    if (!cpfInput?.value || !validateCPF(cpfInput.value)) {
       toast.error('CPF inválido. Verifique o número informado.');
       return;
     }
@@ -263,6 +270,13 @@ export default function Donation() {
     const emailInput = document.getElementById('mp-cardholder-email') as HTMLInputElement;
     if (!emailInput?.value || !emailInput.value.includes('@')) {
       toast.error('E-mail inválido. Verifique o endereço informado.');
+      return;
+    }
+
+    // Validate identification type
+    const idTypeSelect = document.getElementById('mp-identification-type') as HTMLSelectElement;
+    if (!idTypeSelect?.value) {
+      toast.error('Selecione o tipo de documento.');
       return;
     }
 
@@ -278,22 +292,44 @@ export default function Donation() {
         console.log('Token response:', tokenResponse);
       } catch (tokenError: unknown) {
         console.error('Token creation error:', tokenError);
+        console.error('Token error details:', JSON.stringify(tokenError, null, 2));
         
         // Extract specific error message from MercadoPago SDK
-        let errorMsg = 'Erro ao processar dados do cartão.';
+        let errorMsg = 'Verifique os dados do cartão: número, validade e CVV.';
         if (tokenError && typeof tokenError === 'object') {
-          const err = tokenError as { message?: string; cause?: Array<{ code?: string; description?: string }> };
+          const err = tokenError as { 
+            message?: string; 
+            cause?: Array<{ code?: string; description?: string }>;
+            error?: string;
+            status?: number;
+          };
+          
+          console.log('Error object:', err);
+          
           if (err.message) {
-            errorMsg = err.message;
+            // Translate common error messages
+            if (err.message.includes('cardNumber')) {
+              errorMsg = 'Número do cartão inválido.';
+            } else if (err.message.includes('securityCode') || err.message.includes('CVV')) {
+              errorMsg = 'CVV inválido.';
+            } else if (err.message.includes('expirationDate') || err.message.includes('expiration')) {
+              errorMsg = 'Data de validade inválida.';
+            } else if (err.message.includes('cardholderName')) {
+              errorMsg = 'Nome do titular inválido.';
+            } else {
+              errorMsg = err.message;
+            }
           } else if (err.cause && Array.isArray(err.cause) && err.cause.length > 0) {
             const causes = err.cause.map(c => c.description || c.code).filter(Boolean);
             if (causes.length > 0) {
               errorMsg = causes.join('. ');
             }
+          } else if (err.error) {
+            errorMsg = err.error;
           }
         }
         
-        toast.error(errorMsg + ' Verifique as informações do cartão.');
+        toast.error(errorMsg);
         setIsProcessing(false);
         return;
       }
@@ -524,13 +560,19 @@ export default function Donation() {
       {!isMpLoaded ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-muted-foreground">Carregando...</span>
+          <span className="ml-2 text-muted-foreground">Carregando SDK...</span>
         </div>
-      ) : (
-        <form id="mp-card-form" className="space-y-4">
-          <div className="space-y-3">
-            <Label className="font-medium">Dados do Cartão</Label>
-            <div id="mp-card-number" className="h-10 border rounded-md"></div>
+      ) : !isFormMounted ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Preparando formulário...</span>
+        </div>
+      ) : null}
+      
+      <form id="mp-card-form" className={`space-y-4 ${!isFormMounted ? 'opacity-0 h-0 overflow-hidden' : ''}`}>
+        <div className="space-y-3">
+          <Label className="font-medium">Dados do Cartão</Label>
+          <div id="mp-card-number" className="h-10 border rounded-md"></div>
             <div className="grid grid-cols-2 gap-2">
               <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
               <div id="mp-security-code" className="h-10 border rounded-md"></div>
@@ -596,7 +638,6 @@ export default function Donation() {
             )}
           </Button>
         </form>
-      )}
 
       <p className="text-xs text-center text-muted-foreground">
         Pagamento processado com segurança pelo Mercado Pago
