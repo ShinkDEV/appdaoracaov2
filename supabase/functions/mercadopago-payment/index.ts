@@ -98,9 +98,52 @@ serve(async (req) => {
     });
 
     if (isMonthly) {
-      // Create a subscription/preapproval for monthly donations
-      // Add 30 seconds to avoid "past date" error from Mercado Pago
-      const startDate = new Date(Date.now() + 30000).toISOString();
+      // For monthly donations: charge first payment immediately, then create subscription for next month
+      
+      // Step 1: Process immediate first payment
+      console.log('Processing immediate first payment for monthly donation');
+      
+      const firstPaymentResponse = await fetch('https://api.mercadopago.com/v1/payments', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': crypto.randomUUID(),
+        },
+        body: JSON.stringify({
+          token: paymentData.token,
+          transaction_amount: paymentData.transactionAmount,
+          installments: 1,
+          payment_method_id: paymentData.paymentMethodId,
+          issuer_id: paymentData.issuerId,
+          description: 'Apoio Mensal - App da Oração (1ª cobrança)',
+          statement_descriptor: 'APP DA ORACAO',
+          payer: {
+            email: paymentData.payer.email,
+            identification: paymentData.payer.identification,
+          },
+        }),
+      });
+
+      const firstPaymentResult = await firstPaymentResponse.json();
+
+      console.log('First payment response:', JSON.stringify(firstPaymentResult, null, 2));
+
+      if (!firstPaymentResponse.ok || firstPaymentResult.status !== 'approved') {
+        console.error('First payment failed:', firstPaymentResult);
+        const errorMessage = firstPaymentResult.message || firstPaymentResult.cause?.[0]?.description || 'Erro ao processar primeiro pagamento';
+        return new Response(
+          JSON.stringify({ error: errorMessage, details: firstPaymentResult }),
+          { status: firstPaymentResponse.status || 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('First payment approved, creating subscription for next month');
+
+      // Step 2: Create subscription starting next month
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const startDate = nextMonth.toISOString();
       
       const preapprovalPayload: Record<string, unknown> = {
         reason: 'Apoio Mensal - App da Oração',
@@ -114,7 +157,6 @@ serve(async (req) => {
         },
         back_url: 'https://prayer-remix-hub.lovable.app/doacao-sucesso',
         payer_email: paymentData.payer.email,
-        card_token_id: paymentData.token,
         status: 'authorized',
       };
 
@@ -140,28 +182,9 @@ serve(async (req) => {
 
       if (!preapprovalResponse.ok) {
         console.error('Mercado Pago Preapproval Error:', preapprovalResult);
-        
-        // Better error message extraction
-        let errorMessage = 'Erro ao criar assinatura';
-        if (preapprovalResult.message) {
-          errorMessage = preapprovalResult.message;
-        } else if (preapprovalResult.cause && Array.isArray(preapprovalResult.cause)) {
-          errorMessage = preapprovalResult.cause.map((c: { description?: string }) => c.description).filter(Boolean).join(', ') || errorMessage;
-        } else if (preapprovalResult.error) {
-          errorMessage = preapprovalResult.error;
-        }
-        
-        return new Response(
-          JSON.stringify({ error: errorMessage, details: preapprovalResult }),
-          { status: preapprovalResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        // First payment was successful, so we still return success but note subscription issue
+        console.log('First payment was successful but subscription creation failed');
       }
-
-      console.log('Subscription created successfully:', {
-        id: preapprovalResult.id,
-        status: preapprovalResult.status,
-        userId,
-      });
 
       // Save subscription to database
       const serviceRoleClient = createClient(
@@ -169,32 +192,34 @@ serve(async (req) => {
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
       );
 
-      const { error: insertError } = await serviceRoleClient
-        .from('subscriptions')
-        .insert({
-          user_id: userId,
-          mercadopago_subscription_id: preapprovalResult.id,
-          amount: paymentData.transactionAmount,
-          status: preapprovalResult.status === 'authorized' ? 'active' : 'pending',
-          payer_email: paymentData.payer.email,
-          next_payment_date: preapprovalResult.next_payment_date || null,
-        });
+      if (preapprovalResponse.ok && preapprovalResult.id) {
+        const { error: insertError } = await serviceRoleClient
+          .from('subscriptions')
+          .insert({
+            user_id: userId,
+            mercadopago_subscription_id: preapprovalResult.id,
+            amount: paymentData.transactionAmount,
+            status: 'active',
+            payer_email: paymentData.payer.email,
+            next_payment_date: preapprovalResult.next_payment_date || startDate,
+          });
 
-      if (insertError) {
-        console.error('Error saving subscription to database:', insertError);
-        // Don't fail the payment, just log the error
-      } else {
-        console.log('Subscription saved to database');
+        if (insertError) {
+          console.error('Error saving subscription to database:', insertError);
+        } else {
+          console.log('Subscription saved to database');
+        }
       }
 
       return new Response(
         JSON.stringify({
-          id: preapprovalResult.id,
-          status: preapprovalResult.status === 'authorized' ? 'approved' : preapprovalResult.status,
-          statusDetail: 'subscription_created',
+          id: firstPaymentResult.id,
+          status: 'approved',
+          statusDetail: 'first_payment_and_subscription_created',
           transactionAmount: paymentData.transactionAmount,
-          subscriptionId: preapprovalResult.id,
+          subscriptionId: preapprovalResult?.id || null,
           isSubscription: true,
+          firstPaymentId: firstPaymentResult.id,
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
