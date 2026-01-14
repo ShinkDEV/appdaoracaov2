@@ -175,6 +175,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          amount: number
+          cancelled_at: string | null
+          created_at: string
+          id: string
+          mercadopago_subscription_id: string
+          next_payment_date: string | null
+          payer_email: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          mercadopago_subscription_id: string
+          next_payment_date?: string | null
+          payer_email?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          mercadopago_subscription_id?: string
+          next_payment_date?: string | null
+          payer_email?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_ip_tracking: {
         Row: {
           id: string
