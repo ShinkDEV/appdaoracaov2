@@ -49,6 +49,8 @@
     --gold-light: 48 96% 89%;
     --sage: 173 58% 39%;
     --sage-light: 166 76% 94%;
+    --supporter: 45 100% 50%;
+    --supporter-light: 48 100% 90%;
 
     /* Gradientes modernos */
     --gradient-hero: linear-gradient(135deg, hsl(217 91% 60% / 0.9), hsl(199 89% 48% / 0.85));
@@ -111,6 +113,8 @@
     --gold-light: 45 40% 20%;
     --sage: 173 50% 40%;
     --sage-light: 166 30% 14%;
+    --supporter: 45 100% 55%;
+    --supporter-light: 45 50% 20%;
 
     --gradient-hero: linear-gradient(135deg, hsl(217 70% 25% / 0.95), hsl(199 60% 20% / 0.9));
     --gradient-card: linear-gradient(180deg, hsl(222 47% 9%), hsl(222 47% 7%));

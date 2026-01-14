@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { HandHeart, Pin, ChevronDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { HandHeart, Pin, ChevronDown, Heart } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -85,13 +86,26 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
               {prayer.is_anonymous ? '🙏' : getInitials(prayer.author?.display_name)}
             </AvatarFallback>
           </Avatar>
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-sm font-medium text-foreground truncate">
-              {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'App da Oração')}
-            </span>
-            {!prayer.is_anonymous && prayer.author?.verified && (
-              <VerifiedBadge size="sm" />
-            )}
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className={cn(
+                "text-sm font-medium truncate",
+                !prayer.is_anonymous && prayer.author?.is_supporter 
+                  ? "text-[hsl(var(--supporter))]" 
+                  : "text-foreground"
+              )}>
+                {prayer.is_anonymous ? 'Anônimo' : (prayer.author?.display_name || 'App da Oração')}
+              </span>
+              {!prayer.is_anonymous && prayer.author?.verified && (
+                <VerifiedBadge size="sm" />
+              )}
+              {!prayer.is_anonymous && prayer.author?.is_supporter && (
+                <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-medium bg-[hsl(var(--supporter-light))] text-[hsl(var(--supporter))] border-[hsl(var(--supporter)/0.3)] gap-0.5">
+                  <Heart className="h-2.5 w-2.5 fill-current" />
+                  Apoiador
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
 

@@ -371,6 +371,7 @@ export type Database = {
         }
         Returns: {
           author_display_name: string
+          author_is_supporter: boolean
           author_photo_url: string
           author_verified: boolean
           created_at: string
@@ -384,6 +385,7 @@ export type Database = {
         }[]
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_monthly_supporter: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

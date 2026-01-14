@@ -57,7 +57,7 @@ export function useMyPrayers() {
 
       // Get authors
       const userIds = [...new Set((prayersData || []).map(p => p.user_id))];
-      let profilesMap: Record<string, { display_name: string | null; photo_url: string | null; verified: boolean | null }> = {};
+      let profilesMap: Record<string, { display_name: string | null; photo_url: string | null; verified: boolean | null; is_supporter: boolean }> = {};
 
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
@@ -71,8 +71,24 @@ export function useMyPrayers() {
               profilesMap[profile.id] = {
                 display_name: profile.display_name,
                 photo_url: profile.photo_url,
-                verified: profile.verified
+                verified: profile.verified,
+                is_supporter: false // Will be set below
               };
+            }
+          });
+        }
+        
+        // Check which authors are monthly supporters
+        const { data: supportersData } = await supabase
+          .from('subscriptions')
+          .select('user_id')
+          .in('user_id', userIds)
+          .eq('status', 'active');
+        
+        if (supportersData) {
+          supportersData.forEach(sub => {
+            if (profilesMap[sub.user_id]) {
+              profilesMap[sub.user_id].is_supporter = true;
             }
           });
         }
@@ -103,7 +119,7 @@ export function useMyPrayers() {
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: true,
-        author: prayer.is_anonymous ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null, verified: false }
+        author: prayer.is_anonymous ? undefined : profilesMap[prayer.user_id] || { display_name: 'App da Oração', photo_url: null, verified: false, is_supporter: false }
       }));
 
       setPrayingFor(formattedPrayers);
@@ -177,7 +193,7 @@ export function useMyPrayers() {
         created_at: prayer.created_at,
         prayer_count: prayerCounts[prayer.id] || 0,
         has_prayed: userPrayers.has(prayer.id),
-        author: { display_name: 'Você', photo_url: null, verified: false }
+        author: { display_name: 'Você', photo_url: null, verified: false, is_supporter: false }
       }));
 
       setMyRequests(formattedPrayers);
