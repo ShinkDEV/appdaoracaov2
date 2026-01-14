@@ -64,7 +64,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
 
   const handleSupporterClick = () => {
     if (!isSupporter) {
-      navigate('/doacao');
+      navigate('/apoio');
     }
   };
 
