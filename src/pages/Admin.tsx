@@ -8,8 +8,9 @@ import { PrayerManagement } from '@/components/admin/PrayerManagement';
 import { BannedIPs } from '@/components/admin/BannedIPs';
 import { BannerManagement } from '@/components/admin/BannerManagement';
 import { VerificationRequests } from '@/components/admin/VerificationRequests';
+import { DonationsManagement } from '@/components/admin/DonationsManagement';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck } from 'lucide-react';
+import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck, Heart } from 'lucide-react';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -60,6 +61,10 @@ export default function Admin() {
               <BadgeCheck className="h-4 w-4" />
               <span className="hidden sm:inline">Verificação</span>
             </TabsTrigger>
+            <TabsTrigger value="donations" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
+              <Heart className="h-4 w-4" />
+              <span className="hidden sm:inline">Doações</span>
+            </TabsTrigger>
             <TabsTrigger value="banners" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">Banners</span>
@@ -81,6 +86,10 @@ export default function Admin() {
 
         <TabsContent value="verification" className="mt-6">
           <VerificationRequests />
+        </TabsContent>
+
+        <TabsContent value="donations" className="mt-6">
+          <DonationsManagement />
         </TabsContent>
 
         <TabsContent value="banners" className="mt-6">
