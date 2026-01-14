@@ -118,7 +118,7 @@ const Settings = () => {
                   </div>
                   
                   <Button 
-                    onClick={() => setDonationOpen(true)}
+                    onClick={() => navigate('/apoio')}
                     className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-lg shadow-rose-500/25 gap-2 h-12 text-base font-semibold"
                   >
                     <Heart className="h-5 w-5 fill-white/30" />
