@@ -99,13 +99,13 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
               {!prayer.is_anonymous && prayer.author?.verified && (
                 <VerifiedBadge size="sm" />
               )}
-              {!prayer.is_anonymous && prayer.author?.is_supporter && (
-                <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-medium bg-[hsl(var(--supporter-light))] text-[hsl(var(--supporter))] border-[hsl(var(--supporter)/0.3)] gap-0.5">
-                  <Heart className="h-2.5 w-2.5 fill-current" />
-                  Apoiador
-                </Badge>
-              )}
             </div>
+            {!prayer.is_anonymous && prayer.author?.is_supporter && (
+              <Badge variant="outline" className="h-5 px-1.5 text-[10px] font-medium bg-[hsl(var(--supporter-light))] text-[hsl(var(--supporter))] border-[hsl(var(--supporter)/0.3)] gap-0.5 w-fit">
+                <Heart className="h-2.5 w-2.5 fill-current" />
+                Apoiador
+              </Badge>
+            )}
           </div>
         </div>
 
