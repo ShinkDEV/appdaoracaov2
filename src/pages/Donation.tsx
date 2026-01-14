@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import mercadopagoLogo from '@/assets/mercadopago-logo.svg';
+import siteSeguroImg from '@/assets/site-seguro.svg';
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'apoio@appdaoracao.com';
@@ -371,13 +372,9 @@ export default function Donation() {
           </div>
         </div>
 
-        {/* Card flags */}
-        <div className="flex items-center justify-center gap-2">
-          <img src="https://http2.mlstatic.com/storage/logos-api-admin/a5f047d0-9be0-11ec-aad4-c3381f368c68-m.svg" alt="Visa" className="h-6" />
-          <img src="https://http2.mlstatic.com/storage/logos-api-admin/aa2b8f70-5c85-11ec-ae75-df2bef173be2-m.svg" alt="Mastercard" className="h-6" />
-          <img src="https://http2.mlstatic.com/storage/logos-api-admin/ddf11820-35dc-11ec-ad92-d7d0673b4e9e-m.svg" alt="Elo" className="h-6" />
-          <img src="https://http2.mlstatic.com/storage/logos-api-admin/fbee8180-35dc-11ec-a699-8ba15e5fa2f8-m.svg" alt="Hipercard" className="h-6" />
-          <img src="https://http2.mlstatic.com/storage/logos-api-admin/992bc350-f3be-11eb-826e-6db365b9e0dd-m.svg" alt="American Express" className="h-6" />
+        {/* Site seguro badge */}
+        <div className="flex items-center justify-center">
+          <img src={siteSeguroImg} alt="Site Seguro" className="h-12" />
         </div>
 
         <p className="text-[10px] text-center text-muted-foreground">
