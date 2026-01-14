@@ -19,6 +19,7 @@ export interface PrayerRequest {
     display_name: string | null;
     photo_url: string | null;
     verified: boolean | null;
+    is_supporter: boolean;
   } | undefined;
 }
 
@@ -129,7 +130,8 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         author: prayer.is_anonymous ? undefined : {
           display_name: prayer.author_display_name || 'App da Oração',
           photo_url: prayer.author_photo_url,
-          verified: prayer.author_verified || false
+          verified: prayer.author_verified || false,
+          is_supporter: prayer.author_is_supporter || false
         }
       }));
 

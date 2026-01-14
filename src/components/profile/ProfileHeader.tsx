@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Camera, User, Pencil, Check, X } from 'lucide-react';
+import { Camera, User, Pencil, Check, X, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ImageCropper } from './ImageCropper';
@@ -15,10 +16,11 @@ interface ProfileHeaderProps {
   photoUrl: string | null;
   email: string;
   verified?: boolean;
+  isSupporter?: boolean;
   onUpdate: () => void;
 }
 
-export function ProfileHeader({ userId, displayName, photoUrl, email, verified, onUpdate }: ProfileHeaderProps) {
+export function ProfileHeader({ userId, displayName, photoUrl, email, verified, isSupporter, onUpdate }: ProfileHeaderProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(displayName || '');
   const [uploading, setUploading] = useState(false);
@@ -232,12 +234,22 @@ export function ProfileHeader({ userId, displayName, photoUrl, email, verified, 
             </Button>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold">{displayName || 'Usuário'}</h2>
-            {verified && <VerifiedBadge size="lg" />}
-            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setIsEditingName(true)}>
-              <Pencil className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className={`text-xl font-semibold ${isSupporter ? 'text-[hsl(var(--supporter))]' : ''}`}>
+                {displayName || 'Usuário'}
+              </h2>
+              {verified && <VerifiedBadge size="lg" />}
+              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setIsEditingName(true)}>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
+            {isSupporter && (
+              <Badge variant="outline" className="bg-[hsl(var(--supporter-light))] text-[hsl(var(--supporter))] border-[hsl(var(--supporter)/0.3)] gap-1">
+                <Heart className="h-3 w-3 fill-current" />
+                Apoiador mensal
+              </Badge>
+            )}
           </div>
         )}
         <p className="text-sm text-muted-foreground">{email}</p>

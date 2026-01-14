@@ -13,10 +13,15 @@ interface Profile {
   created_at: string;
 }
 
+interface Subscription {
+  status: string;
+}
+
 export default function Profile() {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSupporter, setIsSupporter] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async () => {
@@ -41,6 +46,16 @@ export default function Profile() {
         .maybeSingle();
 
       setIsAdmin(!!roleData);
+
+      // Check if monthly supporter
+      const { data: subscriptionData } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      setIsSupporter(!!subscriptionData);
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
@@ -72,6 +87,7 @@ export default function Profile() {
         photoUrl={profile.photo_url}
         email={user.email || ''}
         verified={profile.verified ?? false}
+        isSupporter={isSupporter}
         onUpdate={fetchProfile}
       />
 
