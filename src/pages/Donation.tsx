@@ -330,13 +330,13 @@ export default function Donation() {
       </div>
 
       {donationType === 'monthly' && (
-        <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-          <p className="text-sm text-primary font-medium flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Doação recorrente
+        <div className="p-3 rounded-lg bg-[hsl(var(--supporter-light))] border border-[hsl(var(--supporter)/0.3)]">
+          <p className="text-sm text-[hsl(var(--supporter))] font-medium flex items-center gap-2">
+            <Heart className="h-4 w-4 fill-current" />
+            Seja um Apoiador Mensal!
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            O valor será cobrado automaticamente todo mês. Você pode cancelar a qualquer momento.
+            Ganhe uma <span className="font-semibold text-[hsl(var(--supporter))]">tag exclusiva</span> no seu nome e ajude a manter o app funcionando. O valor será cobrado automaticamente todo mês e você pode cancelar a qualquer momento.
           </p>
         </div>
       )}
