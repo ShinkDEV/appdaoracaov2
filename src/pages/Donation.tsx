@@ -355,19 +355,32 @@ export default function Donation() {
         <form id="mp-card-form" className="space-y-4">
           <div className="space-y-3">
             <Label className="font-medium">Dados do Cartão</Label>
-            <div id="mp-card-number" className="h-10 border rounded-md"></div>
+            <div className="relative">
+              <div id="mp-card-number" className="h-10 border rounded-md"></div>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none mp-placeholder" id="placeholder-card-number">Número do cartão</span>
+            </div>
             <div className="grid grid-cols-2 gap-2">
-              <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
-              <div id="mp-security-code" className="h-10 border rounded-md"></div>
+              <div className="relative">
+                <div id="mp-expiration-date" className="h-10 border rounded-md"></div>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none mp-placeholder" id="placeholder-expiration">MM/AA</span>
+              </div>
+              <div className="relative">
+                <div id="mp-security-code" className="h-10 border rounded-md"></div>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none mp-placeholder" id="placeholder-cvv">CVV</span>
+              </div>
             </div>
             <input 
               type="text" 
               id="mp-cardholder-name" 
               className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Nome no cartão"
+              placeholder="Nome impresso no cartão"
             />
-            <select id="mp-issuer" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"></select>
-            <select id="mp-installments" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"></select>
+            <select id="mp-issuer" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="">Banco emissor</option>
+            </select>
+            <select id="mp-installments" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="">Parcelas</option>
+            </select>
           </div>
 
           <div className="space-y-3">
@@ -376,15 +389,17 @@ export default function Donation() {
               type="email" 
               id="mp-cardholder-email" 
               className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="E-mail"
+              placeholder="Seu e-mail"
             />
             <div className="grid grid-cols-2 gap-2">
-              <select id="mp-identification-type" className="h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"></select>
+              <select id="mp-identification-type" className="h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">Documento</option>
+              </select>
               <input 
                 type="text" 
                 id="mp-identification-number" 
                 className="h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="CPF"
+                placeholder="Número do CPF"
               />
             </div>
           </div>
