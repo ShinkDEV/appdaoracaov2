@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
+import mercadopagoLogo from '@/assets/mercadopago-logo.svg';
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'apoio@appdaoracao.com';
@@ -352,9 +353,9 @@ export default function Donation() {
         {/* Mercado Pago logo */}
         <div className="flex items-center justify-center">
           <img 
-            src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/6.6.92/mercadopago/logo__large@2x.png" 
+            src={mercadopagoLogo} 
             alt="Mercado Pago" 
-            className="h-8 opacity-80"
+            className="h-10"
           />
         </div>
         
