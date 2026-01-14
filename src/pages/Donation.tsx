@@ -3,7 +3,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, Copy, Check, CreditCard, Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Heart, Copy, Check, CreditCard, Loader2, ArrowLeft, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -347,9 +347,42 @@ export default function Donation() {
         </div>
       )}
 
-      <p className="text-xs text-center text-muted-foreground">
-        Pagamento processado com segurança pelo Mercado Pago
-      </p>
+      {/* Security badges */}
+      <div className="mt-6 pt-4 border-t space-y-4">
+        {/* Mercado Pago logo */}
+        <div className="flex items-center justify-center">
+          <img 
+            src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/6.6.92/mercadopago/logo__large@2x.png" 
+            alt="Mercado Pago" 
+            className="h-8 opacity-80"
+          />
+        </div>
+        
+        {/* Security badges */}
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
+            <ShieldCheck className="h-4 w-4 text-green-600" />
+            <span className="text-xs font-medium text-green-700">Pagamento Seguro</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+            <Lock className="h-4 w-4 text-blue-600" />
+            <span className="text-xs font-medium text-blue-700">Dados Criptografados</span>
+          </div>
+        </div>
+
+        {/* Card flags */}
+        <div className="flex items-center justify-center gap-2">
+          <img src="https://http2.mlstatic.com/storage/logos-api-admin/a5f047d0-9be0-11ec-aad4-c3381f368c68-m.svg" alt="Visa" className="h-6" />
+          <img src="https://http2.mlstatic.com/storage/logos-api-admin/aa2b8f70-5c85-11ec-ae75-df2bef173be2-m.svg" alt="Mastercard" className="h-6" />
+          <img src="https://http2.mlstatic.com/storage/logos-api-admin/ddf11820-35dc-11ec-ad92-d7d0673b4e9e-m.svg" alt="Elo" className="h-6" />
+          <img src="https://http2.mlstatic.com/storage/logos-api-admin/fbee8180-35dc-11ec-a699-8ba15e5fa2f8-m.svg" alt="Hipercard" className="h-6" />
+          <img src="https://http2.mlstatic.com/storage/logos-api-admin/992bc350-f3be-11eb-826e-6db365b9e0dd-m.svg" alt="American Express" className="h-6" />
+        </div>
+
+        <p className="text-[10px] text-center text-muted-foreground">
+          Pagamento processado com segurança pelo Mercado Pago
+        </p>
+      </div>
     </div>
   );
 
