@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Shield, LogOut, ChevronRight, Settings as SettingsIcon, Heart, Download, Sparkles, Instagram, Youtube, Gift, Mail, Copy, Check } from 'lucide-react';
-import { DonationModal } from '@/components/donation';
+
 import { UpdatesModal } from '@/components/updates';
 import { toast } from 'sonner';
 
@@ -13,7 +13,6 @@ const CONTACT_EMAIL = 'contato@appdaoracao.com';
 const Settings = () => {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
-  const [donationOpen, setDonationOpen] = useState(false);
   const [updatesOpen, setUpdatesOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -205,7 +204,6 @@ const Settings = () => {
         <p className="text-xs text-muted-foreground">App da Oração v1.1.0</p>
       </div>
 
-      <DonationModal open={donationOpen} onOpenChange={setDonationOpen} />
       <UpdatesModal open={updatesOpen} onOpenChange={setUpdatesOpen} />
     </div>
   );
