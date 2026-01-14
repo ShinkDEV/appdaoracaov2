@@ -375,9 +375,8 @@ export default function Donation() {
               className="w-full h-10 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Nome impresso no cartão"
             />
-            <select id="mp-issuer" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="">Banco emissor</option>
-            </select>
+            {/* Hidden - auto-populated by MP SDK based on card number */}
+            <select id="mp-issuer" className="hidden"></select>
             <select id="mp-installments" className="w-full h-10 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               <option value="">Parcelas</option>
             </select>
