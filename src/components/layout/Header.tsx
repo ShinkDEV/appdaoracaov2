@@ -20,9 +20,9 @@ export const Header: React.FC = () => {
 
           {/* Donate Button */}
           <Button asChild size="sm" variant="outline" className="gap-1.5">
-            <Link to="/doar">
+            <Link to="/apoio">
               <Heart className="h-4 w-4 text-primary" />
-              Doar
+              Apoiar
             </Link>
           </Button>
         </div>
