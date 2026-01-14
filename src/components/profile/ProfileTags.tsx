@@ -1,4 +1,5 @@
 import { Lock, Heart, BadgeCheck, Info } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Tooltip,
@@ -21,6 +22,14 @@ interface ProfileTagsProps {
 }
 
 export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
+  const navigate = useNavigate();
+
+  const handleSupporterClick = () => {
+    if (!isSupporter) {
+      navigate('/doacao');
+    }
+  };
+
   return (
     <Card className="border-border/50 shadow-card">
       <CardHeader className="pb-3">
@@ -78,10 +87,11 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <div
+                onClick={handleSupporterClick}
                 className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
                   isSupporter
                     ? 'bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800'
-                    : 'bg-muted/30 border-border/50 opacity-60'
+                    : 'bg-muted/30 border-border/50 opacity-60 cursor-pointer hover:opacity-80 hover:border-amber-300'
                 }`}
               >
                 <div
@@ -106,7 +116,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                     Apoiador Mensal
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {isSupporter ? 'Obrigado pelo apoio!' : 'Seja um doador mensal'}
+                    {isSupporter ? 'Obrigado pelo apoio!' : 'Clique para se tornar um doador'}
                   </p>
                 </div>
                 {isSupporter && (
@@ -119,7 +129,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
             <TooltipContent>
               {isSupporter
                 ? 'Você é um apoiador mensal!'
-                : 'Torne-se um doador mensal para desbloquear'}
+                : 'Clique para ir à página de doação'}
             </TooltipContent>
           </Tooltip>
 
