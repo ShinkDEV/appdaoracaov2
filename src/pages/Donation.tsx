@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,52 +8,28 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { initMercadoPago, CardNumber, ExpirationDate, SecurityCode, createCardToken } from '@mercadopago/sdk-react';
+import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'apoio@appdaoracao.com';
 
-// CPF mask function
-const formatCPF = (value: string): string => {
-  const numbers = value.replace(/\D/g, '').slice(0, 11);
-  return numbers
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-};
-
-// CPF validation function
-const validateCPF = (cpf: string): boolean => {
-  const numbers = cpf.replace(/\D/g, '');
-  
-  if (numbers.length !== 11) return false;
-  
-  // Check for known invalid CPFs (all same digits)
-  if (/^(\d)\1+$/.test(numbers)) return false;
-  
-  // Validate first check digit
-  let sum = 0;
-  for (let i = 0; i < 9; i++) {
-    sum += parseInt(numbers[i]) * (10 - i);
-  }
-  let remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(numbers[9])) return false;
-  
-  // Validate second check digit
-  sum = 0;
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(numbers[i]) * (11 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(numbers[10])) return false;
-  
-  return true;
-};
-
 type Step = 'select-value' | 'card-form' | 'success';
 type DonationType = 'one-time' | 'monthly';
+
+interface CardPaymentFormData {
+  token: string;
+  issuer_id: string;
+  payment_method_id: string;
+  transaction_amount: number;
+  installments: number;
+  payer: {
+    email: string;
+    identification: {
+      type: string;
+      number: string;
+    };
+  };
+}
 
 export default function Donation() {
   const navigate = useNavigate();
@@ -64,13 +40,6 @@ export default function Donation() {
   const [copiedPix, setCopiedPix] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMpInitialized, setIsMpInitialized] = useState(false);
-  const [publicKey, setPublicKey] = useState<string | null>(null);
-  
-  // Form fields
-  const [cardholderName, setCardholderName] = useState('');
-  const [cardholderEmail, setCardholderEmail] = useState('');
-  const [identificationType, setIdentificationType] = useState('CPF');
-  const [identificationNumber, setIdentificationNumber] = useState('');
 
   const finalValue = selectedValue || (customValue ? parseFloat(customValue) : 0);
 
@@ -89,7 +58,6 @@ export default function Donation() {
             return;
           }
 
-          setPublicKey(data.publicKey);
           initMercadoPago(data.publicKey, { locale: 'pt-BR' });
           setIsMpInitialized(true);
           console.log('MercadoPago SDK initialized');
@@ -124,61 +92,23 @@ export default function Donation() {
     setSelectedValue(null);
   };
 
-  const handlePayment = async () => {
-    // Validate cardholder name
-    if (!cardholderName || cardholderName.trim().length < 3) {
-      toast.error('Nome do titular inválido. Digite o nome impresso no cartão.');
-      return;
-    }
-
-    // Validate CPF
-    if (!validateCPF(identificationNumber)) {
-      toast.error('CPF inválido. Verifique o número informado.');
-      return;
-    }
-
-    // Validate email
-    if (!cardholderEmail || !cardholderEmail.includes('@')) {
-      toast.error('E-mail inválido. Verifique o endereço informado.');
-      return;
-    }
-
+  const handlePaymentSubmit = async (formData: CardPaymentFormData) => {
     setIsProcessing(true);
 
     try {
-      console.log('Creating card token...');
-      
-      // Create card token using the React SDK
-      const tokenResponse = await createCardToken({
-        cardholderName: cardholderName,
-        identificationType: identificationType,
-        identificationNumber: identificationNumber.replace(/\D/g, ''),
-      });
-
-      console.log('Token response:', tokenResponse);
-
-      if (!tokenResponse?.id) {
-        console.error('No token received:', tokenResponse);
-        toast.error('Erro ao processar cartão. Verifique os dados.');
-        setIsProcessing(false);
-        return;
-      }
-
-      console.log('Token created successfully:', tokenResponse.id);
+      console.log('Payment form data received:', formData);
 
       const { data, error } = await supabase.functions.invoke('mercadopago-payment', {
         body: {
-          token: tokenResponse.id,
-          transactionAmount: finalValue,
-          installments: 1,
-          paymentMethodId: tokenResponse.first_six_digits ? 'visa' : 'master', // Will be determined by the API
+          token: formData.token,
+          transactionAmount: formData.transaction_amount,
+          installments: donationType === 'monthly' ? 1 : formData.installments,
+          paymentMethodId: formData.payment_method_id,
+          issuerId: formData.issuer_id,
           donationType: donationType,
           payer: {
-            email: cardholderEmail,
-            identification: {
-              type: identificationType,
-              number: identificationNumber.replace(/\D/g, ''),
-            },
+            email: formData.payer.email,
+            identification: formData.payer.identification,
           },
         },
       });
@@ -212,22 +142,15 @@ export default function Donation() {
     } catch (error) {
       console.error('Payment error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erro ao processar pagamento';
-      
-      // Translate common error messages
-      if (errorMessage.includes('cardNumber') || errorMessage.includes('card number')) {
-        toast.error('Número do cartão inválido');
-      } else if (errorMessage.includes('securityCode') || errorMessage.includes('CVV') || errorMessage.includes('security code')) {
-        toast.error('CVV inválido');
-      } else if (errorMessage.includes('expirationDate') || errorMessage.includes('expiration')) {
-        toast.error('Data de validade inválida');
-      } else if (errorMessage.includes('cardholderName')) {
-        toast.error('Nome do titular inválido');
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handlePaymentError = (error: unknown) => {
+    console.error('CardPayment error:', error);
+    toast.error('Erro no formulário de pagamento. Verifique os dados.');
   };
 
   const renderSelectValue = () => (
@@ -397,102 +320,31 @@ export default function Donation() {
           <span className="ml-2 text-muted-foreground">Carregando formulário...</span>
         </div>
       ) : (
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handlePayment(); }}>
-          <div className="space-y-3">
-            <Label className="font-medium">Dados do Cartão</Label>
-            
-            <div className="space-y-2">
-              <div className="h-12 border rounded-md overflow-hidden bg-background">
-                <CardNumber 
-                  placeholder="Número do cartão"
-                  style={{
-                    height: '100%',
-                    padding: '0 12px',
-                  }}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-2">
-                <div className="h-12 border rounded-md overflow-hidden bg-background">
-                  <ExpirationDate 
-                    placeholder="MM/AA"
-                    style={{
-                      height: '100%',
-                      padding: '0 12px',
-                    }}
-                  />
-                </div>
-                <div className="h-12 border rounded-md overflow-hidden bg-background">
-                  <SecurityCode 
-                    placeholder="CVV"
-                    style={{
-                      height: '100%',
-                      padding: '0 12px',
-                    }}
-                  />
-                </div>
-              </div>
-              
-              <input 
-                type="text" 
-                value={cardholderName}
-                onChange={(e) => setCardholderName(e.target.value)}
-                className="w-full h-12 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Nome impresso no cartão"
-                required
-              />
+        <div className="space-y-4">
+          <CardPayment
+            initialization={{ amount: finalValue }}
+            customization={{
+              paymentMethods: {
+                maxInstallments: donationType === 'monthly' ? 1 : 12,
+                minInstallments: 1,
+              },
+              visual: {
+                style: {
+                  theme: 'default',
+                },
+              },
+            }}
+            onSubmit={handlePaymentSubmit}
+            onError={handlePaymentError}
+          />
+          
+          {isProcessing && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">Processando pagamento...</span>
             </div>
-          </div>
-
-          <div className="space-y-3">
-            <Label className="font-medium">Dados Pessoais</Label>
-            <input 
-              type="email" 
-              value={cardholderEmail}
-              onChange={(e) => setCardholderEmail(e.target.value)}
-              className="w-full h-12 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Seu e-mail"
-              required
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <select 
-                value={identificationType}
-                onChange={(e) => setIdentificationType(e.target.value)}
-                className="h-12 px-3 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="CPF">CPF</option>
-                <option value="CNPJ">CNPJ</option>
-              </select>
-              <input 
-                type="text" 
-                value={identificationNumber}
-                onChange={(e) => setIdentificationNumber(formatCPF(e.target.value))}
-                className="h-12 px-3 border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="000.000.000-00"
-                maxLength={14}
-                required
-              />
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full h-12 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold gap-2"
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Processando...
-              </>
-            ) : (
-              <>
-                <CreditCard className="h-5 w-5" />
-                Confirmar Doação
-              </>
-            )}
-          </Button>
-        </form>
+          )}
+        </div>
       )}
 
       <p className="text-xs text-center text-muted-foreground">
@@ -528,9 +380,6 @@ export default function Donation() {
           setStep('select-value');
           setSelectedValue(null);
           setCustomValue('');
-          setCardholderName('');
-          setCardholderEmail('');
-          setIdentificationNumber('');
         }}
       >
         Fazer outra doação
