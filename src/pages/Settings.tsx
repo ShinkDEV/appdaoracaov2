@@ -219,7 +219,15 @@ const Settings = () => {
           )}
         </div>
 
-      <div className="mt-12 text-center">
+      <div className="mt-12 text-center space-y-2">
+        {user && (
+          <button 
+            onClick={() => navigate('/assinatura')} 
+            className="text-xs text-muted-foreground/70 hover:text-muted-foreground transition-colors"
+          >
+            Gerenciar doações
+          </button>
+        )}
         <p className="text-xs text-muted-foreground">App da Oração v1.1.0</p>
       </div>
 
