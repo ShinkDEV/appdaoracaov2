@@ -567,6 +567,17 @@ export default function Donation() {
   return (
     <Layout>
       <div className="max-w-md mx-auto">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/')} 
+          className="gap-1.5 mb-4 -ml-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para início
+        </Button>
+
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
