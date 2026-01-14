@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lock, Heart, BadgeCheck, Info, Send, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProfileTagsProps {
   isSupporter: boolean;
@@ -30,14 +32,35 @@ type RequirementType = '10k_followers' | '50k_views' | '100k_influencer';
 
 export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [showVerificationForm, setShowVerificationForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     requirement: '' as RequirementType | '',
     link: '',
   });
+
+  useEffect(() => {
+    if (user && !isVerified) {
+      checkPendingRequest();
+    }
+  }, [user, isVerified]);
+
+  const checkPendingRequest = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('verification_requests')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .maybeSingle();
+    
+    setHasPendingRequest(!!data);
+  };
 
   const handleSupporterClick = () => {
     if (!isSupporter) {
@@ -72,6 +95,11 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
   const handleSubmitVerification = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast.error('Você precisa estar logado para solicitar verificação');
+      return;
+    }
+
     if (!formData.name || !formData.email || !formData.requirement || !formData.link) {
       toast.error('Por favor, preencha todos os campos');
       return;
@@ -85,13 +113,29 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
 
     setIsSubmitting(true);
     
-    // Simulate API call - in production, this would send to an edge function
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success('Solicitação enviada com sucesso! Analisaremos seu pedido em breve.');
-    setShowVerificationForm(false);
-    setFormData({ name: '', email: '', requirement: '', link: '' });
-    setIsSubmitting(false);
+    try {
+      const { error } = await supabase
+        .from('verification_requests')
+        .insert({
+          user_id: user.id,
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          requirement: formData.requirement,
+          link: formData.link.trim(),
+        });
+
+      if (error) throw error;
+
+      toast.success('Solicitação enviada com sucesso! Analisaremos seu pedido em breve.');
+      setShowVerificationForm(false);
+      setFormData({ name: '', email: '', requirement: '', link: '' });
+      setHasPendingRequest(true);
+    } catch (error) {
+      console.error('Error submitting verification request:', error);
+      toast.error('Erro ao enviar solicitação. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -141,7 +185,7 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                   </p>
                 </div>
 
-                {!isVerified && (
+                {!isVerified && !hasPendingRequest && (
                   <Button 
                     onClick={() => setShowVerificationForm(true)} 
                     className="w-full mt-2"
@@ -150,6 +194,14 @@ export function ProfileTags({ isSupporter, isVerified }: ProfileTagsProps) {
                     <Send className="h-4 w-4 mr-2" />
                     Solicitar Verificação
                   </Button>
+                )}
+
+                {!isVerified && hasPendingRequest && (
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-2">
+                    <p className="text-blue-800 dark:text-blue-200 text-xs text-center">
+                      ✓ Você já tem uma solicitação pendente em análise
+                    </p>
+                  </div>
                 )}
               </div>
             </DialogContent>

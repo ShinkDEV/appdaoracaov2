@@ -7,8 +7,9 @@ import { UserManagement } from '@/components/admin/UserManagement';
 import { PrayerManagement } from '@/components/admin/PrayerManagement';
 import { BannedIPs } from '@/components/admin/BannedIPs';
 import { BannerManagement } from '@/components/admin/BannerManagement';
+import { VerificationRequests } from '@/components/admin/VerificationRequests';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, BookOpen, Globe, Image, ArrowLeft } from 'lucide-react';
+import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck } from 'lucide-react';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -55,6 +56,10 @@ export default function Admin() {
               <BookOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Pedidos</span>
             </TabsTrigger>
+            <TabsTrigger value="verification" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
+              <BadgeCheck className="h-4 w-4" />
+              <span className="hidden sm:inline">Verificação</span>
+            </TabsTrigger>
             <TabsTrigger value="banners" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">Banners</span>
@@ -72,6 +77,10 @@ export default function Admin() {
 
         <TabsContent value="prayers" className="mt-6">
           <PrayerManagement />
+        </TabsContent>
+
+        <TabsContent value="verification" className="mt-6">
+          <VerificationRequests />
         </TabsContent>
 
         <TabsContent value="banners" className="mt-6">
