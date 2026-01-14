@@ -138,6 +138,30 @@ serve(async (req) => {
         userId,
       });
 
+      // Save subscription to database
+      const serviceRoleClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+
+      const { error: insertError } = await serviceRoleClient
+        .from('subscriptions')
+        .insert({
+          user_id: userId,
+          mercadopago_subscription_id: preapprovalResult.id,
+          amount: paymentData.transactionAmount,
+          status: preapprovalResult.status === 'authorized' ? 'active' : 'pending',
+          payer_email: paymentData.payer.email,
+          next_payment_date: preapprovalResult.next_payment_date || null,
+        });
+
+      if (insertError) {
+        console.error('Error saving subscription to database:', insertError);
+        // Don't fail the payment, just log the error
+      } else {
+        console.log('Subscription saved to database');
+      }
+
       return new Response(
         JSON.stringify({
           id: preapprovalResult.id,
