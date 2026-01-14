@@ -256,9 +256,10 @@ export default function Donation() {
         body: {
           token: tokenResponse.token,
           transactionAmount: finalValue,
-          installments: parseInt(String(formData.installments || 1), 10),
+          installments: donationType === 'monthly' ? 1 : parseInt(String(formData.installments || 1), 10),
           paymentMethodId: formData.paymentMethodId,
           issuerId: formData.issuerId,
+          donationType: donationType,
           payer: {
             email: formData.cardholderEmail,
             identification: {
@@ -275,7 +276,11 @@ export default function Donation() {
 
       if (data.status === 'approved') {
         setStep('success');
-        toast.success('Doação realizada com sucesso!');
+        if (data.isSubscription) {
+          toast.success('Apoio mensal ativado com sucesso!');
+        } else {
+          toast.success('Doação realizada com sucesso!');
+        }
       } else if (data.status === 'in_process' || data.status === 'pending') {
         setStep('success');
         toast.info('Pagamento em análise');
