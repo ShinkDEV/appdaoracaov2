@@ -19,6 +19,8 @@ import Subscription from "./pages/Subscription";
 import Install from "./pages/Install";
 import Advertise from "./pages/Advertise";
 import NotFound from "./pages/NotFound";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,8 @@ const App = () => (
             <Route path="/apoio" element={<Donation />} />
             <Route path="/instalar" element={<Layout><Install /></Layout>} />
             <Route path="/anuncie" element={<Advertise />} />
+            <Route path="/termos" element={<Terms />} />
+            <Route path="/privacidade" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
