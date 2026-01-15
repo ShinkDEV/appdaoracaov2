@@ -1,10 +1,30 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { PrayerCard } from './PrayerCard';
-import { Loading } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { BookHeart, RefreshCw } from 'lucide-react';
 import type { PrayerRequest, PrayerTheme } from '@/hooks/usePrayers';
+
+function PrayerCardSkeleton() {
+  return (
+    <div className="rounded-xl border bg-card p-4 space-y-3">
+      <div className="flex items-start gap-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      </div>
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+      <div className="flex justify-between pt-2">
+        <Skeleton className="h-8 w-20 rounded-full" />
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </div>
+    </div>
+  );
+}
 
 interface PrayerListProps {
   prayers: PrayerRequest[];
@@ -60,8 +80,12 @@ export function PrayerList({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <Loading text="Carregando pedidos de oração..." />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}>
+            <PrayerCardSkeleton />
+          </div>
+        ))}
       </div>
     );
   }
@@ -105,8 +129,10 @@ export function PrayerList({
       <div ref={loadMoreRef} className="h-4 mt-6" />
 
       {loadingMore && (
-        <div className="flex justify-center py-8">
-          <Loading text="Carregando mais..." />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 mt-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <PrayerCardSkeleton key={`loading-${i}`} />
+          ))}
         </div>
       )}
 
