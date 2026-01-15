@@ -45,7 +45,7 @@ export function usePrayers(options: UsePrayersOptions = {}) {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
   
-  const pageSize = options.limit || 10;
+  const pageSize = options.limit || 6;
 
   const fetchThemes = useCallback(async () => {
     const { data, error } = await supabase
