@@ -65,6 +65,14 @@ const NewRequest = () => {
 
       if (error) throw error;
 
+      // Meta Pixel - Track prayer request creation
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Lead', {
+          content_name: 'Prayer Request',
+          content_category: themes.find(t => t.id === themeId)?.name || 'Unknown',
+        });
+      }
+
       toast({ title: 'Pedido criado!', description: 'Seu pedido de oração foi enviado.' });
       navigate('/');
     } catch (error: any) {

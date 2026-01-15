@@ -143,6 +143,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
 
+      // Meta Pixel - Track signup
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'CompleteRegistration', {
+          content_name: 'Email Signup',
+        });
+      }
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
@@ -174,6 +181,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) throw error;
+
+      // Meta Pixel - Track Google signup/login initiation
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'InitiateCheckout', {
+          content_name: 'Google OAuth',
+        });
+      }
 
       return { error: null };
     } catch (error) {
