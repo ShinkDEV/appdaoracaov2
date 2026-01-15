@@ -132,19 +132,11 @@ export function UpdatesModal({ open, onOpenChange }: UpdatesModalProps) {
   );
 }
 
-// Hook to check if should show updates
+// Hook to check if should show updates (disabled auto-show)
 export function useUpdatesModal() {
   const [showUpdates, setShowUpdates] = useState(false);
 
-  useEffect(() => {
-    const lastSeenVersion = localStorage.getItem(STORAGE_KEY);
-    if (lastSeenVersion !== APP_VERSION) {
-      // Small delay to not show immediately on load
-      const timer = setTimeout(() => setShowUpdates(true), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
+  // Auto-show disabled - users can access updates manually from Settings
   return {
     showUpdates,
     setShowUpdates,
