@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "appdaoracaov2",
+  "compatibility_date": "2026-01-14",
+  "assets": {
+    "not_found_handling": "single-page-application"
+  }
+}
