@@ -85,16 +85,14 @@ export default function Index() {
       <UpdatesModal open={showUpdates} onOpenChange={setShowUpdates} />
 
       {/* Hero Banner */}
-      <div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
+      <header className="relative rounded-xl overflow-hidden bg-gradient-to-r from-[hsl(217,91%,60%)] via-[hsl(199,89%,55%)] to-[hsl(190,90%,50%)]">
         <div className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 text-center">
           <h1 className="text-base sm:text-lg md:text-2xl lg:text-3xl font-bold text-white leading-relaxed">
-            <span className="text-[hsl(190,100%,85%)]">O primeiro app</span> que conecta
-          </h1>
-          <h1 className="text-base sm:text-lg md:text-2xl lg:text-3xl font-bold text-white leading-relaxed">
+            <span className="text-[hsl(190,100%,85%)]">O primeiro app de oração</span> que conecta{' '}
             propósito e oração por <TypewriterText />
           </h1>
         </div>
-      </div>
+      </header>
 
       {/* Active Banners */}
       {banners.length > 0 && (
