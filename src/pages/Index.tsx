@@ -195,12 +195,13 @@ export default function Index() {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} App da Oração
           </p>
+          <a href="/anuncie" className="text-xs text-muted-foreground hover:text-foreground transition-colors underline">
+            Anuncie conosco
+          </a>
           <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
             <a href="/termos" className="hover:text-foreground transition-colors underline">Termos de Uso</a>
             <span>•</span>
-            <a href="/privacidade" className="hover:text-foreground transition-colors underline">Política de Privacidade</a>
-            <span>•</span>
-            <a href="/anuncie" className="hover:text-foreground transition-colors underline">Anuncie</a>
+            <a href="/privacidade" className="hover:text-foreground transition-colors underline">Privacidade</a>
           </div>
         </div>
       </footer>
