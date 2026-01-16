@@ -426,6 +426,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_emails: {
+        Args: never
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_monthly_supporter: { Args: { _user_id: string }; Returns: boolean }
     }
