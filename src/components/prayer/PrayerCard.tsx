@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { HandHeart, Pin, ChevronDown, Heart } from 'lucide-react';
+import { HandHeart, Pin, ChevronDown, Heart, Hash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -43,6 +43,12 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
       {/* Badges row */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2 flex-wrap">
+          {prayer.short_code && (
+            <span className="inline-flex items-center gap-0.5 px-2 py-1 rounded-full text-[10px] font-mono font-medium bg-muted text-muted-foreground border border-border/50">
+              <Hash className="h-2.5 w-2.5" />
+              {prayer.short_code}
+            </span>
+          )}
           {prayer.is_pinned && (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800">
               <Pin className="h-3 w-3" />

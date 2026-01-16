@@ -9,6 +9,7 @@ export interface PrayerRequest {
   title: string;
   description: string;
   theme_id: string;
+  short_code: string | null;
   is_anonymous: boolean;
   is_pinned: boolean;
   is_deleted: boolean;
@@ -121,6 +122,7 @@ export function usePrayers(options: UsePrayersOptions = {}) {
         title: prayer.title,
         description: prayer.description,
         theme_id: prayer.theme_id,
+        short_code: prayer.short_code || null,
         is_anonymous: prayer.is_anonymous || false,
         is_pinned: prayer.is_pinned || false,
         is_deleted: false,
