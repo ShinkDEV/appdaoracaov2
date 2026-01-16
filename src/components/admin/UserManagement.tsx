@@ -33,6 +33,7 @@ interface Profile {
   verified: boolean | null;
   verified_at: string | null;
   created_at: string;
+  email?: string | null;
 }
 
 export function UserManagement() {
@@ -47,17 +48,42 @@ export function UserManagement() {
 
   const fetchProfiles = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    // Fetch profiles
+    const { data: profilesData, error: profilesError } = await supabase
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
+    if (profilesError) {
       toast.error('Erro ao carregar usuários');
-      console.error(error);
-    } else {
-      setProfiles(data || []);
+      console.error(profilesError);
+      setLoading(false);
+      return;
     }
+
+    // Fetch user emails for admin
+    const { data: emailsData, error: emailsError } = await supabase
+      .rpc('get_user_emails');
+
+    if (emailsError) {
+      console.error('Erro ao carregar emails:', emailsError);
+    }
+
+    // Merge emails with profiles
+    const emailMap = new Map<string, string>();
+    if (emailsData) {
+      emailsData.forEach((item: { user_id: string; email: string }) => {
+        emailMap.set(item.user_id, item.email);
+      });
+    }
+
+    const profilesWithEmails = (profilesData || []).map(profile => ({
+      ...profile,
+      email: emailMap.get(profile.id) || null,
+    }));
+
+    setProfiles(profilesWithEmails);
     setLoading(false);
   };
 
@@ -112,7 +138,8 @@ export function UserManagement() {
 
   const filteredProfiles = profiles.filter(profile => 
     profile.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    profile.id.toLowerCase().includes(searchQuery.toLowerCase())
+    profile.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    profile.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const bannedCount = profiles.filter(p => p.banned).length;
@@ -231,7 +258,10 @@ export function UserManagement() {
                                 <BadgeCheck className="h-4 w-4 text-primary fill-primary/20" />
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground">{profile.id.slice(0, 8)}...</p>
+                            {profile.email && (
+                              <p className="text-xs text-muted-foreground">{profile.email}</p>
+                            )}
+                            <p className="text-[10px] text-muted-foreground/60">{profile.id.slice(0, 8)}...</p>
                           </div>
                         </div>
                       </TableCell>
