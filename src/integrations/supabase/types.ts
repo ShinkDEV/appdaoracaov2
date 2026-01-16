@@ -77,6 +77,7 @@ export type Database = {
           is_anonymous: boolean | null
           is_deleted: boolean | null
           is_pinned: boolean | null
+          short_code: string | null
           theme_id: string
           title: string
           user_id: string
@@ -89,6 +90,7 @@ export type Database = {
           is_anonymous?: boolean | null
           is_deleted?: boolean | null
           is_pinned?: boolean | null
+          short_code?: string | null
           theme_id: string
           title: string
           user_id: string
@@ -101,6 +103,7 @@ export type Database = {
           is_anonymous?: boolean | null
           is_deleted?: boolean | null
           is_pinned?: boolean | null
+          short_code?: string | null
           theme_id?: string
           title?: string
           user_id?: string
