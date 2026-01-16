@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { ArrowLeft, EyeOff } from 'lucide-react';
 import { VALIDATION } from '@/lib/constants';
+import { trackPrayerCreated } from '@/lib/analytics';
 
 const NewRequest = () => {
   const { user } = useAuth();
@@ -65,11 +66,15 @@ const NewRequest = () => {
 
       if (error) throw error;
 
+      // Google Analytics - Track prayer request creation
+      const themeName = themes.find(t => t.id === themeId)?.name || 'Unknown';
+      trackPrayerCreated(themeId, themeName, isAnonymous);
+
       // Meta Pixel - Track prayer request creation
       if (typeof window !== 'undefined' && (window as any).fbq) {
         (window as any).fbq('track', 'Lead', {
           content_name: 'Prayer Request',
-          content_category: themes.find(t => t.id === themeId)?.name || 'Unknown',
+          content_category: themeName,
         });
       }
 
