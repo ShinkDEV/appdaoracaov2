@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { HandHeart, Pin, ChevronDown, Heart, Hash } from 'lucide-react';
+import { HandHeart, Pin, ChevronDown, Heart, Hash, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,21 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const handleShare = () => {
+    if (!prayer.short_code) return;
+    
+    const message = `Peço sua oração por esse pedido no App da Oração 🙏🏻
+
+📲 Basta acessar o link appdaoracao.com e pesquisar 🔍
+
+na caixinha por *${prayer.short_code}*
+
+Este é um aplicativo de orações 100% gratuito.`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
@@ -155,6 +170,16 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
               <span className="text-xs">({prayer.prayer_count})</span>
             )}
           </button>
+          
+          {prayer.short_code && (
+            <button 
+              onClick={handleShare}
+              className="p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 transition-colors rounded-full dark:text-green-500 dark:hover:bg-green-950/30"
+              title="Compartilhar no WhatsApp"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+          )}
           
           <button className="p-1.5 text-muted-foreground/60 hover:text-muted-foreground transition-colors rounded-full hover:bg-muted/50">
             <ChevronDown className="h-4 w-4" />
