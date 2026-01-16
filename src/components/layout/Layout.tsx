@@ -37,6 +37,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <a href="/termos" className="hover:text-foreground transition-colors">Termos de Uso</a>
               <span>•</span>
               <a href="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</a>
+              <span>•</span>
+              <a href="/anuncie" className="hover:text-foreground transition-colors">Anuncie</a>
             </div>
           </div>
         </footer>
