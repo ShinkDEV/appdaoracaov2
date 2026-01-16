@@ -189,8 +189,8 @@ export default function Index() {
         onPray={togglePrayer}
       />
 
-      {/* Footer Links */}
-      <footer className="border-t border-border/30 pt-6 pb-2 mt-8">
+      {/* Mobile Footer Links - Hidden on desktop since Layout has footer */}
+      <footer className="xl:hidden border-t border-border/30 pt-6 pb-2 mt-8">
         <div className="text-center space-y-2">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} App da Oração
