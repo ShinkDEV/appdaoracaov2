@@ -424,6 +424,7 @@ export type Database = {
           id: string
           is_anonymous: boolean
           is_pinned: boolean
+          short_code: string
           theme_id: string
           title: string
           user_id: string
