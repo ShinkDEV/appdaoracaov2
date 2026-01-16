@@ -199,6 +199,8 @@ export default function Index() {
             <a href="/termos" className="hover:text-foreground transition-colors underline">Termos de Uso</a>
             <span>•</span>
             <a href="/privacidade" className="hover:text-foreground transition-colors underline">Política de Privacidade</a>
+            <span>•</span>
+            <a href="/anuncie" className="hover:text-foreground transition-colors underline">Anuncie</a>
           </div>
         </div>
       </footer>
