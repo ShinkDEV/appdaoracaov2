@@ -1,5 +1,5 @@
 // Versão do app
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.3.0';
 
 // Temas de oração - lista parametrizada
 export const PRAYER_THEMES = [

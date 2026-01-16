@@ -22,6 +22,15 @@ interface Update {
 
 const UPDATES: Update[] = [
   {
+    version: '1.3.0',
+    date: '2026-01-16',
+    changes: [
+      { type: 'feature', text: 'Código único para cada oração - encontre pedidos facilmente!' },
+      { type: 'feature', text: 'Compartilhar pedidos no WhatsApp - espalhe a oração!' },
+      { type: 'improvement', text: 'Novo visual dos cards com código de identificação' },
+    ]
+  },
+  {
     version: '1.2.0',
     date: '2026-01-13',
     changes: [
