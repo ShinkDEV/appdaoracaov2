@@ -188,6 +188,20 @@ export default function Index() {
         onRefresh={refresh}
         onPray={togglePrayer}
       />
+
+      {/* Mobile Footer Links */}
+      <footer className="xl:hidden border-t border-border/30 pt-6 pb-2 mt-8">
+        <div className="text-center space-y-2">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} App da Oração
+          </p>
+          <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+            <a href="/termos" className="hover:text-foreground transition-colors underline">Termos de Uso</a>
+            <span>•</span>
+            <a href="/privacidade" className="hover:text-foreground transition-colors underline">Política de Privacidade</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
