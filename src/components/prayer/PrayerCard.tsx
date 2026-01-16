@@ -46,7 +46,7 @@ na caixinha por *${prayer.short_code}*
 
 Este é um aplicativo de orações 100% gratuito.`;
 
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
