@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
+import { trackPrayerInteraction } from '@/lib/analytics';
 import type { PrayerRequest, PrayerTheme } from '@/hooks/usePrayers';
 
 interface PrayerCardProps {
@@ -111,7 +112,10 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
 
         <div className="flex items-center gap-1.5 shrink-0">
           <button
-            onClick={() => onPray(prayer.id)}
+            onClick={() => {
+              trackPrayerInteraction(prayer.id, 'pray');
+              onPray(prayer.id);
+            }}
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
               prayer.has_prayed 

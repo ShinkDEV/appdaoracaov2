@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
+import { trackSignUp, trackLogin } from '@/lib/analytics';
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -107,10 +108,12 @@ const Auth = () => {
       if (isSignUp) {
         const { error } = await signUp(email, password, displayName);
         if (error) throw error;
+        trackSignUp('email');
         setEmailSent(true);
       } else {
         const { error } = await signIn(email, password);
         if (error) throw error;
+        trackLogin('email');
         toast({ title: 'Bem-vindo de volta!' });
         navigate('/');
       }
@@ -336,6 +339,8 @@ const Auth = () => {
                     description: error.message || 'Erro ao entrar com Google',
                   });
                   setGoogleLoading(false);
+                } else {
+                  trackLogin('google');
                 }
               }}
             >

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import mercadopagoLogo from '@/assets/mercadopago-logo.svg';
 import siteSeguroImg from '@/assets/site-seguro.svg';
+import { trackDonationStart, trackDonationComplete, trackPixCopy } from '@/lib/analytics';
 
 const DONATION_VALUES = [5, 10, 20, 50, 100];
 const PIX_KEY = 'apoio@appdaoracao.com';
@@ -77,6 +78,7 @@ export default function Donation() {
     try {
       await navigator.clipboard.writeText(PIX_KEY);
       setCopiedPix(true);
+      trackPixCopy();
       toast.success('Chave PIX copiada!');
       setTimeout(() => setCopiedPix(false), 2000);
     } catch {
@@ -96,6 +98,7 @@ export default function Donation() {
 
   const handlePaymentSubmit = async (formData: CardPaymentFormData) => {
     setIsProcessing(true);
+    trackDonationStart(formData.transaction_amount, donationType);
 
     try {
       console.log('Payment form data received:', formData);
@@ -129,6 +132,7 @@ export default function Donation() {
 
       if (data.status === 'approved') {
         setStep('success');
+        trackDonationComplete(formData.transaction_amount, donationType);
         if (data.isSubscription) {
           toast.success('Apoio mensal ativado com sucesso!');
         } else {
@@ -136,6 +140,7 @@ export default function Donation() {
         }
       } else if (data.status === 'in_process' || data.status === 'pending') {
         setStep('success');
+        trackDonationComplete(formData.transaction_amount, donationType);
         toast.info('Pagamento em análise');
       } else {
         console.error('Payment not approved:', data);
