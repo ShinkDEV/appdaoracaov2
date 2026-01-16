@@ -7,6 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { trackPrayerInteraction } from '@/lib/analytics';
+import { useAuth } from '@/contexts/AuthContext';
 import type { PrayerRequest, PrayerTheme } from '@/hooks/usePrayers';
 
 interface PrayerCardProps {
@@ -16,6 +17,7 @@ interface PrayerCardProps {
 }
 
 export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState(false);
   
   const shouldTruncate = prayer.description.length > 80;
@@ -64,17 +66,32 @@ export function PrayerCard({ prayer, theme, onPray }: PrayerCardProps) {
       </h3>
 
       {/* Description */}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
-        {displayDescription}
-        {shouldTruncate && !expanded && (
-          <button
-            onClick={() => setExpanded(true)}
-            className="text-primary hover:text-primary/80 ml-1 font-medium"
-          >
-            Ver mais
-          </button>
+      <div className="relative mb-4 flex-1">
+        <p className={cn(
+          "text-sm text-muted-foreground leading-relaxed",
+          !user && "blur-sm select-none"
+        )}>
+          {displayDescription}
+          {shouldTruncate && !expanded && user && (
+            <button
+              onClick={() => setExpanded(true)}
+              className="text-primary hover:text-primary/80 ml-1 font-medium"
+            >
+              Ver mais
+            </button>
+          )}
+        </p>
+        {!user && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <a 
+              href="/auth" 
+              className="text-xs font-medium text-primary hover:underline bg-background/80 px-2 py-1 rounded"
+            >
+              Faça login para ver
+            </a>
+          </div>
         )}
-      </p>
+      </div>
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-3 border-t border-border/40 mt-auto">
