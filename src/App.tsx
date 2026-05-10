@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import MyPrayers from "./pages/MyPrayers";
 import Settings from "./pages/Settings";
+import Testimonies from "./pages/Testimonies";
 import DonationSuccess from "./pages/DonationSuccess";
 import Donation from "./pages/Donation";
 import Subscription from "./pages/Subscription";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/admin" element={<Layout><Admin /></Layout>} />
             <Route path="/minhas-oracoes" element={<Layout><MyPrayers /></Layout>} />
             <Route path="/configuracoes" element={<Layout><Settings /></Layout>} />
+            <Route path="/testemunhos" element={<Layout><Testimonies /></Layout>} />
             <Route path="/doacao-sucesso" element={<Layout><DonationSuccess /></Layout>} />
             <Route path="/assinatura" element={<Layout><Subscription /></Layout>} />
             <Route path="/apoio" element={<Donation />} />
