@@ -214,6 +214,92 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonies: {
+        Row: {
+          content: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_anonymous: boolean
+          is_deleted: boolean
+          likes_count: number
+          prayer_request_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_deleted?: boolean
+          likes_count?: number
+          prayer_request_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_deleted?: boolean
+          likes_count?: number
+          prayer_request_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "testimonies_prayer_request_id_fkey"
+            columns: ["prayer_request_id"]
+            isOneToOne: false
+            referencedRelation: "prayer_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "testimonies_prayer_request_id_fkey"
+            columns: ["prayer_request_id"]
+            isOneToOne: false
+            referencedRelation: "public_prayer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      testimony_likes: {
+        Row: {
+          created_at: string
+          id: string
+          testimony_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          testimony_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          testimony_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "testimony_likes_testimony_id_fkey"
+            columns: ["testimony_id"]
+            isOneToOne: false
+            referencedRelation: "testimonies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_ip_tracking: {
         Row: {
           id: string
@@ -426,6 +512,23 @@ export type Database = {
           is_pinned: boolean
           short_code: string
           theme_id: string
+          title: string
+          user_id: string
+        }[]
+      }
+      get_public_testimonies: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          author_display_name: string
+          author_is_supporter: boolean
+          author_photo_url: string
+          author_verified: boolean
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          likes_count: number
+          prayer_request_id: string
           title: string
           user_id: string
         }[]
