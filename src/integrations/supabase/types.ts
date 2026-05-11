@@ -134,11 +134,35 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      profile_moderation: {
         Row: {
           ban_reason: string | null
-          banned: boolean | null
+          banned: boolean
           banned_at: string | null
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ban_reason?: string | null
+          banned?: boolean
+          banned_at?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ban_reason?: string | null
+          banned?: boolean
+          banned_at?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
           created_at: string
           display_name: string | null
           id: string
@@ -147,9 +171,6 @@ export type Database = {
           verified_at: string | null
         }
         Insert: {
-          ban_reason?: string | null
-          banned?: boolean | null
-          banned_at?: string | null
           created_at?: string
           display_name?: string | null
           id: string
@@ -158,9 +179,6 @@ export type Database = {
           verified_at?: string | null
         }
         Update: {
-          ban_reason?: string | null
-          banned?: boolean | null
-          banned_at?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
