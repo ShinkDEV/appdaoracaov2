@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
     const uploadResponse = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Content-Type': file.type || 'image/jpeg',
+        'Content-Type': safeContentType,
         'Host': host,
         'x-amz-content-sha256': payloadHash,
         'x-amz-date': dateTimeStr,
