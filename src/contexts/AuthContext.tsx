@@ -7,9 +7,6 @@ interface Profile {
   id: string;
   display_name: string | null;
   photo_url: string | null;
-  banned: boolean;
-  banned_at: string | null;
-  ban_reason: string | null;
   verified: boolean;
   verified_at: string | null;
   created_at: string;
@@ -58,17 +55,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (profileData) {
         setProfile(profileData);
+      }
 
-        // Check if user is banned
-        if (profileData.banned) {
-          toast({
-            variant: "destructive",
-            title: "Conta suspensa",
-            description: profileData.ban_reason || "Sua conta foi suspensa. Entre em contato com o administrador.",
-          });
-          await supabase.auth.signOut();
-          return;
-        }
+      // Check if user is banned (moderation table is admin-only; we call RPC)
+      const { data: bannedFlag } = await supabase.rpc('is_banned' as any, { _user_id: userId });
+      if (bannedFlag === true) {
+        toast({
+          variant: "destructive",
+          title: "Conta suspensa",
+          description: "Sua conta foi suspensa. Entre em contato com o administrador.",
+        });
+        await supabase.auth.signOut();
+        return;
       }
 
       // Check admin role

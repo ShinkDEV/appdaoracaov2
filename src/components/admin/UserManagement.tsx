@@ -36,6 +36,13 @@ interface Profile {
   email?: string | null;
 }
 
+interface ModerationRow {
+  user_id: string;
+  banned: boolean | null;
+  ban_reason: string | null;
+  banned_at: string | null;
+}
+
 export function UserManagement() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,10 +85,26 @@ export function UserManagement() {
       });
     }
 
-    const profilesWithEmails = (profilesData || []).map(profile => ({
-      ...profile,
-      email: emailMap.get(profile.id) || null,
-    }));
+    // Fetch moderation data (admin-only table)
+    const { data: moderationData } = await supabase
+      .from('profile_moderation' as any)
+      .select('user_id, banned, ban_reason, banned_at');
+
+    const moderationMap = new Map<string, ModerationRow>();
+    ((moderationData as unknown as ModerationRow[]) || []).forEach((row) => {
+      moderationMap.set(row.user_id, row);
+    });
+
+    const profilesWithEmails: Profile[] = (profilesData || []).map((profile: any) => {
+      const mod = moderationMap.get(profile.id);
+      return {
+        ...profile,
+        email: emailMap.get(profile.id) || null,
+        banned: mod?.banned ?? false,
+        ban_reason: mod?.ban_reason ?? null,
+        banned_at: mod?.banned_at ?? null,
+      };
+    });
 
     setProfiles(profilesWithEmails);
     setLoading(false);
@@ -89,15 +112,15 @@ export function UserManagement() {
 
   const toggleBan = async (profile: Profile, reason?: string) => {
     const newBanStatus = !profile.banned;
-    
+
     const { error } = await supabase
-      .from('profiles')
-      .update({
+      .from('profile_moderation' as any)
+      .upsert({
+        user_id: profile.id,
         banned: newBanStatus,
         ban_reason: newBanStatus ? reason : null,
         banned_at: newBanStatus ? new Date().toISOString() : null,
-      })
-      .eq('id', profile.id);
+      }, { onConflict: 'user_id' });
 
     if (error) {
       toast.error('Erro ao atualizar status do usuário');
