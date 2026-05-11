@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
     const payloadHash = await sha256Hex(new Uint8Array(fileBuffer));
     
     const canonicalHeaders = [
-      `content-type:${file.type || 'image/jpeg'}`,
+      `content-type:${safeContentType}`,
       `host:${host}`,
       `x-amz-content-sha256:${payloadHash}`,
       `x-amz-date:${dateTimeStr}`,
