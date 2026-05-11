@@ -14,13 +14,436 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      banned_ips: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      banners: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          link: string | null
+          mobile_image_url: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          link?: string | null
+          mobile_image_url?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          link?: string | null
+          mobile_image_url?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      prayer_requests: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          description: string
+          id: string
+          is_anonymous: boolean | null
+          is_deleted: boolean | null
+          is_pinned: boolean | null
+          short_code: string | null
+          theme_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          description: string
+          id?: string
+          is_anonymous?: boolean | null
+          is_deleted?: boolean | null
+          is_pinned?: boolean | null
+          short_code?: string | null
+          theme_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          description?: string
+          id?: string
+          is_anonymous?: boolean | null
+          is_deleted?: boolean | null
+          is_pinned?: boolean | null
+          short_code?: string | null
+          theme_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      prayer_themes: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          ban_reason: string | null
+          banned: boolean | null
+          banned_at: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          photo_url: string | null
+          verified: boolean | null
+          verified_at: string | null
+        }
+        Insert: {
+          ban_reason?: string | null
+          banned?: boolean | null
+          banned_at?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          photo_url?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+        }
+        Update: {
+          ban_reason?: string | null
+          banned?: boolean | null
+          banned_at?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          photo_url?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          amount: number
+          cancelled_at: string | null
+          created_at: string
+          id: string
+          mercadopago_subscription_id: string
+          next_payment_date: string | null
+          payer_email: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          mercadopago_subscription_id: string
+          next_payment_date?: string | null
+          payer_email?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          mercadopago_subscription_id?: string
+          next_payment_date?: string | null
+          payer_email?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      testimonies: {
+        Row: {
+          content: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_anonymous: boolean
+          is_deleted: boolean
+          likes_count: number
+          prayer_request_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_deleted?: boolean
+          likes_count?: number
+          prayer_request_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_deleted?: boolean
+          likes_count?: number
+          prayer_request_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      testimony_likes: {
+        Row: {
+          created_at: string
+          id: string
+          testimony_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          testimony_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          testimony_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "testimony_likes_testimony_id_fkey"
+            columns: ["testimony_id"]
+            isOneToOne: false
+            referencedRelation: "testimonies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_ip_tracking: {
+        Row: {
+          id: string
+          ip_address: string
+          recorded_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          ip_address: string
+          recorded_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string
+          recorded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_prayers: {
+        Row: {
+          created_at: string
+          id: string
+          prayer_request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prayer_request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prayer_request_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verification_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          id: string
+          link: string
+          name: string
+          requirement: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          link: string
+          name: string
+          requirement: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          link?: string
+          name?: string
+          requirement?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_prayer_counts: {
+        Args: { prayer_ids: string[] }
+        Returns: {
+          count: number
+          prayer_request_id: string
+        }[]
+      }
+      get_public_prayer_requests: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_theme_id?: string
+        }
+        Returns: {
+          author_display_name: string
+          author_is_supporter: boolean
+          author_photo_url: string
+          author_verified: boolean
+          created_at: string
+          description: string
+          id: string
+          is_anonymous: boolean
+          is_pinned: boolean
+          short_code: string
+          theme_id: string
+          title: string
+          user_id: string
+        }[]
+      }
+      get_public_testimonies: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          author_display_name: string
+          author_is_supporter: boolean
+          author_photo_url: string
+          author_verified: boolean
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          likes_count: number
+          prayer_request_id: string
+          title: string
+          user_id: string
+        }[]
+      }
+      get_user_emails: {
+        Args: never
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_banned: { Args: { _user_id: string }; Returns: boolean }
+      is_monthly_supporter: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
