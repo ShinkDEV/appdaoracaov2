@@ -61,7 +61,7 @@ export function useMyPrayers() {
 
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
-          .from('public_profiles')
+          .from('profiles')
           .select('id, display_name, photo_url, verified')
           .in('id', userIds);
 
