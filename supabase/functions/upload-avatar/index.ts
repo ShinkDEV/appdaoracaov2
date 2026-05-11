@@ -74,8 +74,43 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Validate content type against an allowlist of safe image types
+    const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const detectedType = (file.type || '').toLowerCase();
+    if (!ALLOWED_MIME_TYPES.includes(detectedType)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid file type. Only JPEG, PNG, WebP and GIF are allowed.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Enforce max file size (5 MB)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return new Response(
+        JSON.stringify({ error: 'File too large. Maximum size is 5MB.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (file.size === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Empty file.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Pick safe extension matching the validated mime type
+    const extByMime: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    };
+    const safeExt = extByMime[detectedType];
+    const safeContentType = detectedType;
+
     // Generate unique filename
-    const fileName = `${user.id}/${user.id}-${Date.now()}.jpg`;
+    const fileName = `${user.id}/${user.id}-${Date.now()}.${safeExt}`;
     
     // Read file as ArrayBuffer
     const fileBuffer = await file.arrayBuffer();
@@ -97,7 +132,7 @@ Deno.serve(async (req) => {
     const payloadHash = await sha256Hex(new Uint8Array(fileBuffer));
     
     const canonicalHeaders = [
-      `content-type:${file.type || 'image/jpeg'}`,
+      `content-type:${safeContentType}`,
       `host:${host}`,
       `x-amz-content-sha256:${payloadHash}`,
       `x-amz-date:${dateTimeStr}`,
@@ -136,7 +171,7 @@ Deno.serve(async (req) => {
     const uploadResponse = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Content-Type': file.type || 'image/jpeg',
+        'Content-Type': safeContentType,
         'Host': host,
         'x-amz-content-sha256': payloadHash,
         'x-amz-date': dateTimeStr,
