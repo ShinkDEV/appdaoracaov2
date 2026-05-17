@@ -272,6 +272,7 @@ export default function ShareDevotional() {
         await navigator.share({
           files: [file],
           title: 'Palavra do dia — @appdaoracao',
+          text: 'Leia a palavra do dia em https://apdaoracao.com',
         });
       } else {
         handleDownload();
