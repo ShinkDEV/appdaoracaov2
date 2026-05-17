@@ -43,6 +43,7 @@ const App = () => (
             <Route path="/minhas-oracoes" element={<Layout><MyPrayers /></Layout>} />
             <Route path="/configuracoes" element={<Layout><Settings /></Layout>} />
             <Route path="/testemunhos" element={<Layout><Testimonies /></Layout>} />
+            <Route path="/orando-a-palavra" element={<Layout><OrandoAPalavra /></Layout>} />
             <Route path="/doacao-sucesso" element={<Layout><DonationSuccess /></Layout>} />
             <Route path="/assinatura" element={<Layout><Subscription /></Layout>} />
             <Route path="/apoio" element={<Donation />} />
