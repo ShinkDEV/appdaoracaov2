@@ -438,27 +438,9 @@ function StoryCard({
           padding: `${120 * scale}px ${90 * scale}px`,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: s(16) }}>
-          <div
-            style={{
-              width: s(64),
-              height: s(64),
-              borderRadius: '50%',
-              background: `${theme.textColor}1f`,
-              border: `${2 * scale}px solid ${theme.borderColor}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: s(32),
-              color: theme.accentColor,
-            }}
-          >
-            ✝
-          </div>
-          <div>
-            <div style={{ fontSize: s(28), fontWeight: 600 }}>App da Oração</div>
-            <div style={{ fontSize: s(22), color: theme.mutedColor }}>Palavra do dia</div>
-          </div>
+        <div>
+          <div style={{ fontSize: s(28), fontWeight: 600 }}>App da Oração</div>
+          <div style={{ fontSize: s(22), color: theme.mutedColor }}>Palavra do dia</div>
         </div>
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: s(40) }}>
