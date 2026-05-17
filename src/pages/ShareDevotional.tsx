@@ -286,8 +286,8 @@ export default function ShareDevotional() {
                         : 'border-border hover:border-primary/50',
                     )}
                     style={{
-                      background: t.background,
-                      backgroundImage: t.image ? `url(${t.image})` : undefined,
+                      backgroundColor: t.background.startsWith('#') ? t.background : '#000',
+                      backgroundImage: t.image ? `url(${t.image})` : t.background.startsWith('linear') ? t.background : undefined,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                     }}
