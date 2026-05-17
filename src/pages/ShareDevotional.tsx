@@ -438,12 +438,22 @@ function StoryCard({
           padding: `${120 * scale}px ${90 * scale}px`,
         }}
       >
-        <div>
+        <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: s(28), fontWeight: 600 }}>App da Oração</div>
           <div style={{ fontSize: s(22), color: theme.mutedColor }}>Palavra do dia</div>
         </div>
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: s(40) }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: s(40),
+          }}
+        >
           <div
             style={{
               fontSize: s(64),
@@ -458,8 +468,6 @@ function StoryCard({
           {verseText && (
             <div
               style={{
-                borderLeft: `${6 * scale}px solid ${theme.accentColor}`,
-                paddingLeft: s(32),
                 fontSize: s(42),
                 lineHeight: 1.4,
                 fontStyle: 'italic',
