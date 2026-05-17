@@ -486,7 +486,7 @@ function StoryCard({
                     color: theme.accentColor,
                   }}
                 >
-                  — {verseRef}
+                  {verseRef}
                 </div>
               )}
             </div>
