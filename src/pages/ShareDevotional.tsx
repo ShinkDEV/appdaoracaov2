@@ -179,6 +179,20 @@ export default function ShareDevotional() {
 
   const generateImage = async () => {
     if (!storyRef.current) return null;
+    // Aguarda imagens carregarem antes de capturar
+    const imgs = Array.from(storyRef.current.querySelectorAll('img'));
+    await Promise.all(
+      imgs.map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            }),
+      ),
+    );
+    // Roda duas vezes — primeira render pode falhar em inlinar fontes/imagens
+    await toPng(storyRef.current, { cacheBust: true, pixelRatio: 1, width: 1080, height: 1920 });
     return await toPng(storyRef.current, {
       cacheBust: true,
       pixelRatio: 2,
@@ -381,7 +395,6 @@ function StoryCard({
           <img
             src={theme.image}
             alt=""
-            crossOrigin="anonymous"
             style={{
               position: 'absolute',
               inset: 0,
