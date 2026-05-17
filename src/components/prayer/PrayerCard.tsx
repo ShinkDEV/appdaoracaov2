@@ -186,7 +186,7 @@ Este é um aplicativo de orações 100% gratuito.`;
             </button>
           )}
           
-          <button className="p-1.5 text-muted-foreground/60 hover:text-muted-foreground transition-colors rounded-full hover:bg-muted/50">
+          <button className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted/50">
             <ChevronDown className="h-4 w-4" />
           </button>
         </div>
