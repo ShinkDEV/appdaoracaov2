@@ -13,10 +13,16 @@ import {
   Eye,
   Mail
 } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 export default function Advertise() {
   return (
     <Layout>
+      <SEO
+        title="Anuncie no App da Oração — Alcance milhares de cristãos"
+        description="Divulgue sua igreja, produto ou ministério para uma comunidade engajada de cristãos. Banners e anúncios segmentados."
+        path="/anuncie"
+      />
       <div className="space-y-8 pb-8">
         {/* Hero Section */}
         <div className="text-center space-y-4">
