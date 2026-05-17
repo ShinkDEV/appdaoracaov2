@@ -24,6 +24,7 @@ import { LoadingSpinner } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/empty-state';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { SEO } from '@/components/SEO';
+import { Helmet } from 'react-helmet-async';
 import {
   AlertDialog,
   AlertDialogAction,
