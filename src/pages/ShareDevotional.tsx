@@ -7,6 +7,11 @@ import { useDevotionals } from '@/hooks/useDevotionals';
 import { SEO } from '@/components/SEO';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import bgStream from '@/assets/story-bg-stream.jpg';
+import bgSunset from '@/assets/story-bg-sunset.jpg';
+import bgMountains from '@/assets/story-bg-mountains.jpg';
+import bgWheat from '@/assets/story-bg-wheat.jpg';
+import bgForest from '@/assets/story-bg-forest.jpg';
 
 type Theme = {
   id: string;
@@ -19,6 +24,8 @@ type Theme = {
   glow1: string;
   glow2: string;
   fontFamily?: string;
+  image?: string;
+  overlay?: string;
 };
 
 const THEMES: Theme[] = [
@@ -88,6 +95,72 @@ const THEMES: Theme[] = [
     borderColor: 'rgba(255,255,255,0.18)',
     glow1: 'rgba(165,243,252,0.3)',
     glow2: 'rgba(94,234,212,0.25)',
+  },
+  // Naturais (foto de fundo)
+  {
+    id: 'riacho',
+    name: 'Riacho',
+    background: '#0a1a14',
+    image: bgStream,
+    overlay: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.65) 100%)',
+    textColor: '#ffffff',
+    accentColor: '#bbf7d0',
+    mutedColor: 'rgba(255,255,255,0.92)',
+    borderColor: 'rgba(255,255,255,0.25)',
+    glow1: 'transparent',
+    glow2: 'transparent',
+  },
+  {
+    id: 'por-do-sol',
+    name: 'Pôr do sol',
+    background: '#2a1410',
+    image: bgSunset,
+    overlay: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.7) 100%)',
+    textColor: '#ffffff',
+    accentColor: '#fed7aa',
+    mutedColor: 'rgba(255,255,255,0.95)',
+    borderColor: 'rgba(255,255,255,0.3)',
+    glow1: 'transparent',
+    glow2: 'transparent',
+  },
+  {
+    id: 'montanha',
+    name: 'Montanha',
+    background: '#1a1a2e',
+    image: bgMountains,
+    overlay: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.7) 100%)',
+    textColor: '#ffffff',
+    accentColor: '#fde68a',
+    mutedColor: 'rgba(255,255,255,0.95)',
+    borderColor: 'rgba(255,255,255,0.3)',
+    glow1: 'transparent',
+    glow2: 'transparent',
+  },
+  {
+    id: 'trigal',
+    name: 'Trigal',
+    background: '#2a1f10',
+    image: bgWheat,
+    overlay: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.75) 100%)',
+    textColor: '#ffffff',
+    accentColor: '#fde68a',
+    mutedColor: 'rgba(255,255,255,0.95)',
+    borderColor: 'rgba(255,255,255,0.3)',
+    glow1: 'transparent',
+    glow2: 'transparent',
+  },
+  {
+    id: 'floresta',
+    name: 'Floresta',
+    background: '#0e1a0e',
+    image: bgForest,
+    overlay: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.7) 100%)',
+    textColor: '#ffffff',
+    accentColor: '#bbf7d0',
+    mutedColor: 'rgba(255,255,255,0.95)',
+    borderColor: 'rgba(255,255,255,0.3)',
+    glow1: 'transparent',
+    glow2: 'transparent',
   },
 ];
 
