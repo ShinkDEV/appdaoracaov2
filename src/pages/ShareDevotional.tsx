@@ -1,17 +1,102 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
-import { ArrowLeft, Download, Share2, Loader2, Instagram } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Loader2, Instagram, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDevotionals } from '@/hooks/useDevotionals';
 import { SEO } from '@/components/SEO';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+type Theme = {
+  id: string;
+  name: string;
+  background: string;
+  textColor: string;
+  accentColor: string;
+  mutedColor: string;
+  borderColor: string;
+  glow1: string;
+  glow2: string;
+  fontFamily?: string;
+};
+
+const THEMES: Theme[] = [
+  {
+    id: 'midnight',
+    name: 'Meia-noite',
+    background: 'linear-gradient(160deg, #1e3a8a 0%, #0f172a 50%, #0c4a6e 100%)',
+    textColor: '#ffffff',
+    accentColor: '#93c5fd',
+    mutedColor: 'rgba(255,255,255,0.7)',
+    borderColor: 'rgba(255,255,255,0.15)',
+    glow1: 'rgba(96,165,250,0.35)',
+    glow2: 'rgba(20,184,166,0.25)',
+  },
+  {
+    id: 'sunrise',
+    name: 'Amanhecer',
+    background: 'linear-gradient(160deg, #f59e0b 0%, #ea580c 50%, #be123c 100%)',
+    textColor: '#ffffff',
+    accentColor: '#fef3c7',
+    mutedColor: 'rgba(255,255,255,0.85)',
+    borderColor: 'rgba(255,255,255,0.25)',
+    glow1: 'rgba(254,243,199,0.4)',
+    glow2: 'rgba(251,113,133,0.3)',
+  },
+  {
+    id: 'sage',
+    name: 'Oliveira',
+    background: 'linear-gradient(160deg, #064e3b 0%, #065f46 50%, #1e3a2b 100%)',
+    textColor: '#ffffff',
+    accentColor: '#86efac',
+    mutedColor: 'rgba(255,255,255,0.75)',
+    borderColor: 'rgba(255,255,255,0.15)',
+    glow1: 'rgba(134,239,172,0.3)',
+    glow2: 'rgba(250,204,21,0.2)',
+  },
+  {
+    id: 'paper',
+    name: 'Papel',
+    background: 'linear-gradient(160deg, #fafaf9 0%, #f5f5f4 50%, #e7e5e4 100%)',
+    textColor: '#1c1917',
+    accentColor: '#9a3412',
+    mutedColor: 'rgba(28,25,23,0.65)',
+    borderColor: 'rgba(28,25,23,0.12)',
+    glow1: 'rgba(251,191,36,0.18)',
+    glow2: 'rgba(180,83,9,0.12)',
+    fontFamily: '"DM Sans", "Inter", system-ui, serif',
+  },
+  {
+    id: 'royal',
+    name: 'Real',
+    background: 'linear-gradient(160deg, #4c1d95 0%, #1e1b4b 50%, #312e81 100%)',
+    textColor: '#ffffff',
+    accentColor: '#fcd34d',
+    mutedColor: 'rgba(255,255,255,0.75)',
+    borderColor: 'rgba(252,211,77,0.25)',
+    glow1: 'rgba(252,211,77,0.25)',
+    glow2: 'rgba(167,139,250,0.3)',
+  },
+  {
+    id: 'ocean',
+    name: 'Oceano',
+    background: 'linear-gradient(160deg, #0c4a6e 0%, #0e7490 50%, #134e4a 100%)',
+    textColor: '#ffffff',
+    accentColor: '#a5f3fc',
+    mutedColor: 'rgba(255,255,255,0.78)',
+    borderColor: 'rgba(255,255,255,0.18)',
+    glow1: 'rgba(165,243,252,0.3)',
+    glow2: 'rgba(94,234,212,0.25)',
+  },
+];
 
 export default function ShareDevotional() {
   const navigate = useNavigate();
   const { daily, loading } = useDevotionals();
   const storyRef = useRef<HTMLDivElement>(null);
   const [generating, setGenerating] = useState(false);
+  const [theme, setTheme] = useState<Theme>(THEMES[0]);
 
   useEffect(() => {
     if (!loading && !daily) {
@@ -92,7 +177,7 @@ export default function ShareDevotional() {
         <div>
           <h1 className="text-2xl font-bold">Compartilhar nos Stories</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Baixe a imagem abaixo e poste no Instagram marcando <span className="font-semibold text-primary">@appdaoracao</span>
+            Escolha um tema, baixe e marque <span className="font-semibold text-primary">@appdaoracao</span>
           </p>
         </div>
 
@@ -100,26 +185,56 @@ export default function ShareDevotional() {
           <div className="aspect-[9/16] rounded-2xl bg-muted animate-pulse" />
         ) : daily ? (
           <>
-            {/* Preview (escalado) */}
+            {/* Preview escalado */}
             <div className="rounded-2xl overflow-hidden shadow-2xl mx-auto" style={{ width: '100%', maxWidth: 360 }}>
-              <div
-                style={{
-                  width: 360,
-                  height: 640,
-                  transform: 'scale(1)',
-                  transformOrigin: 'top left',
-                }}
-              >
+              <div style={{ width: 360, height: 640 }}>
                 <StoryCard
                   title={daily.title}
                   verseText={daily.verse_text}
                   verseRef={daily.verse_reference}
                   scale={360 / 1080}
+                  theme={theme}
                 />
               </div>
             </div>
 
-            {/* Canvas oculto em tamanho real para export */}
+            {/* Seletor de temas */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Tema</p>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {THEMES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTheme(t)}
+                    className={cn(
+                      'relative aspect-[9/16] rounded-lg overflow-hidden border-2 transition-all',
+                      theme.id === t.id
+                        ? 'border-primary ring-2 ring-primary/30 scale-105'
+                        : 'border-border hover:border-primary/50',
+                    )}
+                    style={{ background: t.background }}
+                    aria-label={`Tema ${t.name}`}
+                  >
+                    {theme.id === t.id && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <Check className="h-4 w-4 text-white drop-shadow" />
+                      </div>
+                    )}
+                    <span
+                      className="absolute bottom-0 inset-x-0 text-[9px] font-medium py-0.5 text-center"
+                      style={{
+                        color: t.textColor,
+                        background: 'rgba(0,0,0,0.25)',
+                      }}
+                    >
+                      {t.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Canvas oculto em tamanho real */}
             <div style={{ position: 'fixed', left: -99999, top: 0, pointerEvents: 'none' }}>
               <div ref={storyRef} style={{ width: 1080, height: 1920 }}>
                 <StoryCard
@@ -127,6 +242,7 @@ export default function ShareDevotional() {
                   verseText={daily.verse_text}
                   verseRef={daily.verse_reference}
                   scale={1}
+                  theme={theme}
                 />
               </div>
             </div>
@@ -161,13 +277,14 @@ function StoryCard({
   verseText,
   verseRef,
   scale,
+  theme,
 }: {
   title: string;
   verseText: string | null;
   verseRef: string | null;
   scale: number;
+  theme: Theme;
 }) {
-  // Tamanho base: 1080 x 1920
   const s = (n: number) => `${n * scale}px`;
   return (
     <div
@@ -176,12 +293,11 @@ function StoryCard({
         height: 1920 * scale,
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(160deg, #1e3a8a 0%, #0f172a 50%, #0c4a6e 100%)',
-        color: '#ffffff',
-        fontFamily: '"Inter", "DM Sans", system-ui, sans-serif',
+        background: theme.background,
+        color: theme.textColor,
+        fontFamily: theme.fontFamily || '"Inter", "DM Sans", system-ui, sans-serif',
       }}
     >
-      {/* Glows decorativos */}
       <div
         style={{
           position: 'absolute',
@@ -190,7 +306,7 @@ function StoryCard({
           width: 700 * scale,
           height: 700 * scale,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(96,165,250,0.35), transparent 70%)',
+          background: `radial-gradient(circle, ${theme.glow1}, transparent 70%)`,
           filter: `blur(${60 * scale}px)`,
         }}
       />
@@ -202,12 +318,11 @@ function StoryCard({
           width: 800 * scale,
           height: 800 * scale,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(20,184,166,0.25), transparent 70%)',
+          background: `radial-gradient(circle, ${theme.glow2}, transparent 70%)`,
           filter: `blur(${80 * scale}px)`,
         }}
       />
 
-      {/* Conteúdo */}
       <div
         style={{
           position: 'relative',
@@ -217,30 +332,29 @@ function StoryCard({
           padding: `${120 * scale}px ${90 * scale}px`,
         }}
       >
-        {/* Topo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: s(16) }}>
           <div
             style={{
               width: s(64),
               height: s(64),
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.12)',
-              border: `${2 * scale}px solid rgba(255,255,255,0.25)`,
+              background: `${theme.textColor}1f`,
+              border: `${2 * scale}px solid ${theme.borderColor}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: s(32),
+              color: theme.accentColor,
             }}
           >
             ✝
           </div>
           <div>
-            <div style={{ fontSize: s(28), fontWeight: 600, letterSpacing: s(0.5) }}>App da Oração</div>
-            <div style={{ fontSize: s(22), opacity: 0.7 }}>Palavra do dia</div>
+            <div style={{ fontSize: s(28), fontWeight: 600 }}>App da Oração</div>
+            <div style={{ fontSize: s(22), color: theme.mutedColor }}>Palavra do dia</div>
           </div>
         </div>
 
-        {/* Centro */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: s(40) }}>
           <div
             style={{
@@ -256,13 +370,13 @@ function StoryCard({
           {verseText && (
             <div
               style={{
-                borderLeft: `${6 * scale}px solid rgba(147,197,253,0.9)`,
+                borderLeft: `${6 * scale}px solid ${theme.accentColor}`,
                 paddingLeft: s(32),
                 fontSize: s(42),
                 lineHeight: 1.4,
                 fontStyle: 'italic',
                 fontWeight: 300,
-                opacity: 0.95,
+                color: theme.mutedColor,
               }}
             >
               "{verseText}"
@@ -273,7 +387,7 @@ function StoryCard({
                     fontSize: s(32),
                     fontStyle: 'normal',
                     fontWeight: 600,
-                    color: '#93c5fd',
+                    color: theme.accentColor,
                   }}
                 >
                   — {verseRef}
@@ -283,18 +397,17 @@ function StoryCard({
           )}
         </div>
 
-        {/* Rodapé */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingTop: s(40),
-            borderTop: `${1 * scale}px solid rgba(255,255,255,0.15)`,
+            borderTop: `${1 * scale}px solid ${theme.borderColor}`,
           }}
         >
-          <div style={{ fontSize: s(30), fontWeight: 700, letterSpacing: s(0.5) }}>@appdaoracao</div>
-          <div style={{ fontSize: s(24), opacity: 0.7 }}>appdaoracao.com</div>
+          <div style={{ fontSize: s(30), fontWeight: 700 }}>@appdaoracao</div>
+          <div style={{ fontSize: s(24), color: theme.mutedColor }}>appdaoracao.com</div>
         </div>
       </div>
     </div>
