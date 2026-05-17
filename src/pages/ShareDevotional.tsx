@@ -164,6 +164,41 @@ const THEMES: Theme[] = [
   },
 ];
 
+const imageDataUrlCache = new Map<string, string>();
+
+async function imageUrlToDataUrl(src: string) {
+  if (src.startsWith('data:')) return src;
+  const absoluteSrc = new URL(src, window.location.href).href;
+  const cached = imageDataUrlCache.get(absoluteSrc);
+  if (cached) return cached;
+
+  const response = await fetch(absoluteSrc, { cache: 'force-cache' });
+  if (!response.ok) throw new Error('Não foi possível carregar a imagem de fundo');
+
+  const blob = await response.blob();
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+
+  imageDataUrlCache.set(absoluteSrc, dataUrl);
+  return dataUrl;
+}
+
+async function waitForImage(img: HTMLImageElement) {
+  if (img.complete && img.naturalWidth > 0) return;
+  if (img.decode) {
+    await img.decode().catch(() => undefined);
+    return;
+  }
+  await new Promise<void>((resolve) => {
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+  });
+}
+
 export default function ShareDevotional() {
   const navigate = useNavigate();
   const { daily, loading } = useDevotionals();
@@ -179,27 +214,34 @@ export default function ShareDevotional() {
 
   const generateImage = async () => {
     if (!storyRef.current) return null;
-    // Aguarda imagens carregarem antes de capturar
+
     const imgs = Array.from(storyRef.current.querySelectorAll('img'));
-    await Promise.all(
-      imgs.map((img) =>
-        img.complete && img.naturalWidth > 0
-          ? Promise.resolve()
-          : new Promise<void>((resolve) => {
-              img.onload = () => resolve();
-              img.onerror = () => resolve();
-            }),
-      ),
+    const restoreImages = await Promise.all(
+      imgs.map(async (img) => {
+        const originalSrc = img.getAttribute('src');
+        if (!originalSrc) return () => undefined;
+        const dataUrl = await imageUrlToDataUrl(originalSrc);
+        img.setAttribute('src', dataUrl);
+        await waitForImage(img);
+        return () => img.setAttribute('src', originalSrc);
+      }),
     );
-    // Roda duas vezes — primeira render pode falhar em inlinar fontes/imagens
-    await toPng(storyRef.current, { cacheBust: true, pixelRatio: 1, width: 1080, height: 1920 });
-    return await toPng(storyRef.current, {
-      cacheBust: true,
-      pixelRatio: 2,
-      width: 1080,
-      height: 1920,
-      style: { transform: 'scale(1)', transformOrigin: 'top left' },
-    });
+
+    try {
+      await Promise.all(imgs.map(waitForImage));
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      // Roda duas vezes — primeira render pode falhar em inlinar fontes/imagens
+      await toPng(storyRef.current, { cacheBust: true, pixelRatio: 1, width: 1080, height: 1920 });
+      return await toPng(storyRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        width: 1080,
+        height: 1920,
+        style: { transform: 'scale(1)', transformOrigin: 'top left' },
+      });
+    } finally {
+      restoreImages.forEach((restore) => restore());
+    }
   };
 
   const handleDownload = async () => {
