@@ -72,6 +72,11 @@ export default function OrandoAPalavra() {
 
   return (
     <div className="space-y-6">
+      <SEO
+        title="Orando a Palavra — Devocional diário | App da Oração"
+        description="Devocional cristão do dia e palavras compartilhadas pela comunidade. Receba uma reflexão bíblica nova todos os dias."
+        path="/orando-a-palavra"
+      />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
