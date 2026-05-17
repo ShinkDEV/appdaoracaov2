@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Sparkles, Plus, Send, Loader2 } from 'lucide-react';
+import { BookOpen, Sparkles, Plus, Send, Loader2, Share2 } from 'lucide-react';
 import { z } from 'zod';
 import { useDevotionals } from '@/hooks/useDevotionals';
 import { useAuth } from '@/contexts/AuthContext';
@@ -126,6 +126,17 @@ export default function OrandoAPalavra() {
 
               <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none whitespace-pre-wrap text-foreground/85 leading-relaxed">
                 {daily.content}
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  onClick={() => navigate('/palavra/compartilhar')}
+                  className="gap-2 w-full sm:w-auto"
+                  size="sm"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Compartilhar nos Stories
+                </Button>
               </div>
             </div>
           </Card>
