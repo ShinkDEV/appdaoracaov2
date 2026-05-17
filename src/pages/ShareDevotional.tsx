@@ -285,7 +285,12 @@ export default function ShareDevotional() {
                         ? 'border-primary ring-2 ring-primary/30 scale-105'
                         : 'border-border hover:border-primary/50',
                     )}
-                    style={{ background: t.background }}
+                    style={{
+                      background: t.background,
+                      backgroundImage: t.image ? `url(${t.image})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
                     aria-label={`Tema ${t.name}`}
                   >
                     {theme.id === t.id && (
