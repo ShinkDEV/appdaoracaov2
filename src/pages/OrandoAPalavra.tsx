@@ -22,6 +22,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '@/components/SEO';
 
 const schema = z.object({
   title: z.string().trim().min(3, 'Mínimo 3 caracteres').max(80, 'Máximo 80 caracteres'),
@@ -71,6 +72,11 @@ export default function OrandoAPalavra() {
 
   return (
     <div className="space-y-6">
+      <SEO
+        title="Orando a Palavra — Devocional diário | App da Oração"
+        description="Devocional cristão do dia e palavras compartilhadas pela comunidade. Receba uma reflexão bíblica nova todos os dias."
+        path="/orando-a-palavra"
+      />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

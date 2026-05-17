@@ -1,0 +1,19 @@
+# App da Oração
+
+> O primeiro app que conecta oração e propósito. Uma comunidade cristã brasileira onde pessoas compartilham pedidos de oração, testemunhos e devocionais diários.
+
+App da Oração é uma plataforma gratuita para cristãos do Brasil orarem uns pelos outros, lerem devocionais diários gerados todos os dias e compartilharem testemunhos do que Deus tem feito em suas vidas.
+
+## Pages
+
+- [Início](/): Feed de pedidos de oração da comunidade, filtros por tema e busca.
+- [Orando a Palavra](/orando-a-palavra): Devocional cristão do dia e palavras enviadas pela comunidade.
+- [Testemunhos](/testemunhos): Histórias de orações respondidas compartilhadas pela comunidade.
+- [Instalar o App](/instalar): Passo a passo para instalar o App da Oração como PWA no Android e iPhone.
+- [Anuncie](/anuncie): Informações para igrejas, ministérios e marcas que queiram divulgar no app.
+- [Apoiar](/apoio): Como apoiar financeiramente o projeto.
+
+## Optional
+
+- [Termos de Uso](/termos): Termos e condições de uso.
+- [Política de Privacidade](/privacidade): Como tratamos dados pessoais.

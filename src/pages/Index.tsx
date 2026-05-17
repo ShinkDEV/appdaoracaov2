@@ -11,6 +11,7 @@ import { UpdatesModal, useUpdatesModal } from '@/components/updates';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Search, LogIn } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 interface Banner {
   id: string;
@@ -81,6 +82,11 @@ export default function Index() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      <SEO
+        title="App da Oração — Conectando propósitos e oração"
+        description="O primeiro app que conecta oração e propósito. Faça pedidos, compartilhe testemunhos e una-se em oração com cristãos de todo o Brasil."
+        path="/"
+      />
       {/* Updates Modal */}
       <UpdatesModal open={showUpdates} onOpenChange={setShowUpdates} />
 

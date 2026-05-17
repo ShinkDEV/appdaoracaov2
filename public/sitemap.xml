@@ -3,23 +3,50 @@
 
   <url>
     <loc>https://appdaoracao.com/</loc>
-    <lastmod>2026-01-14</lastmod>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
+    <loc>https://appdaoracao.com/orando-a-palavra</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://appdaoracao.com/testemunhos</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://appdaoracao.com/anuncie</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://appdaoracao.com/instalar</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://appdaoracao.com/apoio</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://appdaoracao.com/termos</loc>
-    <lastmod>2026-01-14</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://appdaoracao.com/privacidade</loc>
-    <lastmod>2026-01-14</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
 </urlset>

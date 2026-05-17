@@ -1,12 +1,14 @@
 User-agent: *
 Disallow: /api/
-Disallow: /auth/
-Disallow: /admin/
-Disallow: /dashboard/
-Disallow: /private/
-Disallow: /_next/
-Disallow: /static/
-Disallow: /cdn-cgi/
+Disallow: /auth
+Disallow: /redefinir-senha
+Disallow: /admin
+Disallow: /perfil
+Disallow: /minhas-oracoes
+Disallow: /configuracoes
+Disallow: /novo-pedido
+Disallow: /assinatura
+Disallow: /doacao-sucesso
 
 Allow: /
 

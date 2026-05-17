@@ -4,6 +4,15 @@ import { Download, Smartphone, Check, Share, MoreVertical, PlusSquare, ArrowLeft
 import { useNavigate } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { toast } from "sonner";
+import { SEO } from "@/components/SEO";
+
+const InstallSEO = () => (
+  <SEO
+    title="Instalar App da Oração no celular — Passo a passo"
+    description="Instale o App da Oração no seu Android ou iPhone em segundos e tenha acesso rápido aos pedidos e devocionais."
+    path="/instalar"
+  />
+);
 
 const Install = () => {
   const navigate = useNavigate();
@@ -19,6 +28,7 @@ const Install = () => {
   if (isInstalled) {
     return (
       <div className="min-h-screen bg-background">
+        <InstallSEO />
         <div className="bg-gradient-to-b from-primary/20 to-background pt-12 pb-8 px-4">
           <div className="max-w-md mx-auto text-center">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -47,6 +57,7 @@ const Install = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <InstallSEO />
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="flex items-center gap-3 px-4 py-3">
