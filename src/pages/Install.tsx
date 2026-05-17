@@ -4,6 +4,15 @@ import { Download, Smartphone, Check, Share, MoreVertical, PlusSquare, ArrowLeft
 import { useNavigate } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { toast } from "sonner";
+import { SEO } from "@/components/SEO";
+
+const InstallSEO = () => (
+  <SEO
+    title="Instalar App da Oração no celular — Passo a passo"
+    description="Instale o App da Oração no seu Android ou iPhone em segundos e tenha acesso rápido aos pedidos e devocionais."
+    path="/instalar"
+  />
+);
 
 const Install = () => {
   const navigate = useNavigate();
