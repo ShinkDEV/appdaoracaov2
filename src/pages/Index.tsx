@@ -11,6 +11,7 @@ import { UpdatesModal, useUpdatesModal } from '@/components/updates';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Search, LogIn } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 interface Banner {
   id: string;
