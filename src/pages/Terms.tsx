@@ -1,10 +1,16 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { SEO } from "@/components/SEO";
 
 const Terms = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Termos de Uso — App da Oração"
+        description="Termos de uso e condições do App da Oração."
+        path="/termos"
+      />
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
