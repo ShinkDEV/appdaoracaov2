@@ -19,6 +19,7 @@ import Donation from "./pages/Donation";
 import Subscription from "./pages/Subscription";
 import Install from "./pages/Install";
 import Advertise from "./pages/Advertise";
+import OrandoAPalavra from "./pages/OrandoAPalavra";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
