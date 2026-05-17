@@ -23,7 +23,7 @@ export const BottomNav: React.FC = () => {
   const navItems: NavItem[] = [
     { icon: Home, label: 'Início', path: '/' },
     { icon: HandHeart, label: 'Orações', path: '/minhas-oracoes' },
-    { icon: BookOpen, label: 'Palavra', path: '/orando-a-palavra', disabled: true, comingSoon: true },
+    { icon: BookOpen, label: 'Palavra', path: '/orando-a-palavra' },
     { icon: User, label: 'Perfil', path: user ? '/perfil' : '/auth' },
     { icon: Menu, label: 'Mais', path: '/configuracoes' },
   ];
