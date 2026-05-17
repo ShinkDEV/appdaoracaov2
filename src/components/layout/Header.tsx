@@ -14,6 +14,10 @@ export const Header: React.FC = () => {
             <img
               src={logoAppDaOracao}
               alt="App da Oração"
+              width={160}
+              height={40}
+              fetchPriority="high"
+              decoding="async"
               className="h-8 sm:h-10 w-auto object-contain"
             />
           </Link>
