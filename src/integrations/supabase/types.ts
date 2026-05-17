@@ -68,6 +68,92 @@ export type Database = {
         }
         Relationships: []
       }
+      devotional_likes: {
+        Row: {
+          created_at: string
+          devotional_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          devotional_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          devotional_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_likes_devotional_id_fkey"
+            columns: ["devotional_id"]
+            isOneToOne: false
+            referencedRelation: "devotionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotionals: {
+        Row: {
+          admin_notes: string | null
+          content: string
+          created_at: string
+          featured_date: string | null
+          id: string
+          is_anonymous: boolean
+          is_system: boolean
+          likes_count: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+          verse_reference: string | null
+          verse_text: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          content: string
+          created_at?: string
+          featured_date?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_system?: boolean
+          likes_count?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+          verse_reference?: string | null
+          verse_text?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          content?: string
+          created_at?: string
+          featured_date?: string | null
+          id?: string
+          is_anonymous?: boolean
+          is_system?: boolean
+          likes_count?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+          verse_reference?: string | null
+          verse_text?: string | null
+        }
+        Relationships: []
+      }
       prayer_requests: {
         Row: {
           created_at: string
@@ -405,6 +491,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_approved_devotionals: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          author_display_name: string
+          author_is_supporter: boolean
+          author_photo_url: string
+          author_verified: boolean
+          content: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          is_system: boolean
+          likes_count: number
+          title: string
+          verse_reference: string
+          verse_text: string
+        }[]
+      }
+      get_daily_devotional: {
+        Args: never
+        Returns: {
+          author_display_name: string
+          author_is_supporter: boolean
+          author_photo_url: string
+          author_verified: boolean
+          content: string
+          created_at: string
+          featured_date: string
+          id: string
+          is_anonymous: boolean
+          is_system: boolean
+          likes_count: number
+          title: string
+          verse_reference: string
+          verse_text: string
+        }[]
+      }
       get_prayer_counts: {
         Args: { prayer_ids: string[] }
         Returns: {

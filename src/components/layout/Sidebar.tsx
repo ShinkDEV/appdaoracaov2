@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, HandHeart, User, Settings, Plus, Shield, LogOut } from 'lucide-react';
+import { Home, HandHeart, User, Settings, Plus, Shield, LogOut, BookOpen } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ export const Sidebar: React.FC = () => {
   const mainNavItems: NavItem[] = [
     { icon: Home, label: 'Início', path: '/' },
     { icon: HandHeart, label: 'Minhas Orações', path: '/minhas-oracoes' },
+    { icon: BookOpen, label: 'Palavra', path: '/orando-a-palavra' },
     { icon: User, label: 'Perfil', path: user ? '/perfil' : '/auth' },
     { icon: Settings, label: 'Configurações', path: '/configuracoes' },
   ];
