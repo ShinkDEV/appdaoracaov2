@@ -24,6 +24,7 @@ import { LoadingSpinner } from '@/components/ui/loading';
 import { EmptyState } from '@/components/ui/empty-state';
 import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { SEO } from '@/components/SEO';
+import { Helmet } from 'react-helmet-async';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,6 +89,21 @@ const Testimonies = () => {
         description="Veja testemunhos reais de pessoas que tiveram orações respondidas. Compartilhe o que Deus tem feito em sua vida."
         path="/testemunhos"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": "Testemunhos — App da Oração",
+          "description": "Coleção de testemunhos reais de orações respondidas compartilhados pela comunidade do App da Oração.",
+          "url": "https://appdaoracao.com/testemunhos",
+          "inLanguage": "pt-BR",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "App da Oração",
+            "url": "https://appdaoracao.com"
+          }
+        })}</script>
+      </Helmet>
       {/* Header */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <div className="flex items-center gap-3">
