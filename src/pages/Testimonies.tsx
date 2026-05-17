@@ -83,6 +83,11 @@ const Testimonies = () => {
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 md:py-10 pb-32">
+      <SEO
+        title="Testemunhos — App da Oração"
+        description="Veja testemunhos reais de pessoas que tiveram orações respondidas. Compartilhe o que Deus tem feito em sua vida."
+        path="/testemunhos"
+      />
       {/* Header */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <div className="flex items-center gap-3">
