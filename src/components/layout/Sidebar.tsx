@@ -26,6 +26,7 @@ export const Sidebar: React.FC = () => {
   const mainNavItems: NavItem[] = [
     { icon: Home, label: 'Início', path: '/' },
     { icon: HandHeart, label: 'Minhas Orações', path: '/minhas-oracoes' },
+    { icon: BookOpen, label: 'Palavra', path: '/orando-a-palavra' },
     { icon: User, label: 'Perfil', path: user ? '/perfil' : '/auth' },
     { icon: Settings, label: 'Configurações', path: '/configuracoes' },
   ];
