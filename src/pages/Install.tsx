@@ -28,6 +28,7 @@ const Install = () => {
   if (isInstalled) {
     return (
       <div className="min-h-screen bg-background">
+        <InstallSEO />
         <div className="bg-gradient-to-b from-primary/20 to-background pt-12 pb-8 px-4">
           <div className="max-w-md mx-auto text-center">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
