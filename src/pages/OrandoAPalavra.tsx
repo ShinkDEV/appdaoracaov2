@@ -22,6 +22,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '@/components/SEO';
 
 const schema = z.object({
   title: z.string().trim().min(3, 'Mínimo 3 caracteres').max(80, 'Máximo 80 caracteres'),
