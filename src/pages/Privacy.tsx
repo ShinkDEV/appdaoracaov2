@@ -1,10 +1,16 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { SEO } from "@/components/SEO";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Política de Privacidade — App da Oração"
+        description="Como o App da Oração coleta, usa e protege seus dados pessoais."
+        path="/privacidade"
+      />
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
