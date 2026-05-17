@@ -376,31 +376,59 @@ function StoryCard({
         fontFamily: theme.fontFamily || '"Inter", "DM Sans", system-ui, sans-serif',
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: -200 * scale,
-          right: -200 * scale,
-          width: 700 * scale,
-          height: 700 * scale,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${theme.glow1}, transparent 70%)`,
-          filter: `blur(${60 * scale}px)`,
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -250 * scale,
-          left: -150 * scale,
-          width: 800 * scale,
-          height: 800 * scale,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${theme.glow2}, transparent 70%)`,
-          filter: `blur(${80 * scale}px)`,
-        }}
-      />
-
+      {theme.image && (
+        <>
+          <img
+            src={theme.image}
+            alt=""
+            crossOrigin="anonymous"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          {theme.overlay && (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: theme.overlay,
+              }}
+            />
+          )}
+        </>
+      )}
+      {!theme.image && (
+        <>
+          <div
+            style={{
+              position: 'absolute',
+              top: -200 * scale,
+              right: -200 * scale,
+              width: 700 * scale,
+              height: 700 * scale,
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${theme.glow1}, transparent 70%)`,
+              filter: `blur(${60 * scale}px)`,
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -250 * scale,
+              left: -150 * scale,
+              width: 800 * scale,
+              height: 800 * scale,
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${theme.glow2}, transparent 70%)`,
+              filter: `blur(${80 * scale}px)`,
+            }}
+          />
+        </>
+      )}
       <div
         style={{
           position: 'relative',
