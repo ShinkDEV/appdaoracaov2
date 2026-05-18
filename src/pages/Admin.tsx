@@ -70,6 +70,10 @@ export default function Admin() {
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">Banners</span>
             </TabsTrigger>
+            <TabsTrigger value="advertise" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
+              <Megaphone className="h-4 w-4" />
+              <span className="hidden sm:inline">Anunciantes</span>
+            </TabsTrigger>
             <TabsTrigger value="ips" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Globe className="h-4 w-4" />
               <span className="hidden sm:inline">IPs</span>
