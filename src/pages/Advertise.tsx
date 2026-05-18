@@ -231,13 +231,50 @@ export default function Advertise() {
               <Badge variant="secondary">Campanhas especiais</Badge>
             </div>
 
-            <Button className="w-full mt-4" size="lg" asChild>
-              <a href="mailto:contato@appdaoracao.com.br?subject=Interesse em anunciar no App da Oração">
-                <Mail className="w-4 h-4 mr-2" />
-                Entrar em contato
-              </a>
-            </Button>
-            
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full mt-4" size="lg">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Entrar em contato
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Quero anunciar</DialogTitle>
+                  <DialogDescription>
+                    Preencha seus dados e entraremos em contato em até 48 horas úteis.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div>
+                    <Label htmlFor="ad-name">Nome *</Label>
+                    <Input id="ad-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} maxLength={120} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-email">E-mail *</Label>
+                    <Input id="ad-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={255} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-phone">Telefone / WhatsApp</Label>
+                    <Input id="ad-phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} maxLength={40} />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-company">Igreja / Empresa</Label>
+                    <Input id="ad-company" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} maxLength={120} />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-message">Mensagem *</Label>
+                    <Textarea id="ad-message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} maxLength={2000} rows={4} required placeholder="Conte sobre o que deseja divulgar..." />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" disabled={submitting} className="w-full">
+                      {submitting ? 'Enviando...' : 'Enviar contato'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
             <p className="text-xs text-center text-muted-foreground">
               Responderemos em até 48 horas úteis
             </p>
