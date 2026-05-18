@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, HandHeart, User, Settings, Plus, Shield, LogOut, BookOpen } from 'lucide-react';
+import { Home, HandHeart, User, Settings, Plus, Shield, LogOut, BookOpen, MessageSquareQuote, Download, Heart, Megaphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
