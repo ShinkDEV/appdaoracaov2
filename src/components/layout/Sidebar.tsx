@@ -114,6 +114,12 @@ export const Sidebar: React.FC = () => {
             {adminNavItems.map(renderNavItem)}
           </>
         )}
+
+        <Separator className="my-4" />
+        <div className="px-2 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Mais
+        </div>
+        {extraNavItems.map(renderNavItem)}
       </nav>
 
       {/* User Profile / Auth */}
