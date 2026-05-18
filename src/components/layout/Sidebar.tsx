@@ -35,6 +35,13 @@ export const Sidebar: React.FC = () => {
     { icon: Shield, label: 'Administração', path: '/admin', adminOnly: true },
   ];
 
+  const extraNavItems: NavItem[] = [
+    { icon: MessageSquareQuote, label: 'Testemunhos', path: '/testemunhos' },
+    { icon: Download, label: 'Instalar App', path: '/instalar' },
+    { icon: Heart, label: 'Apoiar', path: '/apoio' },
+    { icon: Megaphone, label: 'Anuncie', path: '/anuncie' },
+  ];
+
   const handleNewPrayer = () => {
     if (user) {
       navigate('/novo-pedido');
