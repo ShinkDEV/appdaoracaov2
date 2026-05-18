@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, HandHeart, User, Settings, Plus, Shield, LogOut, BookOpen } from 'lucide-react';
+import { Home, HandHeart, User, Settings, Plus, Shield, LogOut, BookOpen, MessageSquareQuote, Download, Heart, Megaphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,13 @@ export const Sidebar: React.FC = () => {
 
   const adminNavItems: NavItem[] = [
     { icon: Shield, label: 'Administração', path: '/admin', adminOnly: true },
+  ];
+
+  const extraNavItems: NavItem[] = [
+    { icon: MessageSquareQuote, label: 'Testemunhos', path: '/testemunhos' },
+    { icon: Download, label: 'Instalar App', path: '/instalar' },
+    { icon: Heart, label: 'Apoiar', path: '/apoio' },
+    { icon: Megaphone, label: 'Anuncie', path: '/anuncie' },
   ];
 
   const handleNewPrayer = () => {
@@ -107,6 +114,12 @@ export const Sidebar: React.FC = () => {
             {adminNavItems.map(renderNavItem)}
           </>
         )}
+
+        <Separator className="my-4" />
+        <div className="px-2 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Mais
+        </div>
+        {extraNavItems.map(renderNavItem)}
       </nav>
 
       {/* User Profile / Auth */}
