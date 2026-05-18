@@ -1,21 +1,66 @@
+import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Megaphone, 
-  Monitor, 
-  Smartphone, 
-  CheckCircle2, 
-  XCircle, 
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Megaphone,
+  Monitor,
+  Smartphone,
+  CheckCircle2,
+  XCircle,
   Heart,
   Users,
   Eye,
   Mail
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, 'Informe seu nome').max(120),
+  email: z.string().trim().email('E-mail inválido').max(255),
+  phone: z.string().trim().max(40).optional().or(z.literal('')),
+  company: z.string().trim().max(120).optional().or(z.literal('')),
+  message: z.string().trim().min(5, 'Conte um pouco sobre o que deseja anunciar').max(2000),
+});
 
 export default function Advertise() {
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', message: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = contactSchema.safeParse(form);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from('advertise_contacts').insert({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone || null,
+      company: parsed.data.company || null,
+      message: parsed.data.message,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error('Erro ao enviar. Tente novamente.');
+      return;
+    }
+    toast.success('Contato enviado! Retornaremos em até 48h úteis.');
+    setForm({ name: '', email: '', phone: '', company: '', message: '' });
+    setOpen(false);
+  };
+
   return (
     <Layout>
       <SEO
