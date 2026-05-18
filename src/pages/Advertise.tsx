@@ -1,21 +1,66 @@
+import { useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Megaphone, 
-  Monitor, 
-  Smartphone, 
-  CheckCircle2, 
-  XCircle, 
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Megaphone,
+  Monitor,
+  Smartphone,
+  CheckCircle2,
+  XCircle,
   Heart,
   Users,
   Eye,
   Mail
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, 'Informe seu nome').max(120),
+  email: z.string().trim().email('E-mail inválido').max(255),
+  phone: z.string().trim().max(40).optional().or(z.literal('')),
+  company: z.string().trim().max(120).optional().or(z.literal('')),
+  message: z.string().trim().min(5, 'Conte um pouco sobre o que deseja anunciar').max(2000),
+});
 
 export default function Advertise() {
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', message: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = contactSchema.safeParse(form);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from('advertise_contacts').insert({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      phone: parsed.data.phone || null,
+      company: parsed.data.company || null,
+      message: parsed.data.message,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error('Erro ao enviar. Tente novamente.');
+      return;
+    }
+    toast.success('Contato enviado! Retornaremos em até 48h úteis.');
+    setForm({ name: '', email: '', phone: '', company: '', message: '' });
+    setOpen(false);
+  };
+
   return (
     <Layout>
       <SEO
@@ -186,13 +231,50 @@ export default function Advertise() {
               <Badge variant="secondary">Campanhas especiais</Badge>
             </div>
 
-            <Button className="w-full mt-4" size="lg" asChild>
-              <a href="mailto:contato@appdaoracao.com.br?subject=Interesse em anunciar no App da Oração">
-                <Mail className="w-4 h-4 mr-2" />
-                Entrar em contato
-              </a>
-            </Button>
-            
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full mt-4" size="lg">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Entrar em contato
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Quero anunciar</DialogTitle>
+                  <DialogDescription>
+                    Preencha seus dados e entraremos em contato em até 48 horas úteis.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div>
+                    <Label htmlFor="ad-name">Nome *</Label>
+                    <Input id="ad-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} maxLength={120} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-email">E-mail *</Label>
+                    <Input id="ad-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={255} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-phone">Telefone / WhatsApp</Label>
+                    <Input id="ad-phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} maxLength={40} />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-company">Igreja / Empresa</Label>
+                    <Input id="ad-company" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} maxLength={120} />
+                  </div>
+                  <div>
+                    <Label htmlFor="ad-message">Mensagem *</Label>
+                    <Textarea id="ad-message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} maxLength={2000} rows={4} required placeholder="Conte sobre o que deseja divulgar..." />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" disabled={submitting} className="w-full">
+                      {submitting ? 'Enviando...' : 'Enviar contato'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
             <p className="text-xs text-center text-muted-foreground">
               Responderemos em até 48 horas úteis
             </p>

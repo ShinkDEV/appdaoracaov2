@@ -9,8 +9,9 @@ import { BannedIPs } from '@/components/admin/BannedIPs';
 import { BannerManagement } from '@/components/admin/BannerManagement';
 import { VerificationRequests } from '@/components/admin/VerificationRequests';
 import { DonationsManagement } from '@/components/admin/DonationsManagement';
+import { AdvertiseContacts } from '@/components/admin/AdvertiseContacts';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck, Heart } from 'lucide-react';
+import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck, Heart, Megaphone } from 'lucide-react';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
@@ -69,6 +70,10 @@ export default function Admin() {
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">Banners</span>
             </TabsTrigger>
+            <TabsTrigger value="advertise" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
+              <Megaphone className="h-4 w-4" />
+              <span className="hidden sm:inline">Anunciantes</span>
+            </TabsTrigger>
             <TabsTrigger value="ips" className="rounded-full gap-1.5 md:gap-2 text-xs md:text-sm py-2 md:py-2.5 px-3 md:px-4">
               <Globe className="h-4 w-4" />
               <span className="hidden sm:inline">IPs</span>
@@ -94,6 +99,10 @@ export default function Admin() {
 
         <TabsContent value="banners" className="mt-6">
           <BannerManagement />
+        </TabsContent>
+
+        <TabsContent value="advertise" className="mt-6">
+          <AdvertiseContacts />
         </TabsContent>
 
         <TabsContent value="ips" className="mt-6">
