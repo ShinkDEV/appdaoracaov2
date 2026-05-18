@@ -101,6 +101,10 @@ export default function Admin() {
           <BannerManagement />
         </TabsContent>
 
+        <TabsContent value="advertise" className="mt-6">
+          <AdvertiseContacts />
+        </TabsContent>
+
         <TabsContent value="ips" className="mt-6">
           <BannedIPs />
         </TabsContent>
