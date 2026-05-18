@@ -9,8 +9,9 @@ import { BannedIPs } from '@/components/admin/BannedIPs';
 import { BannerManagement } from '@/components/admin/BannerManagement';
 import { VerificationRequests } from '@/components/admin/VerificationRequests';
 import { DonationsManagement } from '@/components/admin/DonationsManagement';
+import { AdvertiseContacts } from '@/components/admin/AdvertiseContacts';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck, Heart } from 'lucide-react';
+import { Shield, Users, BookOpen, Globe, Image, ArrowLeft, BadgeCheck, Heart, Megaphone } from 'lucide-react';
 
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
