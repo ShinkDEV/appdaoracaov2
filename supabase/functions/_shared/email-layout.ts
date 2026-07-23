@@ -1,7 +1,7 @@
 // Branded email layout for App da Oração
 // Wraps content HTML with header (logo), body, and footer using the app's visual identity.
 
-const LOGO_URL = "https://appdaoracao.com/apple-touch-icon.png";
+const LOGO_URL = "https://opthlapajhhekupcuilm.supabase.co/storage/v1/object/public/avatars/brand/email-logo.png";
 const SITE_URL = "https://appdaoracao.com";
 const BRAND_NAME = "App da Oração";
 
@@ -61,11 +61,10 @@ ${preheaderHtml}
   <tr><td align="center">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background-color:${COLORS.card};border-radius:16px;box-shadow:0 4px 20px rgba(15,23,42,0.06);overflow:hidden;">
       <!-- Header -->
-      <tr><td align="center" style="padding:32px 32px 8px 32px;">
+      <tr><td align="center" style="padding:36px 32px 12px 32px;">
         <a href="${SITE_URL}" target="_blank" style="text-decoration:none;">
-          <img src="${LOGO_URL}" alt="${BRAND_NAME}" width="64" height="64" style="display:block;border:0;border-radius:16px;" />
+          <img src="${LOGO_URL}" alt="${BRAND_NAME}" width="220" style="display:block;border:0;max-width:220px;height:auto;" />
         </a>
-        <div style="margin-top:12px;font-size:14px;font-weight:600;letter-spacing:0.3px;color:${COLORS.primary};font-family:'Inter',Arial,sans-serif;">${BRAND_NAME}</div>
       </td></tr>
 
       <!-- Body -->
