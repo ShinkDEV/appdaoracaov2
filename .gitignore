@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 bun.lockb
 bun.lock
+
+# Claude Code local settings (machine-specific paths/permissions)
+.claude/

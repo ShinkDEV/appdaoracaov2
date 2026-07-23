@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">App da Oração</string>
+    <string name="title_activity_main">App da Oração</string>
+    <string name="package_name">com.qadosh.appdaoracao</string>
+    <string name="custom_url_scheme">com.qadosh.appdaoracao</string>
+</resources>

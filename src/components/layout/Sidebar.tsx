@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, HandHeart, User, Settings, Plus, Shield, LogOut, BookOpen, MessageSquareQuote, Download, Heart, Megaphone } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ export const Sidebar: React.FC = () => {
 
   const extraNavItems: NavItem[] = [
     { icon: MessageSquareQuote, label: 'Testemunhos', path: '/testemunhos' },
-    { icon: Download, label: 'Instalar App', path: '/instalar' },
+    ...(Capacitor.isNativePlatform() ? [] : [{ icon: Download, label: 'Instalar App', path: '/instalar' }]),
     { icon: Heart, label: 'Apoiar', path: '/apoio' },
     { icon: Megaphone, label: 'Anuncie', path: '/anuncie' },
   ];

@@ -1,6 +1,9 @@
 // Versão do app
 export const APP_VERSION = '1.3.0';
 
+// Chave usada para marcar que o onboarding do app nativo já foi concluído
+export const ONBOARDING_STORAGE_KEY = 'onboarding_complete';
+
 // Temas de oração - lista parametrizada
 export const PRAYER_THEMES = [
   { id: 'familia-relacionamentos', name: 'Família e Relacionamentos', icon: '👨‍👩‍👧‍👦' },

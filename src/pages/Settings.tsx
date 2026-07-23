@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +16,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const [updatesOpen, setUpdatesOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
 
   const handleCopyEmail = async () => {
     try {
@@ -63,7 +65,7 @@ const Settings = () => {
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
                 </button>
-                <button onClick={() => setUpdatesOpen(true)} className="w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50 border-b border-border/50">
+                <button onClick={() => setUpdatesOpen(true)} className={`w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50 ${!isNative ? 'border-b border-border/50' : ''}`}>
                   <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-600"><Gift className="h-5 w-5" /></div>
                   <div className="flex-1 text-left">
                     <p className="font-medium text-foreground">Novidades</p>
@@ -71,14 +73,16 @@ const Settings = () => {
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
                 </button>
-                <button onClick={() => navigate('/instalar')} className="w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50">
-                  <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><Download className="h-5 w-5" /></div>
-                  <div className="flex-1 text-left">
-                    <p className="font-medium text-foreground">Instalar App</p>
-                    <p className="text-sm text-muted-foreground">Adicionar à tela inicial</p>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
-                </button>
+                {!isNative && (
+                  <button onClick={() => navigate('/instalar')} className="w-full flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/50">
+                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><Download className="h-5 w-5" /></div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium text-foreground">Instalar App</p>
+                      <p className="text-sm text-muted-foreground">Adicionar à tela inicial</p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
+                  </button>
+                )}
               </CardContent>
             </Card>
           </div>

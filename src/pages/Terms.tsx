@@ -11,7 +11,7 @@ const Terms = () => {
         description="Termos de uso e condições do App da Oração."
         path="/termos"
       />
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b pt-safe">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
             <Button variant="ghost" size="icon">

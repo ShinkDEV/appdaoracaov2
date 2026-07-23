@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import logoAppDaOracao from '@/assets/logo-app-da-oracao.png';
 
 export const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40 pt-safe">
       <div className="px-4 sm:px-6 md:px-8">
         <div className="flex h-14 sm:h-16 items-center justify-center gap-3">
           {/* Logo */}
@@ -21,14 +19,6 @@ export const Header: React.FC = () => {
               className="h-8 sm:h-10 w-auto object-contain"
             />
           </Link>
-
-          {/* Donate Button */}
-          <Button asChild size="sm" className="gap-1.5 bg-[hsl(var(--supporter))] hover:bg-[hsl(var(--supporter))]/90 text-black font-medium animate-pulse">
-            <Link to="/apoio">
-              <Heart className="h-4 w-4 fill-current" />
-              Apoiar
-            </Link>
-          </Button>
         </div>
       </div>
     </header>

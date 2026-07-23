@@ -285,7 +285,7 @@ export default function ShareDevotional() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pt-safe">
       <SEO
         title="Compartilhar Palavra do Dia | App da Oração"
         description="Compartilhe o devocional do dia nos seus stories do Instagram."

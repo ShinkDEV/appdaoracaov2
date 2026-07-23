@@ -11,7 +11,7 @@ const Privacy = () => {
         description="Como o App da Oração coleta, usa e protege seus dados pessoais."
         path="/privacidade"
       />
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b pt-safe">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
             <Button variant="ghost" size="icon">

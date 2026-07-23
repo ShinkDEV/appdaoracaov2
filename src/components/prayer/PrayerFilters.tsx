@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Search, X, Clock, ArrowUpDown, HandHeart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PrayerTheme } from '@/hooks/usePrayers';
@@ -46,37 +45,37 @@ export function PrayerFilters({
       </div>
 
       {/* Theme filters */}
-      <ScrollArea className="w-full whitespace-nowrap -mx-1 px-1">
-        <div className="flex gap-1.5 sm:gap-2 pb-2">
+      <div
+        className="flex gap-1.5 sm:gap-2 pb-2 overflow-x-auto no-scrollbar -mx-1 px-1"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        <button
+          onClick={() => onThemeChange('all')}
+          className={cn(
+            "shrink-0 rounded-full px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border",
+            selectedTheme === 'all'
+              ? "bg-primary/10 text-primary border-primary/30"
+              : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
+          )}
+        >
+          Todos
+        </button>
+
+        {themes.map((theme) => (
           <button
-            onClick={() => onThemeChange('all')}
+            key={theme.id}
+            onClick={() => onThemeChange(theme.id)}
             className={cn(
-              "shrink-0 rounded-full px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border",
-              selectedTheme === 'all' 
-                ? "bg-primary/10 text-primary border-primary/30" 
+              "shrink-0 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border",
+              selectedTheme === theme.id
+                ? "bg-primary/10 text-primary border-primary/30"
                 : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
             )}
           >
-            Todos
+            {theme.name}
           </button>
-          
-          {themes.map((theme) => (
-            <button
-              key={theme.id}
-              onClick={() => onThemeChange(theme.id)}
-              className={cn(
-                "shrink-0 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-200 border",
-                selectedTheme === theme.id 
-                  ? "bg-primary/10 text-primary border-primary/30" 
-                  : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-primary"
-              )}
-            >
-              {theme.name}
-            </button>
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" className="invisible" />
-      </ScrollArea>
+        ))}
+      </div>
 
       {/* Sort buttons */}
       {onSortChange && (

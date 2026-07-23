@@ -41,7 +41,8 @@ export const BottomNav: React.FC = () => {
       {/* Floating Action Button */}
       <button
         onClick={handleNewPrayer}
-        className="fixed bottom-24 right-4 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
+        className="fixed right-4 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
+        style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
         aria-label="Criar pedido de oração"
       >
         <Plus className="h-7 w-7" strokeWidth={2.5} />
