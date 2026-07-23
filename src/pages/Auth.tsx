@@ -111,8 +111,11 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, displayName);
+        const { data, error } = await supabase.functions.invoke('custom-signup', {
+          body: { email, password, display_name: displayName },
+        });
         if (error) throw error;
+        if (data?.error) throw new Error(data.error);
         trackSignUp('email');
         setEmailSent(true);
       } else {
