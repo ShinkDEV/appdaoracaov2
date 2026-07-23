@@ -171,14 +171,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
+      const { lovable } = await import('@/integrations/lovable');
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
       });
 
-      if (error) throw error;
+      if (result.error) throw result.error;
 
       // Meta Pixel - Track Google signup/login initiation
       if (typeof window !== 'undefined' && (window as any).fbq) {
@@ -192,6 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: error as Error };
     }
   };
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
