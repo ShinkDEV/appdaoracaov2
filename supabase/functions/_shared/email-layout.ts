@@ -1,7 +1,7 @@
 // Branded email layout for App da Oração
 // Wraps content HTML with header (logo), body, and footer using the app's visual identity.
 
-const LOGO_URL = "https://opthlapajhhekupcuilm.supabase.co/storage/v1/object/public/avatars/brand/email-logo.png";
+const LOGO_URL = "https://appdaoracao.com/__l5e/assets-v1/6b47db03-e4cd-4d97-bc3d-1609d6a2824a/logo-app-da-oracao.png";
 const SITE_URL = "https://appdaoracao.com";
 const BRAND_NAME = "App da Oração";
 
