@@ -1,5 +1,7 @@
-// Send email via Resend connector (gateway)
+// Send email via Resend connector (gateway) with branded App da Oração layout
 // Public endpoint — validate inputs carefully
+
+import { renderBrandedEmail } from "../_shared/email-layout.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,8 +15,18 @@ const FROM_DEFAULT = "App da Oração <no-reply@appdaoracao.com>";
 interface SendEmailBody {
   to: string | string[];
   subject: string;
+  // Branded content (preferred)
+  heading?: string;
+  preheader?: string;
+  content?: string;       // inner HTML body
+  ctaLabel?: string;
+  ctaUrl?: string;
+  footerNote?: string;
+  // Raw override (skip branded layout)
   html?: string;
   text?: string;
+  // Options
+  branded?: boolean;      // default true when content/heading provided; wraps raw html too when true
   from?: string;
   reply_to?: string;
 }
@@ -65,8 +77,30 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-  if (!body.html && !body.text) {
-    return new Response(JSON.stringify({ error: "Provide html or text" }), {
+
+  // Build HTML: branded layout when content/heading provided, or when branded=true
+  let html: string | undefined;
+  const useBranded = body.branded !== false && (body.content || body.heading || body.ctaLabel);
+
+  if (useBranded) {
+    const contentHtml = body.content || body.html || (body.text ? `<p>${body.text.replace(/\n/g, "<br/>")}</p>` : "");
+    html = renderBrandedEmail({
+      heading: body.heading,
+      preheader: body.preheader,
+      content: contentHtml,
+      ctaLabel: body.ctaLabel,
+      ctaUrl: body.ctaUrl,
+      footerNote: body.footerNote,
+    });
+  } else if (body.branded === true && body.html) {
+    // Explicit branded=true with raw html: wrap it
+    html = renderBrandedEmail({ content: body.html });
+  } else {
+    html = body.html;
+  }
+
+  if (!html && !body.text) {
+    return new Response(JSON.stringify({ error: "Provide content, html or text" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -77,7 +111,7 @@ Deno.serve(async (req) => {
     to: recipients,
     subject: body.subject,
   };
-  if (body.html) payload.html = body.html;
+  if (html) payload.html = html;
   if (body.text) payload.text = body.text;
   if (body.reply_to && isEmail(body.reply_to)) payload.reply_to = body.reply_to;
 
