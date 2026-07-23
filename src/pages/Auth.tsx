@@ -81,11 +81,15 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/redefinir-senha`,
+      const { data, error } = await supabase.functions.invoke('custom-recovery', {
+        body: {
+          email,
+          redirect_to: `${window.location.origin}/redefinir-senha`,
+        },
       });
-      
+
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       setResetEmailSent(true);
     } catch (error: any) {
       toast({
@@ -98,6 +102,7 @@ const Auth = () => {
     }
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -106,8 +111,11 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, displayName);
+        const { data, error } = await supabase.functions.invoke('custom-signup', {
+          body: { email, password, display_name: displayName },
+        });
         if (error) throw error;
+        if (data?.error) throw new Error(data.error);
         trackSignUp('email');
         setEmailSent(true);
       } else {
